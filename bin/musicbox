@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+
+require 'simple-command'
+require 'musicbox'
+
+SimpleCommand.run do
+
+  global root: nil do
+    @catalog = MusicBox::Catalog.new(root: @root)
+  end
+
+  command 'extract' do |args|
+    MusicBox::Importer.new(catalog: @catalog).extract(args)
+  end
+
+  command 'fix' do |args|
+    @catalog.fix(args)
+  end
+
+  command 'import' do |args|
+    MusicBox::Importer.new(catalog: @catalog).import(args)
+  end
+
+  command 'label' do |args|
+    labeler = MusicBox::Labeler.new(catalog: @catalog)
+    labeler.label(args)
+  end
+
+  command 'dir', open: false do |args|
+    @catalog.dir(args, open: @open)
+  end
+
+  command 'orphaned' do
+    @catalog.show_orphaned
+  end
+
+  command 'show', details: false do |args|
+    @catalog.show(args, show_details: @details)
+  end
+
+  command 'show-dups' do |args|
+    @catalog.show_dups(args)
+  end
+
+  command 'make-artist-keys' do |args|
+    @catalog.make_artist_keys(args)
+  end
+
+  command 'select' do |args|
+    @catalog.select(args)
+  end
+
+  command 'update' do |args|
+    MusicBox::Discogs.new(catalog: @catalog).update
+  end
+
+  command 'update-info', yes: false do |args|
+    @catalog.update_info(args, yes: @yes)
+  end
+
+end
