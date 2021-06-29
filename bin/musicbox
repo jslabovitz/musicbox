@@ -23,7 +23,8 @@ SimpleCommand.run do
 
   command 'label' do |args|
     labeler = MusicBox::Labeler.new(catalog: @catalog)
-    labeler.label(args)
+    @catalog.prompt_releases(args).each { |r| labeler << r.to_label }
+    labeler.make_labels('/tmp/labels.pdf', open: true)
   end
 
   command 'dir', open: false do |args|

@@ -188,6 +188,17 @@ module MusicBox
         end
       end
 
+      def to_label
+        {
+          artist: artist,
+          title: title,
+          key: artist_key,
+          year: original_release_year,
+          format: primary_format_name,
+          id: id,
+        }
+      end
+
     end
 
   end
