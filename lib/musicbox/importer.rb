@@ -131,6 +131,18 @@ module MusicBox
       album.save
       @catalog.import_done_dir.mkpath unless @catalog.import_done_dir.exist?
       source_dir.rename(@catalog.import_done_dir / source_dir.basename)
+      print "Make label? [y] "
+      loop do
+        case STDIN.gets.to_s.strip
+        when 'y', ''
+          labeler = Labeler.new(catalog: @catalog)
+          labeler << release.to_label
+          labeler.make_labels('/tmp/labels.pdf', open: true)
+          break
+        when 'n'
+          break
+        end
+      end
     end
 
     def categorize_source_files(source_dir)
