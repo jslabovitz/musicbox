@@ -1,0 +1,121 @@
+# TODO
+
+- re-implement 'export' command (with dest dir)
+  - re-tag exported files
+
+- make export for Rob
+  - re-add Hootie album
+  - select albums
+  - export to tmp dir
+  - compress
+  - put in Dropbox
+  - text/email Rob
+
+- split up importer.rb
+  - move import, extract, validate into separate files
+  - move common methods into catalog.rb
+  - mixin methods to Catalog instead of separate class
+
+- use common #prompt instead of STDIN.gets
+
+- ask to make labels on update
+
+- match imported tracks by track title -- prompt if different
+
+- don't save artist/title in album info unless different than release?
+
+- improve searching
+  - use same logic between CLI arguments & prompt input
+  - sort results by relevance, not by artist/title
+  - allow multiples in prompt
+    - by series
+    - by built-up selection
+  - refine result
+    - ie: in wantlist, is cd, specific artist
+  - each step could be 
+
+- improve 'select' tool
+  - save to $MUSIC_ROOT/selection.json?
+  - optionally name
+  - can be referred to in query
+
+- improve discogs update
+  - don't simply delete previous wantlist/collections
+  - determine additions/removals/changes
+  - handle case where Discogs has merged/moved releases
+    - ie, release_id has changed
+    - need to move related album
+
+- when finding unripped CDs, also look for dups
+  - to avoid needing to rip dup CDs
+
+- fix Player playlist display
+  - tends not to show in 'r'/'t' mode
+  - use curses or tty for full-screen TTY mode
+
+- figure out why importing rip sets 'artist' on tracks but not on whole album
+
+- allow artist key to be user-defined
+  - save in group database
+  - allow for modification as needed
+  - ensure uniqueness
+  - allow override of primary artist
+    - eg, to file release under main artist instead of artist-group of collaboration
+  - do artist sort/rename using artist ID
+    - instead of CanonicalArtists/PersonalNames hash maps
+
+- use exiftool instead of ffprobe/mp4tags
+  $ exiftool -json -recurse . -ext m4a
+
+- handle importing logs like tracks
+  - see OLD/music_collection for old parsing code
+  - create Log class with attributes:
+    - timestamp
+    - media type
+    - accurip details
+    - file:
+    - disc: (can be nil)
+    - status: (overall)
+    - tracks status: (tracks)
+  - add command to show:
+    - missing rips (no tracks or log files)
+    - questionable rips (tracks, but no log files)
+    - unconfirmed rips (no record in online databases)
+    - bad rips (actual read errors)
+    - dubious rips (inconsistent checksums)
+    - successful rips
+
+- add selectors to #find_releases:
+  - CDs/LPs/other
+  - in collection/wantlist
+  - by title/artist/pattern
+  - rip status
+
+- check album/track info against Discogs release/master info
+  - eg:
+    - release date
+    - album artist
+    - track title/artist
+    - cover art
+  - correct if needed
+
+- download cover art for releases & masters
+
+- show cover art in terminal
+  - when playing, searching
+      convert ./albums/13714693/cover.jpg -resize 800x800 TIFF:- | imgcat
+
+- improve validation
+  - rename 'validate' to 'check'?
+  - ensure track files exist, and correspond to release
+
+- play selection
+  - defaults to all albums
+  - allow query to reduce
+    - all albums by artist
+    - newly added/imported
+    - year/decade
+    - fuzzy search
+
+- calculate loudness
+  - see: info/replay-gain.md
