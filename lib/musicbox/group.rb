@@ -5,8 +5,6 @@ module MusicBox
     attr_accessor :root
     attr_accessor :mode
 
-    class Error < Exception; end
-
     InfoFileName = 'info.json'
 
     def self.item_class

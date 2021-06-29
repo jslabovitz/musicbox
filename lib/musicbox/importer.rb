@@ -2,8 +2,6 @@ module MusicBox
 
   class Importer
 
-    class Error < Exception; end
-
     def initialize(catalog:)
       @catalog = catalog
     end
