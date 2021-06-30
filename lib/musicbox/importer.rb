@@ -95,7 +95,7 @@ module MusicBox
       source_files = categorize_source_files(source_dir)
       actual_tracks = release.tracklist_actual_tracks
       [source_files[:tracks], actual_tracks].map(&:length).max.times.each do |i|
-        puts "%2s. %-80s => %-80s" % [
+        puts "%2s. %-70s => %-70s" % [
           i + 1,
           source_files[:tracks][i]&.basename,
           actual_tracks[i].title,
