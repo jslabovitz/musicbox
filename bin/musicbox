@@ -72,8 +72,8 @@ SimpleCommand.run do
     MusicBox::Discogs.new(catalog: @catalog).update
   end
 
-  command 'update-info', yes: false do |args|
-    @catalog.update_info(args, yes: @yes)
+  command 'update-tags', force: false do |args|
+    @catalog.update_tags(args, force: @force)
   end
 
 end
