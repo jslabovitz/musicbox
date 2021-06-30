@@ -1,16 +1,5 @@
 # TODO
 
-- re-implement 'export' command (with dest dir)
-  - re-tag exported files
-
-- make export for Rob
-  - re-add Hootie album
-  - select albums
-  - export to tmp dir
-  - compress
-  - put in Dropbox
-  - text/email Rob
-
 - split up importer.rb
   - move import, extract, validate into separate files
   - move common methods into catalog.rb
