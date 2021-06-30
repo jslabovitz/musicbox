@@ -4,6 +4,9 @@ module MusicBox
 
     class Tags
 
+      attr_accessor :current
+      attr_accessor :changes
+
       TagFlags = {
         album: 'A',         # album title
         title: 's',         # track title
@@ -23,25 +26,22 @@ module MusicBox
       end
 
       def initialize(params={})
-        @hash = {}
+        @current = {}
         @changes = {}
         params.each { |k, v| send("#{k}=", v) }
       end
 
       def [](key)
-        @changes.has_key?(key) ? @changes[key] : @hash[key]
+        @changes.has_key?(key) ? @changes[key] : @current[key]
       end
 
       def []=(key, value)
-        @changes[key] = value unless @hash[key] == value
+        raise unless TagFlags[key]
+        @changes[key] = value unless @current[key] == value
       end
 
       def changed?
         !@changes.empty?
-      end
-
-      def changes
-        @changes
       end
 
       def update(hash)
@@ -75,20 +75,24 @@ module MusicBox
                   discs: discs,
                 }
               else
-                { key => value }
+                if TagFlags[key]
+                  { key => value }
+                else
+                  {}
+                end
               end
-              @hash.update(info)
+              @current.update(info)
             end
           end
         end
-        @hash[:track] ||= file.basename.to_s.to_i
+        @current[:track] ||= file.basename.to_s.to_i
       end
 
-      def save(file)
-        return unless changed?
+      def save(file, force: false)
+        return unless changed? || force
         set_flags = {}
         remove_flags = []
-        @changes.each do |key, value|
+        @current.merge(@changes).each do |key, value|
           flag = TagFlags[key] or raise
           if value
             set_flags[flag] = value
@@ -99,8 +103,7 @@ module MusicBox
         run_command('mp4tags',
           set_flags.map { |c, v| ["-#{c}", v] },
           !remove_flags.empty? ? ['-remove', remove_flags.join] : nil,
-          file,
-          verbose: false)
+          file)
       end
 
     end
