@@ -27,6 +27,7 @@ module MusicBox
     SeekSeconds = 30
 
     attr_accessor :catalog
+    attr_accessor :albums
     attr_accessor :audio_device
     attr_accessor :mpv_log_level
 
@@ -38,6 +39,7 @@ module MusicBox
     end
 
     def play
+      @albums ||= @catalog.albums.items
       read_albums
       @dispatcher = IO::Dispatcher.new
       setup_interface
@@ -97,7 +99,7 @@ module MusicBox
 
     def read_albums
       @album_for_track_path = {}
-      @catalog.albums.items.each do |album|
+      @albums.each do |album|
         album.tracks.each do |track|
           @album_for_track_path[track.path] = album
         end
@@ -105,7 +107,7 @@ module MusicBox
     end
 
     def random_album
-      @catalog.albums.items.shuffle.first
+      @albums.shuffle.first
     end
 
     def random_tracks(length:)
