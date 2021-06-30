@@ -114,7 +114,7 @@ module MusicBox
     end
 
     def dir(args, open: false)
-      prompt_releases(args).each do |release|
+      find_releases(args).each do |release|
         puts "%-10s %s" % [release.id, release.album ? release.album.dir : '-']
         run_command('open', release.album.dir) if release.album && open
       end
