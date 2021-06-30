@@ -44,6 +44,10 @@ SimpleCommand.run do
     @catalog.show(args, show_details: @details)
   end
 
+  command 'csv' do |args|
+    @catalog.make_csv(args)
+  end
+
   command 'show-dups' do |args|
     @catalog.show_dups(args)
   end

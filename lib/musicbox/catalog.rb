@@ -110,6 +110,15 @@ module MusicBox
       end
     end
 
+    def make_csv(args)
+      print %w[ID year artist title].to_csv
+      find_releases(args).each do |release|
+        if release.cd? && release_in_collection?(release)
+          print [release.id, release.original_release_year, release.artist, release.title].to_csv
+        end
+      end
+    end
+
     def fix(args)
     end
 

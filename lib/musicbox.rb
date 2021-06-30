@@ -1,3 +1,4 @@
+require 'csv'
 require 'discogs-wrapper'
 require 'json'
 require 'path'
