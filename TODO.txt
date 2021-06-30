@@ -5,6 +5,12 @@
   - move common methods into catalog.rb
   - mixin methods to Catalog instead of separate class
 
+- make MusicBox a class that can be instantiated?
+  - then can have multiple parts
+    - Catalog, Updater, Player, Importer, Exporter, Extractor
+  - move config handling into main class
+    - also definition of import/extract dir
+
 - use common #prompt instead of STDIN.gets
 
 - ask to make labels on update
