@@ -42,6 +42,7 @@ module MusicBox
       @dispatcher = IO::Dispatcher.new
       setup_interface
       setup_mpv
+      puts "[ready]"
       @dispatcher.run
     end
 
