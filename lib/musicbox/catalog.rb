@@ -45,11 +45,6 @@ module MusicBox
       wantlist: 'W',
     }
 
-    def play(params={})
-      player = Player.new(**params.merge(catalog: self))
-      player.play
-    end
-
     def show(args, show_details: false)
       show_releases(find_releases(args), show_details: show_details)
     end

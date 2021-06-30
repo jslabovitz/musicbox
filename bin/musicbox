@@ -56,6 +56,14 @@ SimpleCommand.run do
     @catalog.make_artist_keys(args)
   end
 
+  command 'play', device: nil, log_level: nil do |args|
+    player = MusicBox::Player.new(
+      catalog: @catalog,
+      audio_device: @device,
+      mpv_log_level: @log_level)
+    player.play
+  end
+
   command 'select' do |args|
     @catalog.select(args)
   end
