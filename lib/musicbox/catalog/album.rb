@@ -115,6 +115,20 @@ module MusicBox
         end
       end
 
+      def export(dir, threaded: true)
+        threads = []
+        @tracks.each do |track|
+          if threaded
+            threads << Thread.new do
+              track.export(dir)
+            end
+          else
+            track.export(dir)
+          end
+        end
+        threads.map(&:join)
+      end
+
       def serialize
         super(
           title: @title,

@@ -32,5 +32,6 @@ require 'musicbox/catalog/tags'
 require 'musicbox/catalog/track'
 
 require 'musicbox/discogs'
+require 'musicbox/export'
 require 'musicbox/importer'
 require 'musicbox/labeler'

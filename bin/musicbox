@@ -13,6 +13,11 @@ SimpleCommand.run do
     MusicBox::Importer.new(catalog: @catalog).extract(args)
   end
 
+  command 'export', dir: nil, threaded: true do |args|
+    raise Error unless @dir
+    @catalog.export(args, dir: @dir, threaded: @threaded)
+  end
+
   command 'fix' do |args|
     @catalog.fix(args)
   end
