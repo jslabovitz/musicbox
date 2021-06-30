@@ -1,5 +1,8 @@
 # TODO
 
+- convert releases db into :dir mode
+  - to allow covers, etc., to be stored
+
 - split up importer.rb
   - move import, extract, validate into separate files
   - move common methods into catalog.rb
