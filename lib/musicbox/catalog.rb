@@ -124,13 +124,15 @@ module MusicBox
       end
     end
 
-    def update_info(args, yes: false)
+    def update_tags(args, force: false)
       if args.empty?
         albums = @albums.items
       else
         albums = args.map { |a| @albums[a.to_i] }
       end
-      @albums.update_info(albums, yes: yes)
+      albums.each do |album|
+        album.update_tags(force: force)
+      end
     end
 
     def make_artist_keys(args)

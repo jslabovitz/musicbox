@@ -84,7 +84,7 @@ module MusicBox
         # raise Error, "Invalid album: missing artist (#{dir})" unless @artist
       end
 
-      def update_info(yes: false)
+      def update_tags(force: false)
         changes = []
         @tracks.each do |track|
           track.load_tags
@@ -100,14 +100,14 @@ module MusicBox
               puts "\t\t" + change.inspect
             end
           end
-          unless yes
+          unless force
             print "Update album? [y] "
             case STDIN.gets.to_s.strip
             when 'y', ''
-              yes = true
+              force = true
             end
           end
-          if yes
+          if force
             changes.each do |track|
               track.save_tags
             end
