@@ -13,6 +13,7 @@
     - Catalog, Updater, Player, Importer, Exporter, Extractor
   - move config handling into main class
     - also definition of import/extract dir
+  - move commands (called from CLI)
 
 - use common #prompt instead of STDIN.gets
 
