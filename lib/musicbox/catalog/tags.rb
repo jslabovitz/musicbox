@@ -104,6 +104,9 @@ module MusicBox
           set_flags.map { |c, v| ["-#{c}", v] },
           !remove_flags.empty? ? ['-remove', remove_flags.join] : nil,
           file)
+        run_command('mdimport',
+          '-i',
+          file)
       end
 
     end

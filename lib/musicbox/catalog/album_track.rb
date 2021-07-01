@@ -67,41 +67,6 @@ module MusicBox
         }.compact
       end
 
-      #FIXME: does not save tags correctly to final file
-
-      def export(dest_dir)
-        dest_file = dest_dir / path.basename
-        return if dest_file.exist? && dest_file.mtime == path.mtime
-        caf_file = dest_file.replace_extension('.caf')
-        dest_dir.mkpath unless dest_dir.exist?
-        load_tags
-        warn "exporting #{path}"
-        begin
-          run_command('afconvert',
-            path,
-            caf_file,
-            '--data', 0,
-            '--file', 'caff',
-            '--soundcheck-generate')
-          run_command('afconvert',
-            caf_file,
-            '--data', 'aac',
-            '--file', 'm4af',
-            '--soundcheck-read',
-            '--bitrate', 256000,
-            '--quality', 127,
-            '--strategy', 2,
-            dest_file)
-        rescue => e
-          dest_file.unlink if dest_file.exist?
-          raise e
-        ensure
-          caf_file.unlink if caf_file.exist?
-        end
-        @tags.save(dest_file, force: true)
-        dest_file.utime(path.atime, path.mtime)
-      end
-
     end
 
   end

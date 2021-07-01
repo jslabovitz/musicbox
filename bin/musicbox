@@ -13,9 +13,17 @@ SimpleCommand.run do
     MusicBox::Importer.new(catalog: @catalog).extract(args)
   end
 
-  command 'export', dir: nil, threaded: true do |args|
-    raise Error unless @dir
-    @catalog.export(args, dir: @dir, threaded: @threaded)
+  command 'export', dir: nil, compress: false, force: false, parallel: true do |args|
+    raise Error, "Must specify destination directory (--dir)" unless @dir
+    exporter = MusicBox::Exporter.new(
+      catalog: @catalog,
+      dir: @dir,
+      compress: @compress,
+      force: @force,
+      parallel: @parallel)
+    @catalog.find_releases(args).each do |release|
+      exporter.export_release(release)
+    end
   end
 
   command 'fix' do |args|

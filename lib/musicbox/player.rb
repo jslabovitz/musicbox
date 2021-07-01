@@ -2,8 +2,6 @@ module MusicBox
 
   class Player
 
-    class Error < Exception; end
-
     Keymap = {
       'a' => :play_random_album,
       't' => :play_random_tracks,
