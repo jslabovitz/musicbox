@@ -10,7 +10,10 @@ SimpleCommand.run do
   end
 
   command 'extract' do |args|
-    MusicBox::Importer.new(catalog: @catalog).extract(args)
+    extractor = MusicBox::Extractor.new(catalog: @catalog)
+    @catalog.dirs_for_args(@catalog.extract_dir, args).each do |dir|
+      extractor.extract_dir(dir)
+    end
   end
 
   command 'export', dir: nil, compress: false, force: false, parallel: true do |args|
@@ -31,7 +34,10 @@ SimpleCommand.run do
   end
 
   command 'import' do |args|
-    MusicBox::Importer.new(catalog: @catalog).import(args)
+    importer = MusicBox::Importer.new(catalog: @catalog)
+    @catalog.dirs_for_args(@catalog.import_dir, args).each do |dir|
+      importer.import_dir(dir)
+    end
   end
 
   command 'label' do |args|

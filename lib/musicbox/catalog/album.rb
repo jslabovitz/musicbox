@@ -82,6 +82,28 @@ module MusicBox
       def validate
         raise Error, "Invalid album: missing title (#{dir})" unless @title
         # raise Error, "Invalid album: missing artist (#{dir})" unless @artist
+        validate_logs
+      end
+
+      def validate_logs
+        raise Error, "No rip logs" if @log_files.empty?
+        state = :initial
+        @log_files.each do |log_file|
+          log_file.readlines.map(&:chomp).each do |line|
+            case state
+            when :initial
+              if line =~ /^AccurateRip Summary/
+                state = :accuraterip_summary
+              end
+            when :accuraterip_summary
+              if line =~ /^\s+Track \d+ : (\S+)/
+                raise Error, "Not accurately ripped" unless $1 == 'OK'
+              else
+                break
+              end
+            end
+          end
+        end
       end
 
       def update_tags(force: false)

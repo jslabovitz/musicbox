@@ -281,6 +281,32 @@ module MusicBox
       end
     end
 
+    def categorize_files(dir)
+      categories = {}
+      dir.children.sort.each do |path|
+        type = case (ext = path.extname.delete_prefix('.').downcase)
+        when 'm4a', 'm4p', 'mp3'
+          :audio
+        else
+          ext.to_sym
+        end
+;;pp(path: path, type: type)
+        categories[type] ||= []
+        categories[type] << path
+      end
+;;pp(categories: categories)
+      categories
+    end
+
+    def dirs_for_args(base_dir, args)
+      if args.empty?
+        dirs = base_dir.children.select(&:dir?)
+      else
+        dirs = args.map { |p| Path.new(p) }
+      end
+      dirs.sort_by { |d| d.to_s.downcase }
+    end
+
   end
 
 end

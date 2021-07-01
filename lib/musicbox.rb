@@ -36,6 +36,7 @@ require 'musicbox/catalog/track'
 
 require 'musicbox/discogs'
 require 'musicbox/exporter'
+require 'musicbox/extractor'
 require 'musicbox/importer'
 require 'musicbox/labeler'
 require 'musicbox/player'
