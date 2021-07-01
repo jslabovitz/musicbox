@@ -49,6 +49,14 @@ module MusicBox
         @path.dirname
       end
 
+      def has_cover?
+        cover_file.exist?
+      end
+
+      def cover_file
+        dir / 'cover.jpg'
+      end
+
       def <=>(other)
         @release <=> other.release
       end

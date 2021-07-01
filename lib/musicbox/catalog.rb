@@ -45,6 +45,58 @@ module MusicBox
       wantlist: 'W',
     }
 
+    def make_cover(args, output_file: '/tmp/cover.pdf')
+      size = 4.75.in
+      top = 10.in
+      Prawn::Document.generate(output_file) do |pdf|
+        find_releases(args).select { |r| r.cd? && release_in_collection?(r) && r.album&.has_cover? }.each do |release|
+          puts release
+          pdf.fill do
+            pdf.rectangle [0, top],
+              size,
+              size
+          end
+          pdf.image release.album.cover_file.to_s,
+            at: [0, top],
+            width: size,
+            fit: [size, size],
+            position: :center
+          pdf.stroke do
+            pdf.rectangle [0, top],
+              size,
+              size
+          end
+        end
+      end
+      run_command('open', output_file)
+    end
+
+    def get_cover(args)
+      find_releases(args).select { |r| r.cd? && release_in_collection?(r) && r.album }.each do |release|
+        puts release
+        album = release.album
+        { release: release, master: release.master }.compact.each do |kind, r|
+          r.images.each do |image|
+            uri = URI.parse(image['uri'])
+            type = image['type']
+            name = [
+              kind,
+              type,
+              Path.new(uri.path).basename,
+            ].join('-')
+            dir = album.dir / 'images'
+            dir.mkpath unless dir.exist?
+            image_file = dir / name
+            unless image_file.exist?
+              puts "\t" + image_file.to_s
+              image_file.write(HTTP.get(uri))
+              sleep(1)
+            end
+          end
+        end
+      end
+    end
+
     def show(args, show_details: false)
       show_releases(find_releases(args), show_details: show_details)
     end

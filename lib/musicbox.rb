@@ -1,5 +1,6 @@
 require 'csv'
 require 'discogs-wrapper'
+require 'http'
 require 'io-dispatcher'
 require 'json'
 require 'mpv_client'

@@ -33,6 +33,14 @@ SimpleCommand.run do
     @catalog.fix(args)
   end
 
+  command 'get-cover' do |args|
+    @catalog.get_cover(args)
+  end
+
+  command 'make-cover' do |args|
+    @catalog.make_cover(args)
+  end
+
   command 'import' do |args|
     importer = MusicBox::Importer.new(catalog: @catalog)
     @catalog.dirs_for_args(@catalog.import_dir, args).each do |dir|

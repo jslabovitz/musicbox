@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
   s.require_path  = 'lib'
 
   s.add_dependency 'discogs-wrapper', '~> 2.5'
+  s.add_dependency 'http', '~> 5.0'
   s.add_dependency 'io-dispatcher', '~> 0.1'
   s.add_dependency 'json', '~> 2.2'
   s.add_dependency 'mpv_client', '~> 0.1'

@@ -91,15 +91,7 @@ module MusicBox
       end
 
       def primary_image
-        @images ? @images.find { |img| img.type == 'primary' } : nil
-      end
-
-      def secondary_images
-        @images ? (@images.select { |img| img.type == 'secondary' }) : []
-      end
-
-      def image_filename
-        "#{@id}.jpg"
+        @images&.find { |img| img['type'] == 'primary' }
       end
 
       def multidisc?
