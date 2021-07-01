@@ -9,7 +9,6 @@ module MusicBox
     def extract_dir(source_dir)
       puts "Extracting #{source_dir}"
       files = @catalog.categorize_files(source_dir)
-;;pp files
       cue_file = files[:cue]&.shift or raise Error, "No cue file found"
       bin_file = files[:audio]&.shift or raise Error, "No bin file found"
       dest_dir = @catalog.import_dir / source_dir.basename

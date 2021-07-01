@@ -290,11 +290,9 @@ module MusicBox
         else
           ext.to_sym
         end
-;;pp(path: path, type: type)
         categories[type] ||= []
         categories[type] << path
       end
-;;pp(categories: categories)
       categories
     end
 
