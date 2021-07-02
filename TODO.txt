@@ -3,10 +3,10 @@
 - convert releases db into :dir mode
   - to allow covers, etc., to be stored
 
-- split up importer.rb
-  - move import, extract, validate into separate files
-  - move common methods into catalog.rb
-  - mixin methods to Catalog instead of separate class
+- download images into releases/ and masters/, not into albums
+  - another step selects correct image for cover/back
+
+- try extracting cover images from ripped tracks
 
 - make MusicBox a class that can be instantiated?
   - then can have multiple parts
@@ -97,8 +97,6 @@
     - track title/artist
     - cover art
   - correct if needed
-
-- download cover art for releases & masters
 
 - show cover art in terminal
   - when playing, searching
