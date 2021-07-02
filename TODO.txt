@@ -1,12 +1,15 @@
 # TODO
 
-- convert releases db into :dir mode
+- convert releases & masters into :dir mode
   - to allow covers, etc., to be stored
 
 - download images into releases/ and masters/, not into albums
   - another step selects correct image for cover/back
+  - symlink cover/back -> selected image file
 
 - try extracting cover images from ripped tracks
+
+- find albums that are missing cover art
 
 - make MusicBox a class that can be instantiated?
   - then can have multiple parts
@@ -15,9 +18,22 @@
     - also definition of import/extract dir
   - move commands (called from CLI)
 
+- allow searching by track titles
+
 - use common #prompt instead of STDIN.gets
 
 - ask to make labels on update
+
+- rename 'album' to 'tracks'
+  - remove album info
+  - use info from release instead of album
+  - use release.format_quantity instead of album.discs
+  - move albums/** into releases/*/tracks
+  - remove top-level @albums db
+  - run update-tags on all releases
+
+- consider dropping wantlist entirely
+  - would simplify data to be only collection
 
 - match imported tracks by track title -- prompt if different
 
