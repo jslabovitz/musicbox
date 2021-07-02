@@ -28,8 +28,8 @@ module MusicBox
       @albums = Catalog::Albums.new(root: @catalog_dir / 'albums', mode: :dir)
       @collection = Catalog::References.new(root: @catalog_dir / 'collection', mode: :file)
       @wantlist = Catalog::References.new(root: @catalog_dir / 'wantlist', mode: :file)
-      @releases = Catalog::Releases.new(root: @catalog_dir / 'releases', mode: :file)
-      @masters = Catalog::Releases.new(root: @catalog_dir / 'masters', mode: :file)
+      @releases = Catalog::Releases.new(root: @catalog_dir / 'releases', mode: :dir)
+      @masters = Catalog::Releases.new(root: @catalog_dir / 'masters', mode: :dir)
       @artists = Catalog::Artists.new(root: @catalog_dir / 'artists', mode: :file)
       link_groups
     end
