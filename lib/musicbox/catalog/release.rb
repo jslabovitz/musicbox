@@ -99,7 +99,7 @@ module MusicBox
       end
 
       def cd?
-        @formats.find(&:cd?) != nil
+        primary_format_name == 'CD'
       end
 
       def artist
