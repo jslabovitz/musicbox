@@ -79,15 +79,10 @@ SimpleCommand.run do
   end
 
   command 'play', device: nil, log_level: nil do |args|
-    if args.empty?
-      albums = nil
-    else
-      albums = @catalog.prompt_releases(args).map(&:album).compact
-      raise Error, "No albums to play" if albums.empty?
-    end
+    releases = args.empty? ? nil : @catalog.prompt_releases(args)
     player = MusicBox::Player.new(
       catalog: @catalog,
-      albums: albums,
+      releases: releases,
       audio_device: @device,
       mpv_log_level: @log_level)
     player.play

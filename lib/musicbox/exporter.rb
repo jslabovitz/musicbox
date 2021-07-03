@@ -12,11 +12,11 @@ module MusicBox
 
     def export_release(release)
       name = '%s - %s (%s)' % [release.artist, release.title, release.original_release_year]
-      album = release.album or raise Error, "Album does not exist for release #{release.id} (#{name})"
+      rip = release.rip or raise Error, "Rip does not exist for release #{release.id} (#{name})"
       dir = @dir / name
       dir.mkpath unless dir.exist?
       threads = []
-      album.tracks.each do |track|
+      rip.tracks.each do |track|
         src_file = track.path
         dst_file = dir / src_file.basename
         if @force || !dst_file.exist? || dst_file.mtime != src_file.mtime

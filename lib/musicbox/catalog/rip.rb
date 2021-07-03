@@ -2,7 +2,7 @@ module MusicBox
 
   class Catalog
 
-    class Album < Group::Item
+    class Rip < Group::Item
 
       attr_accessor :title
       attr_accessor :artist
@@ -42,19 +42,11 @@ module MusicBox
       end
 
       def tracks=(tracks)
-        @tracks = tracks.map { |h| AlbumTrack.new(h.merge(album: self)) }
+        @tracks = tracks.map { |h| RipTrack.new(h.merge(rip: self)) }
       end
 
       def dir
         @path.dirname
-      end
-
-      def has_cover?
-        cover_file.exist?
-      end
-
-      def cover_file
-        dir / 'cover.jpg'
       end
 
       def <=>(other)
@@ -88,8 +80,6 @@ module MusicBox
       end
 
       def validate
-        raise Error, "Invalid album: missing title (#{dir})" unless @title
-        # raise Error, "Invalid album: missing artist (#{dir})" unless @artist
         validate_logs
       end
 
@@ -131,7 +121,7 @@ module MusicBox
             end
           end
           unless force
-            print "Update album? [y] "
+            print "Update track files? [y] "
             case STDIN.gets.to_s.strip
             when 'y', ''
               force = true

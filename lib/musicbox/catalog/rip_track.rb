@@ -2,13 +2,13 @@ module MusicBox
 
   class Catalog
 
-    class AlbumTrack
+    class RipTrack
 
       attr_accessor :title
       attr_accessor :artist
       attr_accessor :track
       attr_accessor :disc
-      attr_accessor :album
+      attr_accessor :rip
       attr_accessor :file
       attr_accessor :tags
 
@@ -21,7 +21,7 @@ module MusicBox
       end
 
       def path
-        @album.dir / @file
+        @rip.dir / @file
       end
 
       def make_name
@@ -45,14 +45,14 @@ module MusicBox
         @tags.update(
           {
             title: @title,
-            album: @album.title,
+            rip: @rip.title,
             track: @track,
             disc: @disc,
-            discs: @album.discs,
-            artist: @artist || @album.artist,
-            album_artist: @album.artist,
-            grouping: @album.title,
-            year: @album.year,
+            discs: @rip.discs,
+            artist: @artist || @rip.artist,
+            album_artist: @rip.artist,
+            grouping: @rip.title,
+            year: @rip.year,
           }.reject { |k, v| v.nil? || (v.respond_to?(:empty?) && v.empty?) }
         )
       end

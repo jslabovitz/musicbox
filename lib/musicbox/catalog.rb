@@ -9,7 +9,6 @@ module MusicBox
     attr_accessor :extract_done_dir
     attr_accessor :catalog_dir
     attr_accessor :config
-    attr_accessor :albums
     attr_accessor :collection
     attr_accessor :wantlist
     attr_accessor :releases
@@ -25,7 +24,6 @@ module MusicBox
       @extract_dir = @root_dir / 'extract'
       @extract_done_dir = @root_dir / 'extract-done'
       @catalog_dir = @root_dir / 'catalog'
-      @albums = Catalog::Albums.new(root: @catalog_dir / 'albums', mode: :dir)
       @collection = Catalog::References.new(root: @catalog_dir / 'collection', mode: :file)
       @wantlist = Catalog::References.new(root: @catalog_dir / 'wantlist', mode: :file)
       @releases = Catalog::Releases.new(root: @catalog_dir / 'releases', mode: :dir)
@@ -49,14 +47,14 @@ module MusicBox
       size = 4.75.in
       top = 10.in
       Prawn::Document.generate(output_file) do |pdf|
-        find_releases(args).select { |r| r.cd? && release_in_collection?(r) && r.album&.has_cover? }.each do |release|
+        find_releases(args).select { |r| r.cd? && release_in_collection?(r) && r.has_cover? }.each do |release|
           puts release
           pdf.fill do
             pdf.rectangle [0, top],
               size,
               size
           end
-          pdf.image release.album.cover_file.to_s,
+          pdf.image release.cover_file.to_s,
             at: [0, top],
             width: size,
             fit: [size, size],
@@ -72,28 +70,9 @@ module MusicBox
     end
 
     def get_cover(args)
-      find_releases(args).select { |r| r.cd? && release_in_collection?(r) && r.album }.each do |release|
+      find_releases(args).select { |r| r.cd? && release_in_collection?(r) }.each do |release|
         puts release
-        album = release.album
-        { release: release, master: release.master }.compact.each do |kind, r|
-          r.images.each do |image|
-            uri = URI.parse(image['uri'])
-            type = image['type']
-            name = [
-              kind,
-              type,
-              Path.new(uri.path).basename,
-            ].join('-')
-            dir = album.dir / 'images'
-            dir.mkpath unless dir.exist?
-            image_file = dir / name
-            unless image_file.exist?
-              puts "\t" + image_file.to_s
-              image_file.write(HTTP.get(uri))
-              sleep(1)
-            end
-          end
-        end
+        [release, release.master].compact.each(&:get_images)
       end
     end
 
@@ -117,7 +96,6 @@ module MusicBox
       orphaned_releases = @releases.items.dup
       orphaned_masters = @masters.items.dup
       orphaned_artists = @artists.items.dup
-      orphaned_albums = @albums.items.dup
       (@collection.items + @wantlist.items).each do |item|
         release = item.release or raise
         orphaned_releases.delete(release)
@@ -125,7 +103,6 @@ module MusicBox
         release.artists.each do |release_artist|
           orphaned_artists.delete(release_artist.artist)
         end
-        orphaned_albums.delete(release.album) if release.album
       end
       unless orphaned_releases.empty?
         puts "Orphaned releases:"
@@ -148,13 +125,6 @@ module MusicBox
         end
         puts
       end
-      unless orphaned_albums.empty?
-        puts 'Orphaned albums:'
-        orphaned_albums.sort.each do |album|
-          puts album
-        end
-        puts
-      end
     end
 
     def make_csv(args)
@@ -167,23 +137,41 @@ module MusicBox
     end
 
     def fix(args)
+      # key_map = {
+      #   :title => :title,
+      #   :artist => :artist,
+      #   :original_release_year => :year,
+      #   :format_quantity => :discs,
+      # }
+      # find_releases(args).select { |r| r.cd? && release_in_collection?(r) }.each do |release|
+      #   diffs = {}
+      #   key_map.each do |release_key, album_key|
+      #     release_value = release.send(release_key)
+      #     album_value = release.album.send(album_key)
+      #     if album_value && release_value != album_value
+      #       diffs[release_key] = [release_value, album_value]
+      #     end
+      #   end
+      #   unless diffs.empty?
+      #     puts release
+      #     diffs.each do |key, values|
+      #       puts "\t" + '%s: %p => %p' % [key, *values]
+      #     end
+      #     puts
+      #   end
+      # end
     end
 
     def dir(args, open: false)
       find_releases(args).each do |release|
-        puts "%-10s %s" % [release.id, release.album ? release.album.dir : '-']
-        run_command('open', release.album.dir) if release.album && open
+        puts "%-10s %s" % [release.id, release.dir]
+        run_command('open', release.dir) if open
       end
     end
 
     def update_tags(args, force: false)
-      if args.empty?
-        albums = @albums.items
-      else
-        albums = args.map { |a| @albums[a.to_i] }
-      end
-      albums.each do |album|
-        album.update_tags(force: force)
+      find_releases(args).each do |release|
+        release.update_tags(force: force)
       end
     end
 
@@ -265,9 +253,7 @@ module MusicBox
           releases += @releases.items.select(&:multidisc?)
         when ':unripped'
           releases += @releases.items.select { |r|
-            if release_in_collection?(r) && r.primary_format.cd?
-              !r.album || r.album.tracks.select { |t| t.path.exist? }.empty?
-            end
+            release_in_collection?(r) && r.primary_format.cd? && !r.ripped?
           }
         when /^-?\d+$/
           n = selector.to_i
@@ -323,9 +309,6 @@ module MusicBox
         release.master = @masters[release.master_id] if release.master_id
         release.artists.each do |release_artist|
           release_artist.artist = @artists[release_artist.id]
-        end
-        if (release.album = @albums[release.id])
-          release.album.release = release
         end
       end
       (@collection.items + @wantlist.items).each do |item|

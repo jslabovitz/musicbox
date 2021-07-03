@@ -44,7 +44,13 @@ module MusicBox
       attr_accessor :videos
       attr_accessor :year
       attr_accessor :master    # linked on load
-      attr_accessor :album    # linked on load
+      attr_accessor :rip       # linked on load
+
+      def self.load(*)
+        super.tap do |release|
+          release.rip = Rip.load(release.rip_info_file) if release.rip_info_file.exist?
+        end
+      end
 
       def artists=(artists)
         @artists = artists.map { |a| ReleaseArtist.new(a) }
@@ -118,13 +124,42 @@ module MusicBox
         [artist_key, original_release_year, @title]
       end
 
+      def dir
+        @path.dirname
+      end
+
+      def images_dir
+        dir / 'images'
+      end
+
+      def rip_dir
+        dir / 'rip'
+      end
+
+      def rip_info_file
+        rip_dir / 'info.json'
+      end
+
+      def ripped?
+        @rip != nil
+      end
+
+      def has_cover?
+        cover_file.exist?
+      end
+
+      def cover_file
+        dir / 'cover.jpg'
+      end
+
       def to_s
         summary_to_s
       end
 
       def summary_to_s(locations: nil)
-        '%2s | %-8s | %4s | %-4s | %-50.50s | %-60.60s | %s' % [
+        '%2s | %1s | %-8s | %4s | %-4s | %-50.50s | %-60.60s | %-6s' % [
           locations || '-',
+          ripped? ? '*' : '',
           @id,
           original_release_year || '-',
           artist_key,
@@ -144,7 +179,7 @@ module MusicBox
           ['Released', release_year || '-'],
           ['Originally released', original_release_year || '-'],
           ['Locations', locations || '-'],
-          ['Album dir', @album&.dir || '-'],
+          ['Dir', dir || '-'],
           ['Tracks', nil, tracklist_to_info],
         ]
         MusicBox.info_to_s(info)
@@ -189,6 +224,20 @@ module MusicBox
           format: primary_format_name,
           id: id,
         }
+      end
+
+      def get_images
+        images_dir.mkpath unless images_dir.exist?
+        @images.each do |image|
+          uri = URI.parse(image['uri'])
+          name = Path.new(uri.path).basename.to_s
+          image_file = images_dir / name
+          unless image_file.exist?
+            puts "\t" + image_file.to_s
+            image_file.write(HTTP.get(uri))
+            sleep(1)
+          end
+        end
       end
 
     end
