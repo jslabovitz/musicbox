@@ -1,5 +1,9 @@
 # TODO
 
+- auto-play in player on start
+
+- split up 'dir' command into 'open' & 'dir'
+
 - select cover/back image
   - symlink cover/back -> selected image file
 
