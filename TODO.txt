@@ -6,6 +6,8 @@
     - use release.format_quantity instead of .discs
     - run update-tags on all releases
   - match imported tracks by track title -- prompt if different
+  - extract cover images from ripped tracks
+  - figure out why importing rip sets 'artist' on tracks but not on whole album
 
 - move cover-maker into separate class
 
@@ -28,8 +30,6 @@
 - select cover/back image
   - symlink cover/back -> selected image file
 
-- try extracting cover images from ripped tracks
-
 - find albums that are missing cover art
 
 - make MusicBox a class that can be instantiated?
@@ -43,7 +43,7 @@
 
 - use common #prompt instead of STDIN.gets
 
-- ask to make labels on update
+- ask to make labels on update-tags
 
 - improve searching
   - use same logic between CLI arguments & prompt input
@@ -73,8 +73,6 @@
 - fix Player playlist display
   - tends not to show in 'r'/'t' mode
   - use curses or tty for full-screen TTY mode
-
-- figure out why importing rip sets 'artist' on tracks but not on whole album
 
 - allow artist key to be user-defined
   - save in group database
