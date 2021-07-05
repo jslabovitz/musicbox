@@ -25,7 +25,7 @@ module MusicBox
       @extract_dir = @root_dir / 'extract'
       @extract_done_dir = @root_dir / 'extract-done'
       @catalog_dir = @root_dir / 'catalog'
-      @collection = Catalog::References.new(root: @catalog_dir / 'collection', mode: :file)
+      @collection = Catalog::Collection.new(root: @catalog_dir / 'collection', mode: :file)
       @releases = Catalog::Releases.new(root: @catalog_dir / 'releases', mode: :dir)
       @masters = Catalog::Releases.new(root: @catalog_dir / 'masters', mode: :dir)
       @artists = Catalog::Artists.new(root: @catalog_dir / 'artists', mode: :file)

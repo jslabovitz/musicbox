@@ -2,7 +2,7 @@ module MusicBox
 
   class Catalog
 
-    class Reference < Group::Item
+    class CollectionItem < Group::Item
 
       attr_accessor :basic_information
       attr_accessor :date_added

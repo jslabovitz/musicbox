@@ -2,10 +2,10 @@ module MusicBox
 
   class Catalog
 
-    class References < Group
+    class Collection < Group
 
       def self.item_class
-        Reference
+        CollectionItem
       end
 
     end
