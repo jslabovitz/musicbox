@@ -171,15 +171,14 @@ module MusicBox
         tracklist ||= @tracklist
         max_position_length = tracklist.select(&:position).map { |t| t.position.to_s.length }.max
         tracklist.map do |track|
-          value = [
-            track.type == 'track' ? ('%*s:' % [max_position_length, track.position]) : nil,
-            track.title || '-',
-            !track.duration.to_s.empty? ? "[#{track.duration}]" : nil,
-            track.artists ? "(#{ReleaseArtist.artists_to_s(track.artists)})" : nil,
-          ].compact.join(' ')
           [
             track.type,
-            value,
+            [
+              !track.position.to_s.empty? ? ('%*s:' % [max_position_length, track.position]) : nil,
+              track.title || '-',
+              track.artists ? "(#{ReleaseArtist.artists_to_s(track.artists)})" : nil,
+              !track.duration.to_s.empty? ? "[#{track.duration}]" : nil,
+            ].compact.join(' '),
             track.sub_tracks ? tracklist_to_info(track.sub_tracks) : nil,
           ]
         end
