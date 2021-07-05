@@ -30,7 +30,6 @@ module MusicBox
       @masters = Catalog::Releases.new(root: @catalog_dir / 'masters', mode: :dir)
       @artists = Catalog::Artists.new(root: @catalog_dir / 'artists', mode: :file)
       @albums = Catalog::Albums.new(root: @catalog_dir / 'albums', mode: :dir)
-      @groups = %i[collection releases masters artists albums].map { |key| [key, send(key) ] }.to_h
       link_groups
     end
 
