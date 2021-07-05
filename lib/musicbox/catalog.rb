@@ -291,11 +291,11 @@ module MusicBox
     def categorize_files(dir)
       categories = {}
       dir.children.sort.each do |path|
-        type = case (ext = path.extname.delete_prefix('.').downcase)
-        when 'm4a', 'm4p', 'mp3'
+        type = case (ext = path.extname.downcase)
+        when '.m4a', '.m4p', '.mp3'
           :audio
         else
-          ext.to_sym
+          ext.delete_prefix('.').to_sym
         end
         categories[type] ||= []
         categories[type] << path
