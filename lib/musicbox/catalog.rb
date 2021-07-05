@@ -90,46 +90,24 @@ module MusicBox
     end
 
     def show_orphaned
-      orphaned_releases = @releases.items.dup
-      orphaned_masters = @masters.items.dup
-      orphaned_artists = @artists.items.dup
-      orphaned_albums = @albums.items.dup
+      orphaned = %i[releases masters artists albums].map { |k| [k, send(k).items.dup] }.to_h
       @collection.items.each do |item|
         release = item.release or raise
-        orphaned_releases.delete(release)
-        orphaned_masters.delete(release.master) if release.master
+        orphaned[:releases].delete(release)
+        orphaned[:masters].delete(release.master) if release.master
         release.artists.each do |release_artist|
-          orphaned_artists.delete(release_artist.artist)
+          orphaned[:artists].delete(release_artist.artist)
         end
-        orphaned_albums.delete(release.album) if release.album
+        orphaned[:albums].delete(release.album) if release.album
       end
-      unless orphaned_releases.empty?
-        puts "Orphaned releases:"
-        orphaned_releases.sort.each do |release|
-          puts release.summary_to_s
+      orphaned.each do |group, items|
+        unless items.empty?
+          puts "#{group}:"
+          items.sort.each do |item|
+            puts item.summary_to_s
+          end
+          puts
         end
-        puts
-      end
-      unless orphaned_masters.empty?
-        puts 'Orphaned masters:'
-        orphaned_masters.sort.each do |master|
-          puts master.summary_to_s
-        end
-        puts
-      end
-      unless orphaned_artists.empty?
-        puts 'Orphaned artists:'
-        orphaned_artists.sort.each do |artist|
-          puts artist.summary_to_s
-        end
-        puts
-      end
-      unless orphaned_albums.empty?
-        puts 'Orphaned albums:'
-        orphaned_albums.sort.each do |album|
-          puts album
-        end
-        puts
       end
     end
 
