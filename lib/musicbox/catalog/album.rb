@@ -2,24 +2,21 @@ module MusicBox
 
   class Catalog
 
-    class Rip < Group::Item
+    class Album < Group::Item
 
       attr_accessor :title
       attr_accessor :artist
       attr_accessor :year
       attr_accessor :discs
       attr_accessor :tracks
-      attr_accessor :log_files
-      attr_accessor :release    # linked on load
 
       def initialize(params={})
         @tracks = []
-        @log_files = []
         super
       end
 
-      def release_id=(id)
-        @id = id
+      def tracks=(tracks)
+        @tracks = tracks.map { |h| AlbumTrack.new(h.merge(album: self)) }
       end
 
       def date=(date)
@@ -33,60 +30,33 @@ module MusicBox
         end
       end
 
+      def release_id=(id)
+        @id = id
+      end
+
+      def log_files=(*); end
+
       def artist
         @artist || @tracks&.first&.artist
-      end
-
-      def log_files=(files)
-        @log_files = files.map { |f| Path.new(f) }
-      end
-
-      def tracks=(tracks)
-        @tracks = tracks.map { |h| RipTrack.new(h.merge(rip: self)) }
       end
 
       def dir
         @path.dirname
       end
 
-      def <=>(other)
-        @release <=> other.release
+      def cover_file
+        dir / 'cover.jpg'
       end
 
-      def to_s
-        if @release
-          @release.to_s
-        else
-          '<%s: %s: %s (%s)> | %s' % [
-            @id,
-            artist,
-            @title,
-            @year,
-            dir,
-          ]
-        end
-      end
-
-      def convert_to_multidisc
-        raise Error, "Already multidisc" if @discs
-        @discs = 1
-        @tracks.each do |track|
-          old_path = track.path.dup
-          track.disc = @discs
-          track.file = Path.new(track.make_name).add_extension(old_path.extname)
-          old_path.rename(dir / track.file)
-        end
-        save
-      end
-
-      def validate
-        validate_logs
+      def has_cover?
+        cover_file.exist?
       end
 
       def validate_logs
-        raise Error, "No rip logs" if @log_files.empty?
+        log_files = dir.glob('*.log')
+        raise Error, "No rip logs" if log_files.empty?
         state = :initial
-        @log_files.each do |log_file|
+        log_files.each do |log_file|
           log_file.readlines.map(&:chomp).each do |line|
             case state
             when :initial
@@ -107,7 +77,6 @@ module MusicBox
       def update_tags(force: false)
         changes = []
         @tracks.each do |track|
-          track.load_tags
           track.update_tags
           changes << track if track.tags.changed?
         end
@@ -115,7 +84,7 @@ module MusicBox
           puts
           puts "#{@title} [#{dir}]"
           changes.each do |track|
-            puts "\t" + track.make_name.to_s
+            puts "\t" + track.file.to_s
             track.tags.changes.each do |change|
               puts "\t\t" + change.inspect
             end
@@ -141,8 +110,7 @@ module MusicBox
           artist: @artist,
           year: @year,
           discs: @discs,
-          tracks: @tracks.map(&:to_h),
-          log_files: @log_files.map(&:to_s))
+          tracks: @tracks.map(&:to_h))
       end
 
     end

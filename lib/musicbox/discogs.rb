@@ -12,27 +12,16 @@ module MusicBox
     end
 
     def update
-      update_group(:collection)
-      update_group(:wantlist)
-    end
-
-    def update_group(group)
-      clean(group)
+      @catalog.collection.destroy!
       page = 1
       loop do
-        ;;warn "** getting #{group}, page #{page}"
-        sleep(1)
-        result = @discogs.send(:"get_user_#{group}", @user, page: page, per_page: ResultsPerPage)
-        raise "Bad result: #{result.inspect}" if result.nil? || result.message
-        releases = case group
-        when :collection
-          result.releases
-        when :wantlist
-          result.wants
-        end
-        releases.each do |release|
-          store(group, release.id, release)
-          update_release(release)
+        result = discogs_do(:get_user_collection, @user, page: page, per_page: ResultsPerPage)
+        result.releases.each do |release|
+          begin
+            update_release(release)
+          rescue Error => e
+            warn "Error: #{e}"
+          end
         end
         page = result.pagination.page + 1
         break if page > result.pagination.pages
@@ -40,37 +29,23 @@ module MusicBox
     end
 
     def update_release(release)
+      @catalog.collection.save_item(id: release.id, item: release)
       info = release.basic_information
-      store(:releases, info.id) { @discogs.get_release(info.id) }
+      @catalog.releases.save_item_if_new(id: info.id) { discogs_do(:get_release, info.id) }
       if info.master_id && info.master_id > 0
-        store(:masters, info.master_id) { @discogs.get_master_release(info.master_id) }
+        @catalog.masters.save_item_if_new(id: info.master_id) { discogs_do(:get_master_release, info.master_id) }
       end
       info.artists.each do |artist|
-        store(:artists, artist.id) { @discogs.get_artist(artist.id) }
+        @catalog.artists.save_item_if_new(id: artist.id) { discogs_do(:get_artist, artist.id) }
       end
     end
 
-    def clean(group)
-      dir = @catalog.catalog_dir / group
-      dir.rmtree if dir.exist?
-    end
-
-    def store(group, id, result=nil, &block)
-      dir = @catalog.catalog_dir / group
-      dir.mkpath unless dir.exist?
-      file = (dir / id).add_extension('.json')
-      unless file.exist?
-        ;;warn "=> #{file}"
-        if block_given?
-          sleep(1)
-          result = yield
-        end
-        if result && !result.message
-          file.write(JSON.pretty_generate(result))
-        else
-          warn result.inspect
-        end
-      end
+    def discogs_do(command, *args)
+      sleep(1)
+;;pp(command: command, args: args)
+      result = @discogs.send(command, *args)
+      raise Error, "Bad result: #{result.inspect}" if result.nil? || result.message
+      result
     end
 
   end

@@ -24,7 +24,6 @@ module MusicBox
     }
     SeekSeconds = 30
 
-    attr_accessor :catalog
     attr_accessor :albums
     attr_accessor :audio_device
     attr_accessor :mpv_log_level
@@ -37,7 +36,7 @@ module MusicBox
     end
 
     def play
-      @albums ||= @catalog.albums.items
+      raise Error, "No albums to play" if @albums.nil? || @albums.empty?
       read_albums
       @dispatcher = IO::Dispatcher.new
       setup_interface

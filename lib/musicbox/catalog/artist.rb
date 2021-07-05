@@ -34,6 +34,17 @@ module MusicBox
         @name
       end
 
+      def summary_to_s
+        '%-8s | %s' % [
+          @id,
+          @name,
+        ]
+      end
+
+      def <=>(other)
+        @name <=> other.name
+      end
+
     end
 
   end

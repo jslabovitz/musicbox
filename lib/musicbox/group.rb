@@ -98,22 +98,33 @@ module MusicBox
     end
 
     def add_item(item)
-      raise Error, "Item already exists in #{@root}: #{item.id}" if @items[item.id]
+      raise Error, "Item does not have ID" if item.id.nil?
+      raise Error, "Item already exists in #{@root}: #{item.id.inspect}" if @items[item.id]
       @items[item.id] = item
+    end
+
+    def has_item?(id)
+      @items.has_key?(id)
     end
 
     def delete_item(item)
       @items.delete(item.id)
     end
 
-    def store_item(item, id)
+    def save_item(id:, item: nil, &block)
+      raise Error, "ID is nil" unless id
+      item = yield if block_given?
+      raise Error, "Item is nil" unless item
       path = path_for_id(id)
       path.dirname.mkpath unless path.dirname.exist?
+;;warn "writing to #{path}"
       path.write(JSON.pretty_generate(item))
-      item = item_class.load(path)
-      delete_item(item) if find(id: id)
-      add_item(item)
-      item
+    end
+
+    def save_item_if_new(id:, item: nil, &block)
+      unless has_item?(id)
+        save_item(id: id, item: item, &block)
+      end
     end
 
     def destroy_item(item)
@@ -127,6 +138,10 @@ module MusicBox
         end
       end
       delete_item(item)
+    end
+
+    def destroy!
+      @root.rmtree if @root.exist?
     end
 
     class Item
@@ -149,7 +164,7 @@ module MusicBox
       end
 
       def save
-        # ;;warn "* saving item to #{@path}"
+        ;;warn "* saving item to #{@path}"
         @path.dirname.mkpath unless @path.dirname.exist?
         @path.write(JSON.pretty_generate(serialize))
       end
@@ -160,6 +175,10 @@ module MusicBox
 
       def fields(keys)
         keys.map { |k| send(k) }
+      end
+
+      def <=>(other)
+        @id <=> other.id
       end
 
     end

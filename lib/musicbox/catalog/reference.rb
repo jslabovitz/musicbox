@@ -17,6 +17,17 @@ module MusicBox
         @date_added = DateTime.parse(date.to_s)
       end
 
+      def serialize(args={})
+        super(
+          basic_information: @basic_information,
+          date_added: @date_added,
+          folder_id: @folder_id,
+          instance_id: @instance_id,
+          notes: @notes,
+          rating: @rating,
+          resource_url: @resource_url)
+      end
+
     end
 
   end

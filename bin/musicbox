@@ -25,7 +25,8 @@ SimpleCommand.run do
       force: @force,
       parallel: @parallel)
     @catalog.find_releases(args).each do |release|
-      exporter.export_release(release)
+      album = release.album or raise Error, "Album does not exist for release #{release.id}"
+      exporter.export_album(album)
     end
   end
 
@@ -79,10 +80,10 @@ SimpleCommand.run do
   end
 
   command 'play', device: nil, log_level: nil do |args|
-    releases = args.empty? ? nil : @catalog.prompt_releases(args)
+    releases = args.empty? ? @catalog.releases.items.select(&:album) : @catalog.prompt_releases(args)
+    albums = releases.map(&:album).compact
     player = MusicBox::Player.new(
-      catalog: @catalog,
-      releases: releases,
+      albums: albums,
       audio_device: @device,
       mpv_log_level: @log_level)
     player.play

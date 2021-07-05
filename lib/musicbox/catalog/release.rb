@@ -44,13 +44,7 @@ module MusicBox
       attr_accessor :videos
       attr_accessor :year
       attr_accessor :master    # linked on load
-      attr_accessor :rip       # linked on load
-
-      def self.load(*)
-        super.tap do |release|
-          release.rip = Rip.load(release.rip_info_file) if release.rip_info_file.exist?
-        end
-      end
+      attr_accessor :album     # linked on load
 
       def artists=(artists)
         @artists = artists.map { |a| ReleaseArtist.new(a) }
@@ -96,10 +90,6 @@ module MusicBox
         @master&.release_year || release_year
       end
 
-      def primary_image
-        @images&.find { |img| img['type'] == 'primary' }
-      end
-
       def multidisc?
         @formats.find(&:multidisc?) != nil
       end
@@ -121,7 +111,7 @@ module MusicBox
       end
 
       def sort_tuple
-        [artist_key, original_release_year, @title]
+        [artist_key, original_release_year || 0, @title]
       end
 
       def dir
@@ -132,44 +122,23 @@ module MusicBox
         dir / 'images'
       end
 
-      def rip_dir
-        dir / 'rip'
-      end
-
-      def rip_info_file
-        rip_dir / 'info.json'
-      end
-
-      def ripped?
-        @rip != nil
-      end
-
-      def has_cover?
-        cover_file.exist?
-      end
-
-      def cover_file
-        dir / 'cover.jpg'
-      end
-
       def to_s
         summary_to_s
       end
 
-      def summary_to_s(locations: nil)
-        '%2s | %1s | %-8s | %4s | %-4s | %-50.50s | %-60.60s | %-6s' % [
-          locations || '-',
-          ripped? ? '*' : '',
+      def summary_to_s
+        '%-8s | %4s | %-4s | %-50.50s | %-60.60s | %-6s | %1s' % [
           @id,
           original_release_year || '-',
           artist_key,
           artist,
           @title,
           primary_format_name,
+          @album ? '*' : '',
         ]
       end
 
-      def details_to_s(locations: nil)
+      def details_to_s
         info = [
           ['ID', @id],
           ['Master ID', @master_id],
@@ -178,7 +147,6 @@ module MusicBox
           ['Formats', Format.to_s(@formats)],
           ['Released', release_year || '-'],
           ['Originally released', original_release_year || '-'],
-          ['Locations', locations || '-'],
           ['Dir', dir || '-'],
           ['Tracks', nil, tracklist_to_info],
         ]
@@ -187,14 +155,16 @@ module MusicBox
 
       def tracklist_actual_tracks(tracklist=nil)
         tracklist ||= @tracklist
-        tracklist.map do |track|
-          case track.type
-          when 'track'
-            track if track.position.to_s =~ /^(CD-)?\d+/
-          when 'index'
-            tracklist_actual_tracks(track.sub_tracks)
+        tracks = []
+        tracklist.each do |track|
+          if track.position.to_s =~ /^(CD-)?\d+/ && !track.duration.to_s.empty?
+            tracks << track
           end
-        end.flatten.compact
+          if track.type == 'index'
+            tracks += tracklist_actual_tracks(track.sub_tracks)
+          end
+        end
+        tracks
       end
 
       def tracklist_to_info(tracklist=nil)
@@ -204,7 +174,7 @@ module MusicBox
           value = [
             track.type == 'track' ? ('%*s:' % [max_position_length, track.position]) : nil,
             track.title || '-',
-            (track.duration && !track.duration.empty?) ? "[#{track.duration}]" : nil,
+            !track.duration.to_s.empty? ? "[#{track.duration}]" : nil,
             track.artists ? "(#{ReleaseArtist.artists_to_s(track.artists)})" : nil,
           ].compact.join(' ')
           [
