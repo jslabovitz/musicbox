@@ -25,11 +25,11 @@ module MusicBox
       @extract_dir = @root_dir / 'extract'
       @extract_done_dir = @root_dir / 'extract-done'
       @catalog_dir = @root_dir / 'catalog'
-      @collection = Catalog::Collection.new(root: @catalog_dir / 'collection', mode: :file)
-      @releases = Catalog::Releases.new(root: @catalog_dir / 'releases', mode: :dir)
-      @masters = Catalog::Releases.new(root: @catalog_dir / 'masters', mode: :dir)
-      @artists = Catalog::Artists.new(root: @catalog_dir / 'artists', mode: :file)
-      @albums = Catalog::Albums.new(root: @catalog_dir / 'albums', mode: :dir)
+      @collection = Catalog::Collection.new(root: @catalog_dir / 'collection')
+      @releases = Catalog::Releases.new(root: @catalog_dir / 'releases')
+      @masters = Catalog::Releases.new(root: @catalog_dir / 'masters')
+      @artists = Catalog::Artists.new(root: @catalog_dir / 'artists')
+      @albums = Catalog::Albums.new(root: @catalog_dir / 'albums')
       link_groups
     end
 

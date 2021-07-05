@@ -3,7 +3,6 @@ module MusicBox
   class Group
 
     attr_accessor :root
-    attr_accessor :mode
 
     InfoFileName = 'info.json'
 
@@ -11,9 +10,8 @@ module MusicBox
       Item
     end
 
-    def initialize(root:, mode: nil)
+    def initialize(root:)
       @root = Path.new(root).expand_path
-      @mode = mode || :dir
       reset
       load
     end
@@ -33,13 +31,7 @@ module MusicBox
     def load
       reset
       if @root.exist?
-        paths = case @mode
-        when :dir
-          @root.glob("*/#{InfoFileName}")
-        when :file
-          @root.glob('*.json')
-        end
-        paths.each do |path|
+        @root.glob("*/#{InfoFileName}").each do |path|
           # ;;warn "** loading: #{path}"
           add_item(item_class.load(path))
         end
@@ -77,13 +69,7 @@ module MusicBox
     end
 
     def path_for_id(id)
-      path = @root / id
-      case @mode
-      when :dir
-        path / InfoFileName
-      when :file
-        path.add_extension('.json')
-      end
+      @root / id / InfoFileName
     end
 
     def new_item(id, args={})
@@ -129,14 +115,7 @@ module MusicBox
 
     def destroy_item(item)
       path = path_for_id(id)
-      if path.exist?
-        case @mode
-        when :dir
-          path.rmtree
-        when :file
-          path.unlink
-        end
-      end
+      path.rmtree if path.exist?
       delete_item(item)
     end
 

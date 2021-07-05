@@ -7,9 +7,6 @@
     - run update-tags on all releases
   - match imported tracks by track title -- prompt if different
 
-- subclass References, etc.
-  - move :mode attribute to class method
-
 - move cover-maker into separate class
 
 - get images when doing 'update'
