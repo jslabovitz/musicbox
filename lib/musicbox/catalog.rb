@@ -25,18 +25,18 @@ module MusicBox
       @extract_dir = @root_dir / 'extract'
       @extract_done_dir = @root_dir / 'extract-done'
       @catalog_dir = @root_dir / 'catalog'
-      @collection = Catalog::Collection.new(root: @catalog_dir / 'collection')
-      @releases = Catalog::Releases.new(root: @catalog_dir / 'releases')
-      @masters = Catalog::Releases.new(root: @catalog_dir / 'masters')
-      @artists = Catalog::Artists.new(root: @catalog_dir / 'artists')
-      @albums = Catalog::Albums.new(root: @catalog_dir / 'albums')
+      @collection = Collection.new(root: @catalog_dir / 'collection')
+      @releases = Releases.new(root: @catalog_dir / 'releases')
+      @masters = Releases.new(root: @catalog_dir / 'masters')
+      @artists = Artists.new(root: @catalog_dir / 'artists')
+      @albums = Albums.new(root: @catalog_dir / 'albums')
       link_groups
     end
 
     def load_config
       @config = YAML.load((@root_dir / 'config.yaml').read)
-      Catalog::ReleaseArtist.class_variable_set(:@@personal_names, @config['personal_names'])
-      Catalog::ReleaseArtist.class_variable_set(:@@canonical_names, @config['canonical_names'])
+      ReleaseArtist.class_variable_set(:@@personal_names, @config['personal_names'])
+      ReleaseArtist.class_variable_set(:@@canonical_names, @config['canonical_names'])
     end
 
     def make_cover(args, output_file: '/tmp/cover.pdf')
