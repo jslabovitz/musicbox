@@ -1,5 +1,29 @@
 # TODO
 
+- fix Importer
+  - use info from release instead of rip
+    - remove album info from rip
+    - use release.format_quantity instead of .discs
+    - run update-tags on all releases
+  - match imported tracks by track title -- prompt if different
+
+- subclass References, etc.
+  - move :mode attribute to class method
+
+- move cover-maker into separate class
+
+- get images when doing 'update'
+  - retire 'get-cover' command
+
+- store all images in top-level images/ directory
+  - link image files to releases/masters in @image_files
+      @image_files = {
+        primary: [files...],
+        secondary: [files...],
+        ...,
+      }
+  - check for orphaned images
+
 - auto-play in player on start
 
 - split up 'dir' command into 'open' & 'dir'
@@ -24,18 +48,6 @@
 
 - ask to make labels on update
 
-- use info from release instead of rip
-  - remove album info from rip
-  - use release.format_quantity instead of .discs
-  - run update-tags on all releases
-
-- consider dropping wantlist entirely
-  - would simplify data to be only collection
-
-- match imported tracks by track title -- prompt if different
-
-- don't save artist/title in album info unless different than release?
-
 - improve searching
   - use same logic between CLI arguments & prompt input
   - sort results by relevance, not by artist/title
@@ -43,7 +55,7 @@
     - by series
     - by built-up selection
   - refine result
-    - ie: in wantlist, is cd, specific artist
+    - ie: is cd, specific artist
   - each step could be 
 
 - improve 'select' tool
@@ -52,7 +64,7 @@
   - can be referred to in query
 
 - improve discogs update
-  - don't simply delete previous wantlist/collections
+  - don't simply delete previous collection
   - determine additions/removals/changes
   - handle case where Discogs has merged/moved releases
     - ie, release_id has changed
@@ -99,7 +111,6 @@
 
 - add selectors to #find_releases:
   - CDs/LPs/other
-  - in collection/wantlist
   - by title/artist/pattern
   - rip status
 
@@ -118,14 +129,6 @@
 - improve validation
   - rename 'validate' to 'check'?
   - ensure track files exist, and correspond to release
-
-- play selection
-  - defaults to all albums
-  - allow query to reduce
-    - all albums by artist
-    - newly added/imported
-    - year/decade
-    - fuzzy search
 
 - calculate loudness
   - see: info/replay-gain.md
