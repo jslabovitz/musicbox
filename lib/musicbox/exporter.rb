@@ -10,15 +10,14 @@ module MusicBox
       @parallel = parallel
     end
 
-    def export_release(release)
-      name = '%s - %s (%s)' % [release.artist, release.title, release.original_release_year]
-      rip = release.rip or raise Error, "Rip does not exist for release #{release.id} (#{name})"
-      dir = @dir / name
-      dir.mkpath unless dir.exist?
+    def export_album(album)
+      name = '%s - %s (%s)' % [album.artist, album.title, album.year]
+      export_dir = @dir / name
+      export_dir.mkpath unless export_dir.exist?
       threads = []
-      rip.tracks.each do |track|
+      album.tracks.each do |track|
         src_file = track.path
-        dst_file = dir / src_file.basename
+        dst_file = export_dir / src_file.basename
         if @force || !dst_file.exist? || dst_file.mtime != src_file.mtime
           if @parallel
             threads << Thread.new do

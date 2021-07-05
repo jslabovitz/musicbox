@@ -25,7 +25,7 @@ module MusicBox
     SeekSeconds = 30
 
     attr_accessor :catalog
-    attr_accessor :releases
+    attr_accessor :albums
     attr_accessor :audio_device
     attr_accessor :mpv_log_level
 
@@ -37,10 +37,8 @@ module MusicBox
     end
 
     def play
-      @releases ||= @catalog.releases.items
-      @releases.select!(&:ripped?)
-      raise Error, "No releases to play" if @releases.empty?
-      read_tracks
+      @albums ||= @catalog.albums.items
+      read_albums
       @dispatcher = IO::Dispatcher.new
       setup_interface
       setup_mpv
@@ -97,22 +95,22 @@ module MusicBox
       end
     end
 
-    def read_tracks
-      @release_for_track_path = {}
-      @releases.each do |release|
-        release.rip.tracks.each do |track|
-          @release_for_track_path[track.path] = release
+    def read_albums
+      @album_for_track_path = {}
+      @albums.each do |album|
+        album.tracks.each do |track|
+          @album_for_track_path[track.path] = album
         end
       end
     end
 
     def random_album
-      @releases.shuffle.first
+      @albums.shuffle.first
     end
 
     def random_tracks(length:)
       length.times.map do
-        random_album.rip.tracks.shuffle.first
+        random_album.tracks.shuffle.first
       end
     end
 
@@ -141,7 +139,7 @@ module MusicBox
     end
 
     def play_random_album
-      play_tracks(random_album.rip.tracks)
+      play_tracks(random_album.tracks)
     end
 
     def play_random_tracks
@@ -152,9 +150,9 @@ module MusicBox
       if @properties.playlist_position
         entry = @properties.playlist[@properties.playlist_position]
         track_path = Path.new(entry.filename)
-        release = @release_for_track_path[track_path] \
-          or raise Error, "Can't determine release for track file: #{track_path}"
-        play_tracks(release.rip.tracks)
+        album = @album_for_track_path[track_path] \
+          or raise Error, "Can't determine album for track file: #{track_path}"
+        play_tracks(album.tracks)
       else
         puts "no current track"
       end
@@ -186,16 +184,16 @@ module MusicBox
       if @properties.playlist
         @properties.playlist.each_with_index do |entry, i|
           track_path = Path.new(entry.filename)
-          release = @release_for_track_path[track_path] \
-            or raise Error, "Can't determine release for track file: #{track_path}"
-          track = release.rip.tracks.find { |t| t.path == track_path } \
+          album = @album_for_track_path[track_path] \
+            or raise Error, "Can't determine album for track file: #{track_path}"
+          track = album.tracks.find { |t| t.path == track_path } \
             or raise Error, "Can't determine track for track file: #{track_path}"
           puts '%1s %2d. %-40.40s | %-40.40s | %-40.40s' % [
             entry.current ? '>' : '',
             i + 1,
             track.title,
-            release.title,
-            release.artist,
+            album.title,
+            album.artist,
           ]
         end
       end
