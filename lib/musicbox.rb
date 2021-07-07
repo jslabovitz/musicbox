@@ -19,7 +19,6 @@ require 'musicbox/version'
 require 'musicbox/error'
 require 'musicbox/group'
 require 'musicbox/info_to_s'
-require 'musicbox/prompt'
 
 require 'musicbox/catalog'
 require 'musicbox/catalog/album'
