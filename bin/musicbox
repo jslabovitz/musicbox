@@ -45,7 +45,11 @@ SimpleCommand.run do
   command 'import' do |args|
     importer = MusicBox::Importer.new(catalog: @catalog)
     @catalog.dirs_for_args(@catalog.import_dir, args).each do |dir|
-      importer.import_dir(dir)
+      begin
+        importer.import_dir(dir)
+      rescue MusicBox::Error => e
+        warn "Error: #{e}"
+      end
     end
   end
 
