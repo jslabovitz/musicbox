@@ -248,14 +248,14 @@ module MusicBox
 
     def prompt_release(query)
       choices = find_releases([query]).map { |r| [r.to_s, r.id] }.to_h
-      if (id = TTY::Prompt.new.select('Release?', choices, filter: true, quiet: true))
+      if (id = TTY::Prompt.new.select('Release?', choices, filter: true, per_page: 100, quiet: true))
         @releases[id]
       end
     end
 
     def prompt_releases(query)
       choices = find_releases(query).map { |r| [r.to_s, r.id] }.to_h
-      if (ids = TTY::Prompt.new.multi_select('Releases?', choices, filter: true, quiet: true))
+      if (ids = TTY::Prompt.new.multi_select('Releases?', choices, filter: true, per_page: 100, quiet: true))
         ids.map { |id| @releases[id] }
       end
     end
