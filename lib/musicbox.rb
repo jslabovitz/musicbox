@@ -10,6 +10,7 @@ require 'prawn/measurement_extensions'
 require 'run-command'
 require 'set'
 require 'sixarm_ruby_unaccent'
+require 'tty-prompt'
 require 'yaml'
 
 require 'extensions/string'

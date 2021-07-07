@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'run-command', '~> 0.1'
   s.add_dependency 'simple-command', '~> 0.2'
   s.add_dependency 'sixarm_ruby_unaccent', '~> 1.2'
+  s.add_dependency 'tty-prompt', '~> 0.23'
 
   s.add_development_dependency 'bundler', '~> 2.2'
   s.add_development_dependency 'minitest', '~> 5.14'
