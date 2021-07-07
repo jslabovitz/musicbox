@@ -1,36 +1,37 @@
 # TODO
 
-- fix Importer
-  - use info from release instead of rip
-    - remove album info from rip
-    - use release.format_quantity instead of .discs
-    - run update-tags on all releases
-  - match imported tracks by track title -- prompt if different
-  - extract cover images from ripped tracks
-  - figure out why importing rip sets 'artist' on tracks but not on whole album
+- improve finding/prompting releases
+  - specify group by --{releases,masters,artists,albums}
+  - add '--prompt' flag to prompt for single/multiple
+  - rename 'find_releases' to just #find or #search?
 
-- move cover-maker into separate class
-
-- get images when doing 'update'
+- improve cover art
+  - extract cover images from ripped tracks when importing
+      chdir(tmpdir) do
+        FILE = album.tracks.first.file
+        mp4art --extract --art-index=0 FILE
+        # cover is in FILE[0].jpg
+      end
+      FILE.rename(cover_file)
+  - move cover-maker into separate class
+  - get images when doing 'update'
   - retire 'get-cover' command
-
-- store all images in top-level images/ directory
-  - link image files to releases/masters in @image_files
-      @image_files = {
-        primary: [files...],
-        secondary: [files...],
-        ...,
-      }
+  - store all images in top-level images/ directory
+    - link image files to releases/masters in @image_files
+        @image_files = {
+          primary: [files...],
+          secondary: [files...],
+          ...,
+        }
   - check for orphaned images
+  - select cover/back image  - symlink cover/back -> selected image file
+  - find albums that are missing cover art
+
+- figure out why importing rip sets 'artist' on tracks but not on whole album
 
 - auto-play in player on start
 
 - split up 'dir' command into 'open' & 'dir'
-
-- select cover/back image
-  - symlink cover/back -> selected image file
-
-- find albums that are missing cover art
 
 - make MusicBox a class that can be instantiated?
   - then can have multiple parts
@@ -41,8 +42,6 @@
 
 - allow searching by track titles
 
-- use common #prompt instead of STDIN.gets
-
 - ask to make labels on update-tags
 
 - improve searching
@@ -51,9 +50,6 @@
   - allow multiples in prompt
     - by series
     - by built-up selection
-  - refine result
-    - ie: is cd, specific artist
-  - each step could be 
 
 - improve 'select' tool
   - save to $MUSIC_ROOT/selection.json?
@@ -103,11 +99,6 @@
     - bad rips (actual read errors)
     - dubious rips (inconsistent checksums)
     - successful rips
-
-- add selectors to #find_releases:
-  - CDs/LPs/other
-  - by title/artist/pattern
-  - rip status
 
 - check album/track info against Discogs release/master info
   - eg:
