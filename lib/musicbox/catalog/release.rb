@@ -143,22 +143,18 @@ module MusicBox
           ['Formats', Format.to_s(@formats)],
           ['Released', release_year || '-'],
           ['Originally released', original_release_year || '-'],
-          ['Dir', dir || '-'],
+          ['Dir', @dir || '-'],
           ['Tracks', nil, tracklist_to_info],
         ]
         MusicBox.info_to_s(info)
       end
 
-      def tracklist_actual_tracks(tracklist=nil)
+      def tracklist_flattened(tracklist=nil)
         tracklist ||= @tracklist
         tracks = []
         tracklist.each do |track|
-          if track.position.to_s =~ /^(CD-)?\d+/ && !track.duration.to_s.empty?
-            tracks << track
-          end
-          if track.type == 'index'
-            tracks += tracklist_actual_tracks(track.sub_tracks)
-          end
+          tracks << track
+          tracks += tracklist_flattened(track.sub_tracks) if track.type == 'index'
         end
         tracks
       end

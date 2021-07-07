@@ -231,9 +231,7 @@ module MusicBox
         when ':unripped'
           releases += @releases.items.select(&:cd?).reject(&:album)
         when ':odd-positions'
-          releases += @releases.items.select { |r|
-            r.cd? && r.tracklist_actual_tracks.find { |t| t.position !~ /^\d+$/ }
-          }
+          releases += @releases.items.select(&:cd?).select { |r| r.tracklist_flattened.find { |t| t.position !~ /^\d+$/ } }
         when /^-?\d+$/
           n = selector.to_i
           if n > 0
