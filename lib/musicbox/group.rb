@@ -31,9 +31,8 @@ module MusicBox
     def load
       reset
       if @root.exist?
-        @root.glob("*/#{InfoFileName}").each do |path|
-          # ;;warn "** loading: #{path}"
-          add_item(item_class.load(path))
+        @root.glob("*/#{InfoFileName}").each do |info_file|
+          add_item(item_class.load(info_file.dirname))
         end
         ;;warn "* loaded #{@items.length} items from #{@root}"
       end
@@ -68,15 +67,15 @@ module MusicBox
       found
     end
 
-    def path_for_id(id)
-      @root / id / InfoFileName
+    def dir_for_id(id)
+      @root / id
     end
 
     def new_item(id, args={})
       item = item_class.new(
         {
           id: id,
-          path: path_for_id(id),
+          dir: dir_for_id(id),
         }.merge(args)
       )
       add_item(item)
@@ -101,10 +100,11 @@ module MusicBox
       raise Error, "ID is nil" unless id
       item = yield if block_given?
       raise Error, "Item is nil" unless item
-      path = path_for_id(id)
-      path.dirname.mkpath unless path.dirname.exist?
-;;warn "writing to #{path}"
-      path.write(JSON.pretty_generate(item))
+      dir = dir_for_id(id)
+      info_file = dir / InfoFileName
+      dir.mkpath unless dir.exist?
+;;warn "writing to #{info_file}"
+      info_file.write(JSON.pretty_generate(item))
     end
 
     def save_item_if_new(id:, item: nil, &block)
@@ -114,8 +114,8 @@ module MusicBox
     end
 
     def destroy_item(item)
-      path = path_for_id(id)
-      path.rmtree if path.exist?
+      dir = dir_for_id(id)
+      dir.rmtree if dir.exist?
       delete_item(item)
     end
 
@@ -126,26 +126,28 @@ module MusicBox
     class Item
 
       attr_accessor :id
-      attr_accessor :path
+      attr_accessor :dir
 
-      def self.load(path, params={})
-        path = Path.new(path)
-        raise Error, "Path does not exist: #{path}" unless path.exist?
-        new(JSON.load(path.read).merge(path: path).merge(params))
+      def self.load(dir, params={})
+        dir = Path.new(dir)
+        info_file = dir / Group::InfoFileName
+        raise Error, "Info file does not exist: #{info_file}" unless info_file.exist?
+        new(JSON.load(info_file.read).merge(dir: dir).merge(params))
       end
 
       def initialize(params={})
         params.each { |k, v| send("#{k}=", v) }
       end
 
-      def path=(path)
-        @path = Path.new(path)
+      def info_file
+        @dir / Group::InfoFileName
       end
 
       def save
-        ;;warn "* saving item to #{@path}"
-        @path.dirname.mkpath unless @path.dirname.exist?
-        @path.write(JSON.pretty_generate(serialize))
+        ;;warn "* saving item to #{@dir}"
+        raise Error, "dir not defined" unless @dir
+        @dir.mkpath unless @dir.exist?
+        info_file.write(JSON.pretty_generate(serialize))
       end
 
       def serialize(args={})

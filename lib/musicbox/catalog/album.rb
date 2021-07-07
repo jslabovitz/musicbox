@@ -40,12 +40,8 @@ module MusicBox
         @artist || @tracks&.first&.artist
       end
 
-      def dir
-        @path.dirname
-      end
-
       def cover_file
-        dir / 'cover.jpg'
+        @dir / 'cover.jpg'
       end
 
       def has_cover?
@@ -53,7 +49,7 @@ module MusicBox
       end
 
       def validate_logs
-        log_files = dir.glob('*.log')
+        log_files = @dir.glob('*.log')
         raise Error, "No rip logs" if log_files.empty?
         state = :initial
         log_files.each do |log_file|
@@ -82,7 +78,7 @@ module MusicBox
         end
         unless changes.empty?
           puts
-          puts "#{@title} [#{dir}]"
+          puts "#{@title} [#{@dir}]"
           changes.each do |track|
             puts "\t" + track.file.to_s
             track.tags.changes.each do |change|

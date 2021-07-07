@@ -114,12 +114,8 @@ module MusicBox
         [artist_key, original_release_year || 0, @title]
       end
 
-      def dir
-        @path.dirname
-      end
-
       def images_dir
-        dir / 'images'
+        @dir / 'images'
       end
 
       def to_s
