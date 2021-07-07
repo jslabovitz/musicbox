@@ -48,7 +48,7 @@ module MusicBox
 
     def search(query:, fields:, limit: nil)
       found = []
-      words = query.tokenize.sort.uniq - ['-']
+      words = [query].flatten.join(' ').tokenize.sort.uniq - ['-']
       words.each do |word|
         regexp = Regexp.new(Regexp.quote(word), true)
         found += @items.values.select do |item|
