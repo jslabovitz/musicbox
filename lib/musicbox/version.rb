@@ -1,4 +1,4 @@
-module MusicBox
+class MusicBox
 
   VERSION = '0.1'
 

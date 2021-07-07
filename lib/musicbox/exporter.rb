@@ -1,4 +1,4 @@
-module MusicBox
+class MusicBox
 
   class Exporter
 

@@ -1,4 +1,4 @@
-module MusicBox
+class MusicBox
 
   def self.info_to_s(info, indent: 0)
     io = StringIO.new

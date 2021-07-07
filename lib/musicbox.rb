@@ -41,3 +41,7 @@ require 'musicbox/extractor'
 require 'musicbox/importer'
 require 'musicbox/labeler'
 require 'musicbox/player'
+
+class MusicBox
+
+end
