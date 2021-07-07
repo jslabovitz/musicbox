@@ -89,14 +89,7 @@ module MusicBox
               puts "\t\t" + change.inspect
             end
           end
-          unless force
-            print "Update track files? [y] "
-            case STDIN.gets.to_s.strip
-            when 'y', ''
-              force = true
-            end
-          end
-          if force
+          if force || TTY::Prompt.new.yes?('Update track files?')
             changes.each do |track|
               track.save_tags
             end
