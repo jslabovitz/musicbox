@@ -2,8 +2,13 @@ module MusicBox
 
   class Labeler
 
-    def initialize(catalog:)
-      @catalog = catalog
+    def self.make_label(label, output_file:, open: false)
+      labeler = new
+      labeler << label
+      labeler.make_labels(output_file, open: open)
+    end
+
+    def initialize
       @font_dir = Path.new('~/Fonts/D/DejaVu Sans')
       @labels = []
     end
