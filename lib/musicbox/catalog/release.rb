@@ -123,10 +123,10 @@ module MusicBox
       end
 
       def summary_to_s
-        '%-8s | %4s | %-4s | %-50.50s | %-60.60s | %-6s | %1s' % [
+        '%-8s | %-4s %4s | %-50.50s | %-60.60s | %-6s | %1s' % [
           @id,
-          original_release_year || '-',
           artist_key,
+          original_release_year || '-',
           artist,
           @title,
           primary_format_name,
