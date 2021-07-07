@@ -4,6 +4,12 @@
   - specify group by --{releases,masters,artists,albums}
   - add '--prompt' flag to prompt for single/multiple
   - rename 'find_releases' to just #find or #search?
+  - improve searching
+    - use same logic between CLI arguments & prompt input
+    - sort results by relevance, not by artist/title
+    - allow multiples in prompt
+      - by series
+      - by built-up selection
 
 - improve cover art
   - extract cover images from ripped tracks when importing
@@ -26,8 +32,9 @@
   - check for orphaned images
   - select cover/back image  - symlink cover/back -> selected image file
   - find albums that are missing cover art
-
-- figure out why importing rip sets 'artist' on tracks but not on whole album
+  - show cover art in terminal
+    - when playing, searching
+        convert ./albums/13714693/cover.jpg -resize 800x800 TIFF:- | imgcat
 
 - auto-play in player on start
 
@@ -41,15 +48,6 @@
   - move commands (called from CLI)
 
 - allow searching by track titles
-
-- ask to make labels on update-tags
-
-- improve searching
-  - use same logic between CLI arguments & prompt input
-  - sort results by relevance, not by artist/title
-  - allow multiples in prompt
-    - by series
-    - by built-up selection
 
 - improve 'select' tool
   - save to $MUSIC_ROOT/selection.json?
@@ -83,7 +81,6 @@
   $ exiftool -json -recurse . -ext m4a
 
 - handle importing logs like tracks
-  - see OLD/music_collection for old parsing code
   - create Log class with attributes:
     - timestamp
     - media type
@@ -99,18 +96,6 @@
     - bad rips (actual read errors)
     - dubious rips (inconsistent checksums)
     - successful rips
-
-- check album/track info against Discogs release/master info
-  - eg:
-    - release date
-    - album artist
-    - track title/artist
-    - cover art
-  - correct if needed
-
-- show cover art in terminal
-  - when playing, searching
-      convert ./albums/13714693/cover.jpg -resize 800x800 TIFF:- | imgcat
 
 - improve validation
   - rename 'validate' to 'check'?
