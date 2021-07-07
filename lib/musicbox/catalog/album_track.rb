@@ -24,14 +24,6 @@ module MusicBox
         @album.dir / @file
       end
 
-      def make_name
-        '%s%02d - %s' % [
-          @disc ? ('%1d-' % @disc) : '',
-          @track,
-          @title.gsub(%r{[/:]}, '_'),
-        ]
-      end
-
       def load_tags
         @tags ||= Tags.load(path)
       end

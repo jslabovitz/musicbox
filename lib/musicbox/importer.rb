@@ -4,130 +4,114 @@ module MusicBox
 
     def initialize(catalog:)
       @catalog = catalog
+      @prompt = TTY::Prompt.new
     end
 
     def import_dir(source_dir)
-      source_dir = Path.new(source_dir).realpath
-      puts; puts "Importing from #{source_dir}"
-      releases = @catalog.prompt_releases(source_dir.basename.to_s) or return
-      raise "Must specify one release" unless releases.length == 1
-      release = releases.first
-      print release.details_to_s
-      if (album = release.album)
-        puts "Album already exists: #{release.id}"
-        puts "\ta - add as additional disc"
-        puts "\to - overwrite"
-        puts "\ts - skip"
-        print "Choice? [a] "
-        loop do
-          case STDIN.gets.to_s.strip
-          when 'a', ''
-            album.convert_to_multidisc unless album.discs
-            album.discs += 1
-            break
-          when 'o'
-            # import as-is
-            break
-          when 's'
-            puts "Skipping #{source_dir}"
-            return
-          end
-        end
-      else
-        album = @catalog.albums.new_album(release.id, release_id: release.id)
-        album.title = release.title
-        album.artist = release.artists.first.name
-        album.year = release.original_release_year
-        album.release = release
-        puts "Created album: #{album.dir}"
-      end
-      source_files = @catalog.categorize_files(source_dir)
-      audio_files = source_files[:audio]
-      raise Error, "No audio files to import" if audio_files.nil? || audio_files.empty?
-      actual_tracks = release.tracklist_actual_tracks
-      max_tracks = [audio_files, actual_tracks].map(&:length).max
-      max_tracks.times.each do |i|
-        puts "%2s. %-70s => %-70s" % [
-          i + 1,
-          audio_files[i]&.basename,
-          actual_tracks[i].title,
-        ]
-      end
-      if audio_files.length == actual_tracks.length
-        print "Add? [y] "
-        loop do
-          case STDIN.gets.to_s.strip
-          when 'y', ''
-            break
-          when 'n'
-            return
-          end
-        end
-      else
-        print "Imported tracks differ from release tracks. Add anyway? [n] "
-        loop do
-          case STDIN.gets.to_s.strip
-          when 'y'
-            break
-          when 'n', ''
-            return
-          end
-        end
-      end
-      album.dir.mkpath unless album.dir.exist?
-      source_files.each do |type, files|
-        case type
-        when :audio
-          files.each { |f| import_track_file(f, album) }
-        when :log
-          files.each { |f| import_log_file(f, album) }
-        else
-          files.each { |f| import_other_file(f, album) }
-        end
-      end
-      album.save
-      @catalog.import_done_dir.mkpath unless @catalog.import_done_dir.exist?
-      source_dir.rename(@catalog.import_done_dir / source_dir.basename)
-      print "Make label? [y] "
-      loop do
-        case STDIN.gets.to_s.strip
-        when 'y', ''
-          labeler = Labeler.new(catalog: @catalog)
-          labeler << release.to_label
-          labeler.make_labels('/tmp/labels.pdf', open: true)
-          break
-        when 'n'
-          break
-        end
+      @source_dir = Path.new(source_dir).realpath
+      puts; puts "Importing from #{@source_dir}"
+      find_release
+      determine_disc
+      make_album
+      make_copy_plan
+      raise Error, "No tracks were added to album" if @album.tracks.empty?
+      if @prompt.yes?('Add?')
+        import_album
       end
     end
 
-    def import_track_file(source_file, album)
-      tags = Catalog::Tags.load(source_file)
-      track = Catalog::AlbumTrack.new(
-        title: tags[:title],
-        artist: tags[:artist] || album.artist,
+    def determine_disc
+      @disc = nil
+      if @album
+        raise Error, "Album already exists" if @release.format_quantity.nil? || @release.format_quantity == 1
+        puts "Release is multidisc."
+        n = @prompt.ask?('Which disc is this?', required: true, convert: :int)
+        raise Error, "Disc number out of range" unless n >= 1 && n <= @release.format_quantity
+        @disc = n
+      end
+    end
+
+    def find_release
+      @release = @catalog.prompt_release(@source_dir.basename.to_s) or raise Error, "Can't find release"
+      @tracklist_flattened = @release.tracklist_flattened
+      print @release.details_to_s
+    end
+
+    def make_album
+      @album = Catalog::Album.new(
+        id: @release.id,
+        title: @release.title,
+        artist: @release.artist,
+        year: @release.original_release_year,
+        discs: @release.format_quantity,
+        dir: @catalog.albums.dir_for_id(@release.id))
+      @release.album = @album
+    end
+
+    def make_album_track(file)
+      tags = Catalog::Tags.load(file)
+      release_track = find_track_for_title(tags[:title])
+      name = '%s%02d - %s' % [
+        @disc ? ('%1d-' % @disc) : '',
+        tags[:track],
+        release_track.title.gsub(%r{[/:]}, '_'),
+      ]
+      album_track = Catalog::AlbumTrack.new(
+        title: release_track.title,
+        artist: release_track.artist || @release.artist,
         track: tags[:track],
-        disc: album.discs,
-        album: album,
-        tags: tags)
-      album.tracks << track
-      track.file = Path.new(track.make_name).add_extension(source_file.extname)
-      puts "Importing track: #{source_file.basename} => #{track.path.basename}"
-      source_file.cp(track.path)
-      track.update_tags
-      track.save_tags
+        disc: @disc || tags[:disc],
+        file: Path.new(name).add_extension(file.extname),
+        tags: tags,
+        album: @album)
+      puts "%-50s ==> %6s - %-50s ==> %-50s" % [
+        file.basename,
+        release_track.position,
+        release_track.title,
+        album_track.file,
+      ]
+      album_track
     end
 
-    def import_log_file(source_file, album)
-      puts "Importing log: #{source_file.basename}"
-      album.log_files << source_file.basename
-      source_file.cp(album.dir)
+    def find_track_for_title(title)
+      release_track = @tracklist_flattened.find { |t| t.title.downcase == title.downcase }
+      unless release_track
+        puts "Can't find release track with title #{title.inspect}"
+        choices = @tracklist_flattened.map { |t| [t.title, t] }.to_h
+        release_track = @prompt.select('Track?', choices, per_page: 100)
+      end
+      release_track
     end
 
-    def import_other_file(source_file, album)
-      puts "Importing other: #{source_file.basename}"
-      source_file.cp_r(album.dir)
+    def import_album
+      @album.save
+      copy_files
+      @album.update_tags
+      if @prompt.yes?('Make label?')
+        Labeler.make_label(@release.to_label, output_file: '/tmp/labels.pdf', open: true)
+      end
+    end
+
+    def make_copy_plan
+      @copy_plan = @source_dir.children.select(&:file?).sort.map do |source_file|
+        dest_file = case source_file.extname.downcase
+        when '.m4a'
+          album_track = make_album_track(source_file) or next
+          @album.tracks << album_track
+          album_track.file
+        else
+          source_file.basename
+        end
+        [source_file, @album.dir / dest_file]
+      end.to_h
+    end
+
+    def copy_files
+      @copy_plan.each do |source_file, dest_file|
+        source_file.cp(dest_file)
+      end
+      @catalog.import_done_dir.mkpath unless @catalog.import_done_dir.exist?
+      @source_dir.rename(@catalog.import_done_dir / @source_dir.basename)
     end
 
   end
