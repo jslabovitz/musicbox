@@ -32,6 +32,10 @@ module MusicBox
         @sub_tracks = sub_tracks.map { |t| Track.new(t) }
       end
 
+      def artist
+        @artists ? ReleaseArtist.artists_to_s(@artists) : nil
+      end
+
     end
 
   end
