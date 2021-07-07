@@ -179,16 +179,9 @@ module MusicBox
     def select(args)
       ids = []
       loop do
-        releases = find_releases(args)
-        case (choice = MusicBox.prompt(releases))
-        when Numeric
-          ids << releases[choice].id
-          puts ids.join(' ')
-        when String
-          args = choice.split(/\s+/)
-        when nil
-          break
-        end
+        releases = prompt_releases(args) or break
+        ids += releases.map(&:id)
+        puts ids.join(' ')
       end
     end
 
