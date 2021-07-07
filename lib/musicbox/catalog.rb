@@ -248,23 +248,17 @@ module MusicBox
       releases.uniq.sort!
     end
 
+    def prompt_release(query)
+      choices = find_releases([query]).map { |r| [r.to_s, r.id] }.to_h
+      if (id = TTY::Prompt.new.select('Release?', choices, filter: true, quiet: true))
+        @releases[id]
+      end
+    end
+
     def prompt_releases(query)
-      loop do
-        choices = @releases.search(
-          query: [query].flatten.join(' '),
-          fields: [:title, :artists],
-          limit: 20).select(&:cd?)
-        choice = MusicBox.prompt(choices)
-        case choice
-        when Numeric
-          return [choices[choice]]
-        when /^[\d,]+/
-          return choices.values_at(*choice.split(',').map(&:to_i))
-        when nil
-          return nil
-        when String
-          query = choice
-        end
+      choices = find_releases(query).map { |r| [r.to_s, r.id] }.to_h
+      if (ids = TTY::Prompt.new.multi_select('Releases?', choices, filter: true, quiet: true))
+        ids.map { |id| @releases[id] }
       end
     end
 
