@@ -1,24 +1,8 @@
 # TODO
 
-- improve finding/prompting releases
-  - specify group by --{releases,masters,artists,albums}
-  - add '--prompt' flag to prompt for single/multiple
-  - rename 'find_releases' to just #find or #search?
-  - improve searching
-    - use same logic between CLI arguments & prompt input
-    - sort results by relevance, not by artist/title
-    - allow multiples in prompt
-      - by series
-      - by built-up selection
+- ask to make cover on import (after label)
 
 - improve cover art
-  - extract cover images from ripped tracks when importing
-      chdir(tmpdir) do
-        FILE = album.tracks.first.file
-        mp4art --extract --art-index=0 FILE
-        # cover is in FILE[0].jpg
-      end
-      FILE.rename(cover_file)
   - move cover-maker into separate class
   - get images when doing 'update'
   - retire 'get-cover' command
@@ -36,16 +20,21 @@
     - when playing, searching
         convert ./albums/13714693/cover.jpg -resize 800x800 TIFF:- | imgcat
 
+- move config handling into main class
+  - also definition of import/extract dir
+
+- improve finding/prompting releases
+  - specify group by --{releases,masters,artists,albums}
+  - add '--prompt' flag to prompt for single/multiple
+  - rename 'find_releases' to just #find or #search?
+  - improve searching
+    - use same logic between CLI arguments & prompt input
+    - sort results by relevance, not by artist/title
+    - allow multiples in prompt
+      - by series
+      - by built-up selection
+
 - auto-play in player on start
-
-- split up 'dir' command into 'open' & 'dir'
-
-- make MusicBox a class that can be instantiated?
-  - then can have multiple parts
-    - Catalog, Updater, Player, Importer, Exporter, Extractor
-  - move config handling into main class
-    - also definition of import/extract dir
-  - move commands (called from CLI)
 
 - allow searching by track titles
 
