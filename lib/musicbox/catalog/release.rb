@@ -131,14 +131,15 @@ class MusicBox
       end
 
       def summary_to_s
-        '%-8s | %-4s %4s | %-50.50s | %-60.60s | %-6s | %1s' % [
+        '%-8s | %1s%1s | %-4s %4s | %-50.50s | %-60.60s | %-6s' % [
           @id,
+          @album ? 'A' : '',
+          @album&.has_cover? ? 'C' : '',
           artist_key,
           original_release_year || '-',
           artist,
           @title,
           primary_format_name,
-          @album ? '*' : '',
         ]
       end
 
