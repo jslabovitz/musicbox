@@ -39,57 +39,7 @@ class MusicBox
       ReleaseArtist.class_variable_set(:@@canonical_names, @config['canonical_names'])
     end
 
-    def make_cover(args, output_file: '/tmp/cover.pdf')
-      albums = find_releases(args).map(&:album).compact.select(&:has_cover?)
-      size = 4.75.in
-      top = 10.in
-      Prawn::Document.generate(output_file) do |pdf|
-        albums.each do |album|
-          puts album
-          pdf.fill do
-            pdf.rectangle [0, top],
-              size,
-              size
-          end
-          pdf.image album.cover_file.to_s,
-            at: [0, top],
-            width: size,
-            fit: [size, size],
-            position: :center
-          pdf.stroke do
-            pdf.rectangle [0, top],
-              size,
-              size
-          end
-        end
-      end
-      run_command('open', output_file)
-    end
-
-    def get_cover(args)
-      find_releases(args).select(&:cd?).each do |release|
-        puts release
-        [release, release.master].compact.each(&:get_images)
-      end
-    end
-
-    def show(args, show_details: false)
-      show_releases(find_releases(args), show_details: show_details)
-    end
-
-    def show_dups(args)
-      dups = find_dups(find_releases(args))
-      dups.each do |id, formats|
-        formats.each do |format, releases|
-          if releases.length > 1
-            puts
-            show_releases(releases)
-          end
-        end
-      end
-    end
-
-    def show_orphaned
+    def orphaned
       orphaned = %i[releases masters artists albums].map { |k| [k, send(k).items.dup] }.to_h
       @collection.items.each do |item|
         release = item.release or raise
@@ -100,89 +50,24 @@ class MusicBox
         end
         orphaned[:albums].delete(release.album) if release.album
       end
-      orphaned.each do |group, items|
-        unless items.empty?
-          puts "#{group}:"
-          items.sort.each do |item|
-            puts item.summary_to_s
-          end
-          puts
-        end
-      end
+      orphaned
     end
 
-    def make_csv(args)
-      print %w[ID year artist title].to_csv
-      find_releases(args).select(&:cd?).each do |release|
-        print [release.id, release.original_release_year, release.artist, release.title].to_csv
-      end
-    end
-
-    def fix(args)
-      # key_map = {
-      #   :title => :title,
-      #   :artist => :artist,
-      #   :original_release_year => :year,
-      #   :format_quantity => :discs,
-      # }
-      # find_releases(args).select(&:cd?).each do |release|
-      #   diffs = {}
-      #   key_map.each do |release_key, album_key|
-      #     release_value = release.send(release_key)
-      #     album_value = release.album.send(album_key)
-      #     if album_value && release_value != album_value
-      #       diffs[release_key] = [release_value, album_value]
-      #     end
-      #   end
-      #   unless diffs.empty?
-      #     puts release
-      #     diffs.each do |key, values|
-      #       puts "\t" + '%s: %p => %p' % [key, *values]
-      #     end
-      #     puts
-      #   end
-      # end
-    end
-
-    def dir(args, open: false)
-      find_releases(args).each do |release|
-        puts "%-10s %s" % [release.id, release.dir]
-        run_command('open', release.dir) if open
-      end
-    end
-
-    def update_tags(args, force: false)
-      find_releases(args).each do |release|
-        album = release.album or raise
-        album.update_tags(force: force)
-      end
-    end
-
-    def make_artist_keys(args)
-      if args.empty?
-        args = @releases.items.map { |r| r.artists.map(&:name) }.flatten
-      end
-      by_key = {}
-      by_name = {}
+    def artist_keys(artists)
+      keys = {}
+      names = {}
       non_personal_names = Set.new
-      args.map { |a| ReleaseArtist.new(name: a) }.each do |artist|
+      artists.map { |a| a.kind_of?(ReleaseArtist) ? a : ReleaseArtist.new(name: a) }.each do |artist|
         non_personal_names << artist.name if artist.name == artist.canonical_name
         key = artist.key
-        (by_key[key] ||= Set.new) << artist.name
-        (by_name[artist.name] ||= Set.new) << key
+        (keys[key] ||= Set.new) << artist.name
+        (names[artist.name] ||= Set.new) << key
       end
-      ;;pp non_personal_names.sort
-      ;;pp by_key.sort.map { |k, s| [k, s.to_a] }.to_h
-      ;;pp by_name.sort.map { |k, s| [k, s.to_a] }.to_h
-    end
-
-    def select(args)
-      ids = []
-      loop do
-        releases = prompt_releases(args) or break
-        ids += releases.map(&:id)
-        puts ids.join(' ')
-      end
+      {
+        non_personal_names: non_personal_names.sort,
+        keys: keys.sort.map { |k, s| [k, s.to_a] }.to_h,
+        names: names.sort.map { |k, s| [k, s.to_a] }.to_h,
+      }
     end
 
     def show_releases(releases, show_details: false)
@@ -198,21 +83,12 @@ class MusicBox
 
     def find_dups(releases)
       dups = {}
-      releases.each do |release|
-        if release.master_id
-          dups[release.master_id] ||= {}
-          dups[release.master_id][release.primary_format_name] ||= []
-          dups[release.master_id][release.primary_format_name] << release
-        end
+      releases.select(&:master_id).each do |release|
+        dups[release.master_id] ||= {}
+        dups[release.master_id][release.primary_format_name] ||= []
+        dups[release.master_id][release.primary_format_name] << release
       end
-      dups.each do |id, formats|
-        formats.each do |format, releases|
-          if releases.length > 1
-            puts
-            show_releases(releases)
-          end
-        end
-      end
+      dups
     end
 
     def find_releases(selectors)

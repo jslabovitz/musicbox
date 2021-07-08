@@ -46,6 +46,10 @@ class MusicBox
       attr_accessor :master    # linked on load
       attr_accessor :album     # linked on load
 
+      def self.csv_header
+        %w[ID year artist title].to_csv
+      end
+
       def artists=(artists)
         @artists = artists.map { |a| ReleaseArtist.new(a) }
       end
@@ -116,6 +120,10 @@ class MusicBox
 
       def images_dir
         @dir / 'images'
+      end
+
+      def to_csv
+        [@id, original_release_year, artist, @title].to_csv
       end
 
       def to_s

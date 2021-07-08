@@ -44,4 +44,183 @@ require 'musicbox/player'
 
 class MusicBox
 
+  attr_accessor :catalog
+
+  def initialize(root:)
+    @catalog = Catalog.new(root: root)
+  end
+
+  def export(args, **params)
+    exporter = Exporter.new(catalog: @catalog, **params)
+    @catalog.find_releases(args).each do |release|
+      album = release.album or raise Error, "Album does not exist for release #{release.id}"
+      exporter.export_album(album)
+    end
+  end
+
+  def extract(args)
+    extractor = Extractor.new(catalog: @catalog)
+    @catalog.dirs_for_args(@catalog.extract_dir, args).each do |dir|
+      extractor.extract_dir(dir)
+    end
+  end
+
+  def fix(args)
+    # key_map = {
+    #   :title => :title,
+    #   :artist => :artist,
+    #   :original_release_year => :year,
+    #   :format_quantity => :discs,
+    # }
+    # find_releases(args).select(&:cd?).each do |release|
+    #   diffs = {}
+    #   key_map.each do |release_key, album_key|
+    #     release_value = release.send(release_key)
+    #     album_value = release.album.send(album_key)
+    #     if album_value && release_value != album_value
+    #       diffs[release_key] = [release_value, album_value]
+    #     end
+    #   end
+    #   unless diffs.empty?
+    #     puts release
+    #     diffs.each do |key, values|
+    #       puts "\t" + '%s: %p => %p' % [key, *values]
+    #     end
+    #     puts
+    #   end
+    # end
+  end
+
+  def get_cover(args)
+    @catalog.find_releases(args).select(&:cd?).each do |release|
+      puts release
+      [release, release.master].compact.each(&:get_images)
+    end
+  end
+
+  def cover(args, output_file: '/tmp/cover.pdf')
+    albums = @catalog.find_releases(args).map(&:album).compact.select(&:has_cover?)
+    size = 4.75.in
+    top = 10.in
+    Prawn::Document.generate(output_file) do |pdf|
+      albums.each do |album|
+        puts album
+        pdf.fill do
+          pdf.rectangle [0, top],
+            size,
+            size
+        end
+        pdf.image album.cover_file.to_s,
+          at: [0, top],
+          width: size,
+          fit: [size, size],
+          position: :center
+        pdf.stroke do
+          pdf.rectangle [0, top],
+            size,
+            size
+        end
+      end
+    end
+    run_command('open', output_file)
+  end
+
+  def import(args)
+    importer = Importer.new(catalog: @catalog)
+    @catalog.dirs_for_args(@catalog.import_dir, args).each do |dir|
+      begin
+        importer.import_dir(dir)
+      rescue Error => e
+        warn "Error: #{e}"
+      end
+    end
+  end
+
+  def label(args)
+    labeler = Labeler.new
+    @catalog.prompt_releases(args).each { |r| labeler << r.to_label }
+    labeler.make_labels('/tmp/labels.pdf', open: true)
+  end
+
+  def dir(args)
+    @catalog.find_releases(args).each do |release|
+      puts "%-10s %s" % [release.id, release.dir]
+    end
+  end
+
+  def open(args)
+    @catalog.find_releases(args).each do |release|
+      run_command('open', release.dir)
+    end
+  end
+
+  def orphaned
+    @catalog.orphaned.each do |group, items|
+      unless items.empty?
+        puts "#{group}:"
+        items.sort.each do |item|
+          puts item.summary_to_s
+        end
+        puts
+      end
+    end
+  end
+
+  def show(args, show_details: false)
+    @catalog.show_releases(@catalog.find_releases(args), show_details: show_details)
+  end
+
+  def csv(args)
+    print Catalog::Release.csv_header
+    @catalog.find_releases(args).each do |release|
+      print release.to_csv
+    end
+  end
+
+  def dups(args)
+    dups = @catalog.find_dups(@catalog.find_releases(args))
+    dups.each do |id, formats|
+      formats.each do |format, releases|
+        if releases.length > 1
+          puts
+          @catalog.show_releases(releases)
+        end
+      end
+    end
+  end
+
+  def artist_keys(args)
+    if args.empty?
+      args = @catalog.releases.items.map { |r| r.artists.map(&:name) }.flatten
+    end
+    ;;pp @catalog.artist_keys(args)
+  end
+
+  def play(args, **params)
+    releases = args.empty? ? @catalog.releases.items.select(&:album) : @catalog.prompt_releases(args)
+    albums = releases.map(&:album).compact
+    player = MusicBox::Player.new(albums: albums, **params)
+    player.play
+  end
+
+  def select(args)
+    ids = []
+    loop do
+      releases = @catalog.prompt_releases(args) or break
+      ids += releases.map(&:id)
+      puts ids.join(' ')
+    end
+  end
+
+  def update
+    Discogs.new(catalog: @catalog).update
+  end
+
+  def update_tags(args, force: false)
+    @catalog.find_releases(args).each do |release|
+      album = release.album or raise
+      album.update_tags(force: force)
+    end
+  end
+
 end

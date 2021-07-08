@@ -6,103 +6,86 @@ require 'musicbox'
 SimpleCommand.run do
 
   global root: nil do
-    @catalog = MusicBox::Catalog.new(root: @root)
+    @musicbox = MusicBox.new(root: @root)
   end
 
   command 'extract' do |args|
-    extractor = MusicBox::Extractor.new(catalog: @catalog)
-    @catalog.dirs_for_args(@catalog.extract_dir, args).each do |dir|
-      extractor.extract_dir(dir)
-    end
+    @musicbox.extract(args)
   end
 
   command 'export', dir: nil, compress: false, force: false, parallel: true do |args|
-    raise Error, "Must specify destination directory (--dir)" unless @dir
-    exporter = MusicBox::Exporter.new(
-      catalog: @catalog,
+    @musicbox.export(args,
       dir: @dir,
       compress: @compress,
       force: @force,
       parallel: @parallel)
-    @catalog.find_releases(args).each do |release|
-      album = release.album or raise Error, "Album does not exist for release #{release.id}"
-      exporter.export_album(album)
-    end
   end
 
   command 'fix' do |args|
-    @catalog.fix(args)
+    @musicbox.fix(args)
   end
 
   command 'get-cover' do |args|
-    @catalog.get_cover(args)
+    @musicbox.get_cover(args)
   end
 
-  command 'make-cover' do |args|
-    @catalog.make_cover(args)
+  command 'cover' do |args|
+    @musicbox.cover(args)
   end
 
   command 'import' do |args|
-    importer = MusicBox::Importer.new(catalog: @catalog)
-    @catalog.dirs_for_args(@catalog.import_dir, args).each do |dir|
-      begin
-        importer.import_dir(dir)
-      rescue MusicBox::Error => e
-        warn "Error: #{e}"
-      end
-    end
+    @musicbox.import(args)
   end
 
   command 'label' do |args|
-    labeler = MusicBox::Labeler.new(catalog: @catalog)
-    @catalog.prompt_releases(args).each { |r| labeler << r.to_label }
-    labeler.make_labels('/tmp/labels.pdf', open: true)
+    @musicbox.label(args)
   end
 
-  command 'dir', open: false do |args|
-    @catalog.dir(args, open: @open)
+  command 'dir' do |args|
+    @musicbox.dir(args)
+  end
+
+  command 'open' do |args|
+    @musicbox.open(args)
   end
 
   command 'orphaned' do
-    @catalog.show_orphaned
+    @musicbox.orphaned
   end
 
   command 'show', details: false do |args|
-    @catalog.show(args, show_details: @details)
+    @musicbox.show(args,
+      show_details: @details)
   end
 
   command 'csv' do |args|
-    @catalog.make_csv(args)
+    @musicbox.csv(args)
   end
 
-  command 'show-dups' do |args|
-    @catalog.show_dups(args)
+  command 'dups' do |args|
+    @musicbox.dups(args)
   end
 
-  command 'make-artist-keys' do |args|
-    @catalog.make_artist_keys(args)
+  command 'artist-keys' do |args|
+    @musicbox.artist_keys(args)
   end
 
   command 'play', device: nil, log_level: nil do |args|
-    releases = args.empty? ? @catalog.releases.items.select(&:album) : @catalog.prompt_releases(args)
-    albums = releases.map(&:album).compact
-    player = MusicBox::Player.new(
-      albums: albums,
+    @musicbox.play(args,
       audio_device: @device,
       mpv_log_level: @log_level)
-    player.play
   end
 
   command 'select' do |args|
-    @catalog.select(args)
+    @musicbox.select(args)
   end
 
   command 'update' do |args|
-    MusicBox::Discogs.new(catalog: @catalog).update
+    @musicbox.update
   end
 
   command 'update-tags', force: false do |args|
-    @catalog.update_tags(args, force: @force)
+    @musicbox.update_tags(args, force: @force)
   end
 
 end

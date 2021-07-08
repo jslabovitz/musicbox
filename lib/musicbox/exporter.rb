@@ -11,6 +11,7 @@ class MusicBox
     end
 
     def export_album(album)
+      raise Error, "Must specify destination directory" unless @dir
       name = '%s - %s (%s)' % [album.artist, album.title, album.year]
       export_dir = @dir / name
       export_dir.mkpath unless export_dir.exist?
