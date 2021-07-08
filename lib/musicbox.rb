@@ -48,6 +48,7 @@ class MusicBox
 
   def initialize(root:)
     @catalog = Catalog.new(root: root)
+    @prompt = TTY::Prompt.new
   end
 
   def export(args, **params)
@@ -109,11 +110,17 @@ class MusicBox
   end
 
   def cover(args, output_file: '/tmp/cover.pdf')
-    albums = @catalog.find(args, group: :releases).map(&:album).compact.select(&:has_cover?)
     size = 4.75.in
     top = 10.in
     Prawn::Document.generate(output_file) do |pdf|
-      albums.each do |album|
+      @catalog.find(args, group: :releases).each do |release|
+        album = release.album or next
+        unless album.has_cover?
+          @prompt.yes?('Download and show covers?')
+          get_cover([release.id])
+          run_command('open', *[release.dir, release.master&.dir, release.album.dir].compact)
+          @prompt.yes?('Ready to make cover?')
+        end
         puts album
         pdf.fill do
           pdf.rectangle [0, top],
