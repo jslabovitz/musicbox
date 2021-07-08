@@ -91,6 +91,12 @@ class MusicBox
     # end
   end
 
+  def extract_cover(args)
+    @catalog.find_releases(args).select(&:album).each do |release|
+      release.album.extract_cover
+    end
+  end
+
   def get_cover(args)
     @catalog.find_releases(args).select(&:cd?).each do |release|
       puts release

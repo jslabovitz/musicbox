@@ -87,6 +87,7 @@ class MusicBox
       @album.save
       copy_files
       @album.update_tags
+      extract_cover
       if @prompt.yes?('Make label?')
         Labeler.make_label(@release.to_label, output_file: '/tmp/labels.pdf', open: true)
       end

@@ -29,6 +29,10 @@ SimpleCommand.run do
     @musicbox.get_cover(args)
   end
 
+  command 'extract-cover' do |args|
+    @musicbox.extract_cover(args)
+  end
+
   command 'cover' do |args|
     @musicbox.cover(args)
   end

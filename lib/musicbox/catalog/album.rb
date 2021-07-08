@@ -95,6 +95,36 @@ class MusicBox
         end
       end
 
+      def extract_cover
+        if has_cover?
+          puts "#{@id}: already has cover"
+          return
+        end
+        file = @dir / @tracks.first.file
+        begin
+          run_command('mp4art',
+            '--extract',
+            '--art-index', 0,
+            '--overwrite',
+            '--quiet',
+            file)
+        rescue RunCommandFailed => e
+          # ignore
+        end
+        # cover is in FILE.art[0].TYPE
+        files = @dir.glob('*.art*.*')
+        if files.length == 0
+          puts "#{@id}: no cover to extract"
+        elsif files.length > 1
+          raise Error, "Multiple covers found"
+        else
+          file = files.first
+          new_cover_file = (@dir / 'cover').add_extension(file.extname)
+          puts "#{@id}: extracted cover: #{new_cover_file.basename}"
+          file.rename(new_cover_file)
+        end
+      end
+
       def serialize
         super(
           title: @title,
