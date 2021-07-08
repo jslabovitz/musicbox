@@ -52,7 +52,7 @@ class MusicBox
 
   def export(args, **params)
     exporter = Exporter.new(catalog: @catalog, **params)
-    @catalog.find_releases(args).each do |release|
+    @catalog.find(args, group: :releases).each do |release|
       album = release.album or raise Error, "Album does not exist for release #{release.id}"
       exporter.export_album(album)
     end
@@ -72,7 +72,7 @@ class MusicBox
     #   :original_release_year => :year,
     #   :format_quantity => :discs,
     # }
-    # find_releases(args).select(&:cd?).each do |release|
+    # find(args, group: :releases).select(&:cd?).each do |release|
     #   diffs = {}
     #   key_map.each do |release_key, album_key|
     #     release_value = release.send(release_key)
@@ -92,20 +92,24 @@ class MusicBox
   end
 
   def extract_cover(args)
-    @catalog.find_releases(args).select(&:album).each do |release|
+    @catalog.find(args, group: :releases).select(&:album).each do |release|
       release.album.extract_cover
     end
   end
 
   def get_cover(args)
-    @catalog.find_releases(args).select(&:cd?).each do |release|
+    @catalog.find(args, group: :releases).select(&:cd?).each do |release|
       puts release
-      [release, release.master].compact.each(&:get_images)
+      [release, release.master].compact.each do |r|
+        r.get_images
+        run_command('open', r.dir)
+      end
+      run_command('open', release.album.dir)
     end
   end
 
   def cover(args, output_file: '/tmp/cover.pdf')
-    albums = @catalog.find_releases(args).map(&:album).compact.select(&:has_cover?)
+    albums = @catalog.find(args, group: :releases).map(&:album).compact.select(&:has_cover?)
     size = 4.75.in
     top = 10.in
     Prawn::Document.generate(output_file) do |pdf|
@@ -148,14 +152,14 @@ class MusicBox
     labeler.make_labels('/tmp/labels.pdf', open: true)
   end
 
-  def dir(args)
-    @catalog.find_releases(args).each do |release|
+  def dir(args, group: nil)
+    @catalog.find(args, group: group).each do |release|
       puts "%-10s %s" % [release.id, release.dir]
     end
   end
 
-  def open(args)
-    @catalog.find_releases(args).each do |release|
+  def open(args, group: nil)
+    @catalog.find(args, group: group).each do |release|
       run_command('open', release.dir)
     end
   end
@@ -165,31 +169,38 @@ class MusicBox
       unless items.empty?
         puts "#{group}:"
         items.sort.each do |item|
-          puts item.summary_to_s
+          puts item
         end
         puts
       end
     end
   end
 
-  def show(args, show_details: false)
-    @catalog.show_releases(@catalog.find_releases(args), show_details: show_details)
+  def show(args, group: nil, show_details: false)
+    @catalog.find(args, group: group).each do |release|
+      if show_details
+        puts release.details_to_s
+        puts
+      else
+        puts release
+      end
+    end
   end
 
   def csv(args)
     print Catalog::Release.csv_header
-    @catalog.find_releases(args).each do |release|
+    @catalog.find(args, group: :releases).each do |release|
       print release.to_csv
     end
   end
 
   def dups(args)
-    dups = @catalog.find_dups(@catalog.find_releases(args))
+    dups = @catalog.find_dups(@catalog.find(args, group: :releases))
     dups.each do |id, formats|
       formats.each do |format, releases|
         if releases.length > 1
           puts
-          @catalog.show_releases(releases)
+          releases.each { |r| puts r }
         end
       end
     end
@@ -223,7 +234,7 @@ class MusicBox
   end
 
   def update_tags(args, force: false)
-    @catalog.find_releases(args).each do |release|
+    @catalog.find(args, group: :releases).each do |release|
       album = release.album or raise
       album.update_tags(force: force)
     end

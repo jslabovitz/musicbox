@@ -45,20 +45,23 @@ SimpleCommand.run do
     @musicbox.label(args)
   end
 
-  command 'dir' do |args|
-    @musicbox.dir(args)
+  command 'dir', group: nil do |args|
+    @musicbox.dir(args,
+      group: @group)
   end
 
-  command 'open' do |args|
-    @musicbox.open(args)
+  command 'open', group: nil do |args|
+    @musicbox.open(args,
+      group: @group)
   end
 
   command 'orphaned' do
     @musicbox.orphaned
   end
 
-  command 'show', details: false do |args|
+  command 'show', group: nil, details: false do |args|
     @musicbox.show(args,
+      group: @group,
       show_details: @details)
   end
 
@@ -89,7 +92,8 @@ SimpleCommand.run do
   end
 
   command 'update-tags', force: false do |args|
-    @musicbox.update_tags(args, force: @force)
+    @musicbox.update_tags(args,
+      force: @force)
   end
 
 end

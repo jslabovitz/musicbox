@@ -70,17 +70,6 @@ class MusicBox
       }
     end
 
-    def show_releases(releases, show_details: false)
-      releases.each do |release|
-        if show_details
-          puts release.details_to_s
-          puts
-        else
-          puts release.summary_to_s
-        end
-      end
-    end
-
     def find_dups(releases)
       dups = {}
       releases.select(&:master_id).each do |release|
@@ -91,46 +80,60 @@ class MusicBox
       dups
     end
 
-    def find_releases(selectors)
+    def find(selectors, group: nil)
+      unless group.kind_of?(Group)
+        group = case group&.to_sym
+        when :releases, nil
+          @releases
+        when :masters
+          @masters
+        when :albums
+          @albums
+        else
+          raise Error, "Unknown group: #{group.inspect}"
+        end
+      end
+      ;;puts "searching #{group.items.count} items in #{group.class}"
       selectors = [':all'] if selectors.nil? || selectors.empty?
-      releases = []
+      selected = []
       selectors.each do |selector|
         case selector.to_s
         when ':all'
-          releases += @releases.items
+          selected += group.items
         when ':recent'
-          releases += @releases.items.select { |c| (Date.today - c.date_added) < 7 }
+          selected += group.items.select { |c| (Date.today - c.date_added) < 7 }
         when ':multidisc'
-          releases += @releases.items.select(&:multidisc?)
+          selected += group.items.select(&:multidisc?)
         when ':cd'
-          releases += @releases.items.select(&:cd?)
+          selected += group.items.select(&:cd?)
         when ':unripped'
-          releases += @releases.items.select(&:cd?).reject(&:album)
+          selected += group.items.select(&:cd?).reject(&:album)
         when ':odd-positions'
-          releases += @releases.items.select(&:cd?).select { |r| r.tracklist_flattened.find { |t| t.position !~ /^\d+$/ } }
+          selected += group.items.select(&:cd?).select { |r| r.tracklist_flattened.find { |t| t.position !~ /^\d+$/ } }
         when /^-?\d+$/
           n = selector.to_i
+          item = group[n.abs] or raise Error, "Can't find item #{selector.inspect} in #{group.class}"
           if n > 0
-            releases += [@releases[n]]
+            selected += [group[n]]
           else
-            releases -= [@releases[-n]]
+            selected -= [group[-n]]
           end
         else
-          releases += @releases.search(query: selector.to_s, fields: [:title, :artists, :id])
+          selected += group.search(query: selector.to_s, fields: [:title, :artists, :id])
         end
       end
-      releases.uniq.sort!
+      selected.uniq.sort!
     end
 
     def prompt_release(query)
-      choices = find_releases([query]).map { |r| [r.to_s, r.id] }.to_h
+      choices = find([query], group: :releases).map { |r| [r.to_s, r.id] }.to_h
       if (id = TTY::Prompt.new.select('Release?', choices, filter: true, per_page: 100, quiet: true))
         @releases[id]
       end
     end
 
     def prompt_releases(query)
-      choices = find_releases(query).map { |r| [r.to_s, r.id] }.to_h
+      choices = find(query, group: :releases).map { |r| [r.to_s, r.id] }.to_h
       if (ids = TTY::Prompt.new.multi_select('Releases?', choices, filter: true, per_page: 100, quiet: true))
         ids.map { |id| @releases[id] }
       end
