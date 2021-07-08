@@ -41,11 +41,13 @@ class MusicBox
       end
 
       def cover_file
-        @dir / 'cover.jpg'
+        files = @dir.glob('cover.{jpg,png}')
+        raise Error, "Multiple cover files" if files.length > 1
+        files.first
       end
 
       def has_cover?
-        cover_file.exist?
+        !cover_file.nil?
       end
 
       def validate_logs
