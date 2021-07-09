@@ -36,6 +36,7 @@ require 'musicbox/catalog/releases'
 require 'musicbox/catalog/tags'
 require 'musicbox/catalog/track'
 
+require 'musicbox/cover_maker'
 require 'musicbox/discogs'
 require 'musicbox/exporter'
 require 'musicbox/extractor'
@@ -111,36 +112,18 @@ class MusicBox
   end
 
   def cover(args, prompt: false, output_file: '/tmp/cover.pdf')
-    size = 4.75.in
-    top = 10.in
-    Prawn::Document.generate(output_file) do |pdf|
-      @catalog.find(args, group: :releases, prompt: prompt).each do |release|
-        album = release.album or next
-        unless album.has_cover?
-          @prompt.yes?('Download and show covers?')
-          get_cover([release.id])
-          run_command('open', *[release.dir, release.master&.dir, release.album.dir].compact)
-          @prompt.yes?('Ready to make cover?')
-        end
-        puts album
-        pdf.fill do
-          pdf.rectangle [0, top],
-            size,
-            size
-        end
-        pdf.image album.cover_file.to_s,
-          at: [0, top],
-          width: size,
-          fit: [size, size],
-          position: :center
-        pdf.stroke do
-          pdf.rectangle [0, top],
-            size,
-            size
-        end
+    cover_maker = CoverMaker.new(output_file: output_file)
+    @catalog.find(args, group: :releases, prompt: prompt).each do |release|
+      unless release.album&.has_cover?
+        @prompt.yes?('Download and show covers?')
+        get_cover([release.id])
+        run_command('open', *[release.dir, release.master&.dir, release.album.dir].compact)
+        @prompt.yes?('Ready to make cover?')
       end
+      cover_maker << release
     end
-    run_command('open', output_file)
+    cover_maker.make_covers
+    cover_maker.open
   end
 
   def import(args)
