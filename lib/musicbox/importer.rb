@@ -33,10 +33,11 @@ class MusicBox
     end
 
     def find_release
-      @release = @catalog.find(@source_dir.basename.to_s,
+      releases = @catalog.find(@source_dir.basename.to_s,
         group: :releases,
         prompt: true,
         multiple: false)
+      @release = releases.first
       @tracklist_flattened = @release.tracklist_flattened
       print @release.details_to_s
     end
