@@ -81,7 +81,7 @@ class MusicBox
       dups
     end
 
-    def find(selectors, group: nil, prompt: false, multiple: true)
+    def find(*selectors, group: nil, prompt: false, multiple: true)
       unless group.kind_of?(Group)
         group = case group&.to_sym
         when :releases, nil
@@ -95,7 +95,8 @@ class MusicBox
         end
       end
       ;;puts "searching #{group.items.count} items in #{group.class}"
-      selectors = [':all'] if selectors.nil? || selectors.empty?
+      selectors = [selectors].compact.flatten
+      selectors = [':all'] if selectors.empty?
       selected = []
       selectors.each do |selector|
         case selector.to_s
