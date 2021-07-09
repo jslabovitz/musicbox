@@ -197,6 +197,7 @@ class MusicBox
       end
 
       def get_images
+        return unless @images
         images_dir.mkpath unless images_dir.exist?
         @images.each do |image|
           uri = URI.parse(image['uri'])
