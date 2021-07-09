@@ -31,6 +31,7 @@ class MusicBox
       @artists = Artists.new(root: @catalog_dir / 'artists')
       @albums = Albums.new(root: @catalog_dir / 'albums')
       link_groups
+      @prompt = TTY::Prompt.new
     end
 
     def load_config
@@ -80,7 +81,7 @@ class MusicBox
       dups
     end
 
-    def find(selectors, group: nil)
+    def find(selectors, group: nil, prompt: false, multiple: true)
       unless group.kind_of?(Group)
         group = case group&.to_sym
         when :releases, nil
@@ -123,20 +124,22 @@ class MusicBox
         end
       end
       selected.uniq.sort!
-    end
-
-    def prompt_release(query)
-      choices = find([query], group: :releases).map { |r| [r.to_s, r.id] }.to_h
-      if (id = TTY::Prompt.new.select('Release?', choices, filter: true, per_page: 100, quiet: true))
-        @releases[id]
+      if prompt
+        choices = selected.map { |r| [r.to_s, r.id] }.to_h
+        if multiple
+          ids = @prompt.multi_select('Item?', filter: true, per_page: 100, quiet: true) do |menu|
+            # menu.default *(1..choices.length).to_a
+            choices.each do |name, value|
+              menu.choice name, value
+            end
+          end
+          selected = ids.map { |id| group[id] }
+        else
+          id = @prompt.select('Item?', choices, filter: true, per_page: 100, quiet: true)
+          selected = [group[id]] if id
+        end
       end
-    end
-
-    def prompt_releases(query)
-      choices = find(query, group: :releases).map { |r| [r.to_s, r.id] }.to_h
-      if (ids = TTY::Prompt.new.multi_select('Releases?', choices, filter: true, per_page: 100, quiet: true))
-        ids.map { |id| @releases[id] }
-      end
+      selected
     end
 
     def link_groups

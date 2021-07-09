@@ -109,11 +109,11 @@ class MusicBox
     end
   end
 
-  def cover(args, output_file: '/tmp/cover.pdf')
+  def cover(args, prompt: false, output_file: '/tmp/cover.pdf')
     size = 4.75.in
     top = 10.in
     Prawn::Document.generate(output_file) do |pdf|
-      @catalog.find(args, group: :releases).each do |release|
+      @catalog.find(args, group: :releases, prompt: prompt).each do |release|
         album = release.album or next
         unless album.has_cover?
           @prompt.yes?('Download and show covers?')
@@ -155,7 +155,7 @@ class MusicBox
 
   def label(args)
     labeler = Labeler.new
-    @catalog.prompt_releases(args).each { |r| labeler << r.to_label }
+    @catalog.find(args, group: :releases, prompt: true).each { |r| labeler << r.to_label }
     labeler.make_labels('/tmp/labels.pdf', open: true)
   end
 
@@ -183,8 +183,8 @@ class MusicBox
     end
   end
 
-  def show(args, group: nil, show_details: false)
-    @catalog.find(args, group: group).each do |release|
+  def show(args, group: nil, show_details: false, prompt: false)
+    @catalog.find(args, group: group, prompt: prompt).each do |release|
       if show_details
         puts release.details_to_s
         puts
@@ -230,7 +230,7 @@ class MusicBox
   def select(args)
     ids = []
     loop do
-      releases = @catalog.prompt_releases(args) or break
+      releases = @catalog.find(args, group: :releases, prompt: true) or break
       ids += releases.map(&:id)
       puts ids.join(' ')
     end
