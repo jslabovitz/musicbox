@@ -184,12 +184,15 @@ class MusicBox
     end
   end
 
-  def show(args, group: nil, show_details: false, prompt: false)
+  def show(args, group: nil, mode: :summary, prompt: false)
     @catalog.find(args, group: group, prompt: prompt).each do |release|
-      if show_details
+      case mode
+      when :cover
+        release.album.show_cover if release.album&.has_cover?
+      when :details
         puts release.details_to_s
         puts
-      else
+      when :summary
         puts release
       end
     end
