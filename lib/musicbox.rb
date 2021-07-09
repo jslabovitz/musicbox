@@ -224,9 +224,8 @@ class MusicBox
     ;;pp @catalog.artist_keys(args)
   end
 
-  def play(args, **params)
-    releases = args.empty? ? @catalog.releases.items.select(&:album) : @catalog.prompt_releases(args)
-    albums = releases.map(&:album).compact
+  def play(args, prompt: false, **params)
+    albums = @catalog.find(args, prompt: prompt).map(&:album).compact
     player = MusicBox::Player.new(albums: albums, **params)
     player.play
   end
