@@ -14,9 +14,10 @@ class MusicBox
       determine_disc
       make_album
       make_copy_plan
-      raise Error, "No tracks were added to album" if @album.tracks.empty?
       if @prompt.yes?('Add?')
         import_album
+        make_label if @prompt.yes?('Make label?')
+        make_cover if @prompt.yes?('Make cover?')
       end
     end
 
@@ -87,13 +88,11 @@ class MusicBox
     end
 
     def import_album
+      raise Error, "No tracks were added to album" if @album.tracks.empty?
       @album.save
       copy_files
       @album.update_tags
       extract_cover
-      if @prompt.yes?('Make label?')
-        Labeler.make_label(@release.to_label, output_file: '/tmp/labels.pdf', open: true)
-      end
     end
 
     def make_copy_plan
@@ -116,6 +115,14 @@ class MusicBox
       end
       @catalog.import_done_dir.mkpath unless @catalog.import_done_dir.exist?
       @source_dir.rename(@catalog.import_done_dir / @source_dir.basename)
+    end
+
+    def make_label
+      Labeler.make_label(@release.to_label, output_file: '/tmp/labels.pdf', open: true)
+    end
+
+    def make_cover
+      #FIXME
     end
 
   end
