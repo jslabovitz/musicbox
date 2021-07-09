@@ -1,4 +1,5 @@
 require 'csv'
+require 'base64'
 require 'discogs-wrapper'
 require 'http'
 require 'io-dispatcher'
