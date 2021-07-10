@@ -2,55 +2,45 @@ class MusicBox
 
   class CoverMaker
 
-    attr_accessor :output_file
-
-    def self.make_cover(release, output_file:, open: false)
-      cover_maker = new(output_file: output_file)
-      cover_maker << release
-      cover_maker.make_covers
-      cover_maker.open if open
+    def self.make_covers(*releases, output_file:)
+      cover_maker = new
+      cover_maker.make_covers(releases)
+      cover_maker.write(output_file)
     end
 
-    def initialize(output_file:)
-      @output_file = Path.new(output_file)
-      @releases = []
+    def initialize
+      @pdf = Prawn::Document.new
     end
 
-    def <<(release)
-      @releases << release
-    end
-
-    def make_covers
+    def make_covers(releases)
       size = 4.75.in
       top = 10.in
-      pdf = Prawn::Document.new
-      @releases.each do |release|
+      releases.each do |release|
         album = release.album
         unless album&.has_cover?
           puts "Release #{release.id} has no cover"
           next
         end
-        pdf.fill do
-          pdf.rectangle [0, top],
+        @pdf.fill do
+          @pdf.rectangle [0, top],
             size,
             size
         end
-        pdf.image album.cover_file.to_s,
+        @pdf.image album.cover_file.to_s,
           at: [0, top],
           width: size,
           fit: [size, size],
           position: :center
-        pdf.stroke do
-          pdf.rectangle [0, top],
+        @pdf.stroke do
+          @pdf.rectangle [0, top],
             size,
             size
         end
       end
-      pdf.render_file(@output_file.to_s)
     end
 
-    def open
-      run_command('open', @output_file)
+    def write(output_file)
+      @pdf.render_file(output_file.to_s)
     end
 
   end

@@ -41,7 +41,7 @@ require 'musicbox/discogs'
 require 'musicbox/exporter'
 require 'musicbox/extractor'
 require 'musicbox/importer'
-require 'musicbox/labeler'
+require 'musicbox/label_maker'
 require 'musicbox/player'
 
 class MusicBox
@@ -107,13 +107,13 @@ class MusicBox
   end
 
   def cover(args, prompt: false, output_file: '/tmp/cover.pdf')
-    cover_maker = CoverMaker.new(output_file: output_file)
+    releases = []
     @catalog.find(args, group: :releases, prompt: prompt).select(&:album).each do |release|
       release.select_cover unless release.album.has_cover?
-      cover_maker << release if release.album.has_cover?
+      releases << release if release.album.has_cover?
     end
-    cover_maker.make_covers
-    cover_maker.open
+    CoverMaker.make_covers(*releases, output_file: output_file)
+    run_command('open', output_file)
   end
 
   def select_cover(args, prompt: false)
@@ -134,9 +134,12 @@ class MusicBox
   end
 
   def label(args)
-    labeler = Labeler.new
-    @catalog.find(args, group: :releases, prompt: true).each { |r| labeler << r.to_label }
-    labeler.make_labels('/tmp/labels.pdf', open: true)
+    labels = @catalog.find(args, group: :releases, prompt: true).map(&:to_label)
+    output_file = '/tmp/labels.pdf'
+    label_maker = LabelMaker.new
+    label_maker.make_labels(labels)
+    label_maker.write(output_file)
+    run_command('open', output_file)
   end
 
   def dir(args, group: nil)
