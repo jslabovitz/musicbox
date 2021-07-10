@@ -100,30 +100,26 @@ class MusicBox
     end
   end
 
-  def get_cover(args)
+  def download_cover(args)
     @catalog.find(args, group: :releases).select(&:cd?).each do |release|
-      puts release
-      [release, release.master].compact.each do |r|
-        r.get_images
-        run_command('open', r.dir)
-      end
-      run_command('open', release.album.dir)
+      release.download_cover
     end
   end
 
   def cover(args, prompt: false, output_file: '/tmp/cover.pdf')
     cover_maker = CoverMaker.new(output_file: output_file)
-    @catalog.find(args, group: :releases, prompt: prompt).each do |release|
-      unless release.album&.has_cover?
-        @prompt.yes?('Download and show covers?')
-        get_cover([release.id])
-        run_command('open', *[release.dir, release.master&.dir, release.album.dir].compact)
-        @prompt.yes?('Ready to make cover?')
-      end
-      cover_maker << release
+    @catalog.find(args, group: :releases, prompt: prompt).select(&:album).each do |release|
+      release.select_cover unless release.album.has_cover?
+      cover_maker << release if release.album.has_cover?
     end
     cover_maker.make_covers
     cover_maker.open
+  end
+
+  def select_cover(args, prompt: false)
+    @catalog.find(args, group: :releases, prompt: prompt).select(&:album).each do |release|
+      release.select_cover
+    end
   end
 
   def import(args)

@@ -45,6 +45,8 @@ class MusicBox
       attr_accessor :year
       attr_accessor :master    # linked on load
       attr_accessor :album     # linked on load
+      attr_accessor :primary_image_uri  # linked on load
+      attr_accessor :primary_image_file # linked on load
 
       def self.csv_header
         %w[ID year artist title].to_csv
@@ -196,18 +198,48 @@ class MusicBox
         }
       end
 
-      def get_images
-        return unless @images
-        images_dir.mkpath unless images_dir.exist?
-        @images.each do |image|
-          uri = URI.parse(image['uri'])
-          name = Path.new(uri.path).basename.to_s
-          image_file = images_dir / name
-          unless image_file.exist?
-            puts "\t" + image_file.to_s
-            image_file.write(HTTP.get(uri))
+      def link_images(images_dir)
+        image = @images&.find { |i| i['type'] == 'primary' }
+        if image
+          @primary_image_uri = URI.parse(image['uri'])
+          @primary_image_file = images_dir / Path.new(@primary_image_uri.path).basename
+        end
+      end
+
+      def download_cover
+        [self, @master].compact.map(&:download_primary_image)
+      end
+
+      def download_primary_image
+        if @primary_image_uri && @primary_image_file
+          unless @primary_image_file.exist?
+            puts "#{@id}: downloading #{@primary_image_file}"
+            @primary_image_file.dirname.mkpath unless @primary_image_file.dirname.exist?
+            @primary_image_file.write(HTTP.get(@primary_image_uri))
             sleep(1)
           end
+        end
+      end
+
+      def select_cover
+        if @album.has_cover?
+          puts "#{@id}: cover already exists"
+          return
+        end
+        download_cover
+        @album.extract_cover
+        choices = [
+          @primary_image_file,
+          @master&.primary_image_file,
+          @album.cover_file,
+        ].compact.uniq.select(&:exist?)
+        if choices.empty?
+          puts "#{@id}: no covers exist"
+        else
+          choices.each { |f| run_command('open', f) }
+          choice = TTY::Prompt.new.select('Cover?', choices)
+          cover_file = (album.dir / 'cover').add_extension(choice.extname)
+          choice.cp(cover_file)
         end
       end
 

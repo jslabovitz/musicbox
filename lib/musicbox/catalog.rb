@@ -8,6 +8,7 @@ class MusicBox
     attr_accessor :extract_dir
     attr_accessor :extract_done_dir
     attr_accessor :catalog_dir
+    attr_accessor :images_dir
     attr_accessor :config
     attr_accessor :collection
     attr_accessor :releases
@@ -30,6 +31,7 @@ class MusicBox
       @masters = Releases.new(root: @catalog_dir / 'masters')
       @artists = Artists.new(root: @catalog_dir / 'artists')
       @albums = Albums.new(root: @catalog_dir / 'albums')
+      @images_dir = @catalog_dir / 'images'
       link_groups
       @prompt = TTY::Prompt.new
     end
@@ -150,6 +152,8 @@ class MusicBox
           release_artist.artist = @artists[release_artist.id]
         end
         release.album = @albums[release.id]
+        release.link_images(@images_dir)
+        release.master&.link_images(@images_dir)
       end
       @collection.items.each do |item|
         item.release = @releases[item.id]
