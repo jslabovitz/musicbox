@@ -1,26 +1,10 @@
 # TODO
 
 - improve cover art
-  - move cover-maker into separate class
-  - only get primary image by default
-    - add --secondary flag to get secondaries
-  - download images when doing 'update'
-  - extract images when doing 'import'
-  - rename 'get-cover' command to 'update-cover'
-  - store all images in top-level images/ directory
-    - link image files to releases/masters in @image_files
-        @image_files = {
-          primary: [files...],
-          secondary: [files...],
-          ...,
-        }
-    - check for orphaned images
-  - make new 'select-cover' command
-    - open Preview with extracted, release, and master images
-    - prompt for 3 images
-    - copy selected image -> cover_file
-    - set cover_file in info.json file -> save
-      - just read cover_file (as path) instead of deriving via glob
+  - check for orphaned images
+  - save @cover_file in album info.json file?
+    - just read cover_file (as path) instead of deriving via glob
+  - set cover in album tracks
   - show albums that are missing cover art
   - reject obsolete/useless GIF cover files?
 
@@ -34,12 +18,12 @@
 - move config handling into main class
   - also definition of import/extract dir
 
-- improve finding/prompting releases
-  - improve searching
-    - sort results by relevance, not by artist/title
-    - allow multiples in prompt
-      - by series
-      - by built-up selection
+- improve searching
+  - sort results by relevance, not by artist/title
+  - move #find into Group
+    - move hard-coded selectors into Group subclasses
+      - call dynamically
+      - eg, ':cd' => send("select_cd")
 
 - allow searching by track titles
 
