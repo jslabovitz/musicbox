@@ -154,6 +154,7 @@ class MusicBox
           ['Formats', Format.to_s(@formats)],
           ['Released', release_year || '-'],
           ['Originally released', original_release_year || '-'],
+          ['Discogs URI', @uri || '-'],
           ['Dir', @dir || '-'],
           ['Tracks', nil, tracklist_to_info],
         ]
