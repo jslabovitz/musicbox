@@ -50,19 +50,24 @@ class MusicBox
         !cover_file.nil?
       end
 
-      def show_cover
+      def show_cover(width: nil, height: nil, preserve_aspect_ratio: nil)
         # see https://iterm2.com/documentation-images.html
         file = cover_file
-        data = Base64.strict_encode64(file.read)
-        args = {
-          name: Base64.strict_encode64(file.to_s),
-          size: data.length,
-          inline: 1,
-        }
-        puts "\033]1337;File=%s:%s\a" % [
-          args.map { |a| a.join('=') }.join(';'),
-          data,
-        ]
+        if file && file.exist?
+          data = Base64.strict_encode64(file.read)
+          args = {
+            name: Base64.strict_encode64(file.to_s),
+            size: data.length,
+            width: width,
+            height: height,
+            preserveAspectRatio: preserve_aspect_ratio,
+            inline: 1,
+          }.compact
+          puts "\033]1337;File=%s:%s\a" % [
+            args.map { |a| a.join('=') }.join(';'),
+            data,
+          ]
+        end
       end
 
       def validate_logs
