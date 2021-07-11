@@ -45,8 +45,6 @@ class MusicBox
       attr_accessor :year
       attr_accessor :master    # linked on load
       attr_accessor :album     # linked on load
-      attr_accessor :primary_image_uri  # linked on load
-      attr_accessor :primary_image_file # linked on load
 
       def self.csv_header
         %w[ID year artist title].to_csv
@@ -200,23 +198,27 @@ class MusicBox
       end
 
       def link_images(images_dir)
-        image = @images&.find { |i| i['type'] == 'primary' }
-        if image
-          @primary_image_uri = URI.parse(image['uri'])
-          @primary_image_file = images_dir / Path.new(@primary_image_uri.path).basename
+        if @images
+          @images.each do |image|
+            uri = URI.parse(image['uri'])
+            image['file'] = images_dir / Path.new(uri.path).basename
+          end
         end
       end
 
       def download_cover
-        [self, @master].compact.map(&:download_primary_image)
+        @images.each do |image|
+          download_image(uri: image['uri'], file: image['file'])
+        end
+        @master.download_cover if @master
       end
 
-      def download_primary_image
-        if @primary_image_uri && @primary_image_file
-          unless @primary_image_file.exist?
-            puts "#{@id}: downloading #{@primary_image_file}"
-            @primary_image_file.dirname.mkpath unless @primary_image_file.dirname.exist?
-            @primary_image_file.write(HTTP.get(@primary_image_uri))
+      def download_image(uri:, file:)
+        if uri && file
+          unless file.exist?
+            puts "#{@id}: downloading #{uri}"
+            file.dirname.mkpath unless file.dirname.exist?
+            file.write(HTTP.get(uri))
             sleep(1)
           end
         end
@@ -230,10 +232,10 @@ class MusicBox
         download_cover
         @album.extract_cover
         choices = [
-          @primary_image_file,
-          @master&.primary_image_file,
+          @master&.images&.map { |i| i['file'] },
+          @images&.map { |i| i['file'] },
           @album.cover_file,
-        ].compact.uniq.select(&:exist?)
+        ].flatten.compact.uniq.select(&:exist?)
         if choices.empty?
           puts "#{@id}: no covers exist"
         else
