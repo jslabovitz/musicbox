@@ -4,9 +4,9 @@
   - check for orphaned images
   - save @cover_file in album info.json file?
     - just read cover_file (as path) instead of deriving via glob
-  - set cover in album tracks
+  - set cover in album tracks when doing update-tags
   - show albums that are missing cover art
-  - reject obsolete/useless GIF cover files?
+  - ignore obsolete/useless GIF cover files?
 
 - improve player
   - show cover art for track
@@ -14,6 +14,7 @@
   - fix playlist display
     - tends not to show in 'r'/'t' mode
   - use curses or tty for full-screen TTY mode?
+  - use TTY::ProgressBar to show track playing progress?
 
 - move config handling into main class
   - also definition of import/extract dir
@@ -24,8 +25,6 @@
     - move hard-coded selectors into Group subclasses
       - call dynamically
       - eg, ':cd' => send("select_cd")
-
-- allow searching by track titles
 
 - improve 'select' tool
   - save to $MUSIC_ROOT/selection.json?
@@ -72,8 +71,9 @@
     - successful rips
 
 - improve validation
-  - rename 'validate' to 'check'?
-  - ensure track files exist, and correspond to release
+  - validate logs
+  - ensure cover exists
+  - ensure track files exist
 
 - calculate loudness
   - see: info/replay-gain.md
