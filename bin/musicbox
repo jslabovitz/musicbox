@@ -25,8 +25,8 @@ SimpleCommand.run do
     @musicbox.fix(args)
   end
 
-  command 'download-cover' do |args|
-    @musicbox.download_cover(args)
+  command 'download-images' do |args|
+    @musicbox.download_images(args)
   end
 
   command 'extract-cover' do |args|

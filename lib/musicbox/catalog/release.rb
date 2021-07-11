@@ -206,11 +206,16 @@ class MusicBox
         end
       end
 
-      def download_cover
-        @images.each do |image|
+      def download_images
+        image = @images.find { |image| image['type'] == 'primary' }
+        if image
           download_image(uri: image['uri'], file: image['file'])
+        else
+          @images.each do |image|
+            download_image(uri: image['uri'], file: image['file'])
+          end
         end
-        @master.download_cover if @master
+        @master.download_images if @master
       end
 
       def download_image(uri:, file:)
@@ -229,7 +234,7 @@ class MusicBox
           puts "#{@id}: cover already exists"
           return
         end
-        download_cover
+        download_images
         @album.extract_cover
         choices = [
           @master&.images&.map { |i| i['file'] },

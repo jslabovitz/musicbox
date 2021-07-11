@@ -100,9 +100,9 @@ class MusicBox
     end
   end
 
-  def download_cover(args)
+  def download_images(args)
     @catalog.find(args, group: :releases).select(&:cd?).each do |release|
-      release.download_cover
+      release.download_images
     end
   end
 
