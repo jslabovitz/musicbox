@@ -42,6 +42,7 @@ class MusicBox
       setup_interface
       setup_mpv
       puts "[ready]"
+      play_random_album
       @dispatcher.run
     end
 

@@ -10,7 +10,6 @@
 
 - improve player
   - show cover art for track
-  - auto-play on start
   - fix playlist display
     - tends not to show in 'r'/'t' mode
   - use curses or tty for full-screen TTY mode?
