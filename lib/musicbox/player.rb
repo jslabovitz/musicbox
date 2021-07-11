@@ -113,6 +113,23 @@ class MusicBox
       while tracks.length < length
         tracks << random_album.tracks.shuffle.first
       end
+      tracks.to_a
+    end
+
+    def playlist_changed(value)
+      @current_track = @playlist = nil
+      if @properties.playlist
+        @playlist = @properties.playlist.map do |entry|
+          track_path = Path.new(entry.filename)
+          album = @album_for_track_path[track_path] \
+            or raise Error, "Can't determine album for track file: #{track_path}"
+          track = album.tracks.find { |t| t.path == track_path } \
+            or raise Error, "Can't determine track for track file: #{track_path}"
+          @current_track = track if entry.current
+          track
+        end
+      end
+      show_playlist
     end
 
     #
@@ -182,19 +199,19 @@ class MusicBox
     end
 
     def show_playlist
-      if @properties.playlist
-        @properties.playlist.each_with_index do |entry, i|
-          track_path = Path.new(entry.filename)
-          album = @album_for_track_path[track_path] \
-            or raise Error, "Can't determine album for track file: #{track_path}"
-          track = album.tracks.find { |t| t.path == track_path } \
-            or raise Error, "Can't determine track for track file: #{track_path}"
+      if @playlist
+        system('clear')
+        if @current_track
+          @current_track.album.show_cover(width: 'auto', height: 20, preserve_aspect_ratio: false)
+          puts
+        end
+        @playlist.each_with_index do |track, i|
           puts '%1s %2d. %-40.40s | %-40.40s | %-40.40s' % [
-            entry.current ? '>' : '',
+            track == @current_track ? '>' : '',
             i + 1,
             track.title,
-            album.title,
-            album.artist,
+            track.album.title,
+            track.album.artist,
           ]
         end
       end
@@ -217,10 +234,10 @@ class MusicBox
     #
 
     def property_changed(name, value)
-# ;;puts "property: <#{name}> => #{value.inspect}" unless name == 'time-pos'
+# ;;pp(name => value) unless name == 'time-pos'
       key = ObservedProperties[name] or raise
       @properties[key] = value
-      show_playlist if name == 'playlist-pos'
+      send("#{key}_changed", value) rescue NoMethodError
     end
 
     private
