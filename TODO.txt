@@ -1,11 +1,11 @@
 # TODO
 
 - improve cover art
+  - set cover in album tracks when doing update-tags
+  - show albums that are missing cover art
   - check for orphaned images
   - save @cover_file in album info.json file?
     - just read cover_file (as path) instead of deriving via glob
-  - set cover in album tracks when doing update-tags
-  - show albums that are missing cover art
   - ignore obsolete/useless GIF cover files?
 
 - improve player
