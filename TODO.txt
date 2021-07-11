@@ -9,9 +9,7 @@
   - ignore obsolete/useless GIF cover files?
 
 - improve player
-  - show cover art for track
-  - fix playlist display
-    - tends not to show in 'r'/'t' mode
+  - reimplement state checkpointing, to resume exactly where left off
   - use curses or tty for full-screen TTY mode?
   - use TTY::ProgressBar to show track playing progress?
 
