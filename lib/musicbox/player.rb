@@ -109,8 +109,9 @@ class MusicBox
     end
 
     def random_tracks(length:)
-      length.times.map do
-        random_album.tracks.shuffle.first
+      tracks = Set.new
+      while tracks.length < length
+        tracks << random_album.tracks.shuffle.first
       end
     end
 
