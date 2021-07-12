@@ -150,7 +150,7 @@ class MusicBox
           # ignore
         end
         # cover is in FILE.art[0].TYPE
-        files = @dir.glob('*.art*.*')
+        files = @dir.glob('*.art*.*').reject { |f| f.extname.downcase == '.gif' }
         if files.length == 0
           puts "#{@id}: no cover to extract"
         elsif files.length > 1
