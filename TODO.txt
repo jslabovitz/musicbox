@@ -2,11 +2,10 @@
 
 - improve cover art
   - set cover in album tracks when doing update-tags
-  - show albums that are missing cover art
   - check for orphaned images
   - save @cover_file in album info.json file?
     - just read cover_file (as path) instead of deriving via glob
-  - ignore obsolete/useless GIF cover files?
+  - ignore/remove obsolete/useless GIF cover files?
 
 - improve player
   - reimplement state checkpointing, to resume exactly where left off
@@ -15,6 +14,7 @@
 
 - move config handling into main class
   - also definition of import/extract dir
+  - use TTY::Config?
 
 - improve searching
   - sort results by relevance, not by artist/title
