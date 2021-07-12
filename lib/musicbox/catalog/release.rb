@@ -248,6 +248,7 @@ class MusicBox
           choice = TTY::Prompt.new.select('Cover?', choices)
           cover_file = (album.dir / 'cover').add_extension(choice.extname)
           choice.cp(cover_file)
+          @album.update_tags
         end
       end
 
