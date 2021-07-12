@@ -113,6 +113,24 @@ class MusicBox
             end
           end
         end
+        if has_cover?
+          # --replace apparently doesn't work, so must do --remove, then --add
+          @tracks.each do |track|
+            begin
+              run_command('mp4art',
+                '--quiet',
+                '--remove',
+                track.path)
+            rescue RunCommandFailed => e
+              # ignore
+            end
+            run_command('mp4art',
+              '--quiet',
+              '--add',
+              cover_file,
+              track.path)
+          end
+        end
       end
 
       def extract_cover
