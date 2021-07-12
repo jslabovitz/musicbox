@@ -1,11 +1,9 @@
 # TODO
 
 - improve cover art
-  - set cover in album tracks when doing update-tags
   - check for orphaned images
   - save @cover_file in album info.json file?
     - just read cover_file (as path) instead of deriving via glob
-  - ignore/remove obsolete/useless GIF cover files?
 
 - improve player
   - reimplement state checkpointing, to resume exactly where left off
