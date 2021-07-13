@@ -226,9 +226,9 @@ class MusicBox
   end
 
   def update_tags(args, force: false)
-    @catalog.find(args, group: :releases).each do |release|
-      album = release.album or raise
-      album.update_tags(force: force)
+    @catalog.find(args, group: :releases).select(&:album).each do |release|
+      puts release
+      release.album.update_tags(force: force)
     end
   end
 
