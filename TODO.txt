@@ -1,5 +1,19 @@
 # TODO
 
+- write basic docs
+  - overview
+  - assumptions/prerequisites
+    - Discogs account
+    - artist-key/release-year convention
+  - installation
+    - Homebrew tools
+    - gem install
+  - initial configuration
+  - operation
+    - examples
+
+- push to Github/RubyGems
+
 - improve cover art
   - check for orphaned images
   - save @cover_file in album info.json file?
