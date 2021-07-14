@@ -1,6 +1,10 @@
 # TODO
 
-- fix multiple covers being overlaid in 'cover' command
+- make covers 2-up
+
+- center cover horizontally on page
+
+- make crop marks
 
 - ignore non-CDs when doing Discogs update?
   - but handle case where LP includes CD or digital download
@@ -21,6 +25,8 @@
 
 - allow creation of standalone album
   - for: unreleased, mixtape, etc.
+
+- allow label font to be configured
 
 - save artist ID into album
 
