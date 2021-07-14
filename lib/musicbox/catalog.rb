@@ -77,8 +77,11 @@ class MusicBox
       dups = {}
       releases.select(&:master_id).each do |release|
         dups[release.master_id] ||= {}
-        dups[release.master_id][release.primary_format_name] ||= []
-        dups[release.master_id][release.primary_format_name] << release
+        #FIXME: wrong
+        release.formats.map(&:name).each do |format_name|
+          dups[release.master_id][format_name] ||= []
+          dups[release.master_id][format_name] << release
+        end
       end
       dups
     end
