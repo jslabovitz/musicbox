@@ -25,7 +25,7 @@ class MusicBox
       @disc = nil
       if @album
         raise Error, "Album already exists" if @release.format_quantity.nil? || @release.format_quantity == 1
-        puts "Release is multidisc."
+        puts "Release has multiple discs."
         n = @prompt.ask?('Which disc is this?', required: true, convert: :int)
         raise Error, "Disc number out of range" unless n >= 1 && n <= @release.format_quantity
         @disc = n
