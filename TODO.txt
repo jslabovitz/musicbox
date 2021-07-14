@@ -1,5 +1,36 @@
 # TODO
 
+- fix multiple covers being overlaid in 'cover' command
+
+- ignore non-CDs when doing Discogs update?
+  - but handle case where LP includes CD or digital download
+
+- only use #cd? to determine need for ripping
+
+- rework use of #album != nil to has_album?
+
+- fix 'dup' command to not treat multidisc release as duplicate
+
+- import: handle multiple formats/discs better
+  - consider case where digitized LP becomes album
+  - if more than one format, prompt for choice
+  - but how to handle multidisc releases 
+    - some have formats of [CD, CD]
+    - others have [CD x2]
+  - save format into album info
+
+- allow creation of standalone album
+  - for: unreleased, mixtape, etc.
+
+- save artist ID into album
+
+- consider using Album as master/truth?
+  - keep in SQLite?
+  - created/updated from Discogs, but treated separately
+
+- keep separate list of artists
+  - integrate key, first/last name order
+
 - write basic docs
   - overview
   - assumptions/prerequisites
