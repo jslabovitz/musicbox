@@ -94,10 +94,6 @@ class MusicBox
         @master&.release_year || release_year
       end
 
-      def multidisc?
-        @formats.find(&:multidisc?) != nil
-      end
-
       def cd?
         primary_format_name == 'CD'
       end

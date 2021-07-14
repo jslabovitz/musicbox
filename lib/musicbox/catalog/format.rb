@@ -34,11 +34,7 @@ class MusicBox
       end
 
       def qty_to_s
-        multidisc? ? " [#{@qty}]" : ''
-      end
-
-      def multidisc?
-        @qty && @qty > 1
+        (@qty && @qty > 1) ? " [#{@qty}]" : ''
       end
 
       def cd?
