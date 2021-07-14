@@ -164,6 +164,14 @@ class MusicBox
         puts
       end
     end
+    images = @catalog.orphaned_images
+    unless images.empty?
+      puts "Images:"
+      images.sort.each do |image|
+        puts "\t" + image.to_s
+      end
+      puts
+    end
   end
 
   def show(args, group: nil, mode: :summary, prompt: false)
