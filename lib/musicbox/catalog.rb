@@ -106,8 +106,8 @@ class MusicBox
           selected += group.items
         when ':recent'
           selected += group.items.select { |c| (Date.today - c.date_added) < 7 }
-        when ':multidisc'
-          selected += group.items.select(&:multidisc?)
+        when ':multiformat'
+          selected += group.items.select { |r| r.formats&.length > 1 }
         when ':cd'
           selected += group.items.select(&:cd?)
         when ':unripped'
