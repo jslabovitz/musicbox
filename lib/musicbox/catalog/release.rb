@@ -106,10 +106,6 @@ class MusicBox
         [artist_key, original_release_year || 0, @title]
       end
 
-      def images_dir
-        @dir / 'images'
-      end
-
       def to_csv
         [@id, original_release_year, artist, @title].to_csv
       end
