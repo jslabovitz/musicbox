@@ -15,12 +15,13 @@ class MusicBox
     def make_covers(releases)
       size = 4.75.in
       top = 10.in
-      releases.each do |release|
+      releases.each_with_index do |release, i|
         album = release.album
         unless album&.has_cover?
           puts "Release #{release.id} has no cover"
           next
         end
+        @pdf.start_new_page if i > 0
         @pdf.fill do
           @pdf.rectangle [0, top],
             size,
