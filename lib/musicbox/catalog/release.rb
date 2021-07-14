@@ -74,14 +74,6 @@ class MusicBox
         @tracklist = tracklist.map { |t| Track.new(t) }
       end
 
-      def primary_format
-        @formats&.first
-      end
-
-      def primary_format_name
-        primary_format&.name
-      end
-
       def release_year
         if @year && @year != 0
           @year
@@ -95,7 +87,7 @@ class MusicBox
       end
 
       def cd?
-        primary_format_name == 'CD'
+        @formats.find(&:cd?) != nil
       end
 
       def artist
@@ -188,7 +180,7 @@ class MusicBox
           title: title,
           key: artist_key,
           year: original_release_year,
-          format: primary_format_name,
+          format: Format.to_s(@formats),
           id: id,
         }
       end
