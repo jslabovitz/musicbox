@@ -1,5 +1,7 @@
 # TODO
 
+- make image class instead of hash
+
 - make covers 2-up
 
 - center cover horizontally on page
@@ -51,34 +53,32 @@
 
 - push to Github/RubyGems
 
-- improve cover art
-  - check for orphaned images
-  - save @cover_file in album info.json file?
-    - just read cover_file (as path) instead of deriving via glob
+- save @cover_file in album info.json file?
+  - just read cover_file (as path) instead of deriving via glob
 
-- improve player
-  - reimplement state checkpointing, to resume exactly where left off
-  - use curses or tty for full-screen TTY mode?
-  - use TTY::ProgressBar to show track playing progress?
+- reimplement player state checkpointing, to resume exactly where left off
+
+- use curses or tty for full-screen player TTY mode?
+
+- use TTY::ProgressBar to show track playing progress?
 
 - move config handling into main class
   - also definition of import/extract dir
   - use TTY::Config?
 
-- improve searching
-  - sort results by relevance, not by artist/title
-  - move #find into Group
-    - move hard-coded selectors into Group subclasses
-      - call dynamically
-      - eg, ':cd' => send("select_cd")
+- sort #find results by relevance, not by artist/title
+
+- move #find into Group
+  - move hard-coded selectors into Group subclasses
+    - call dynamically
+    - eg, ':cd' => send("select_cd")
 
 - improve 'select' tool
   - save to $MUSIC_ROOT/selection.json?
   - optionally name
   - can be referred to in query
 
-- improve discogs update
-  - don't simply delete previous collection
+- when updating collection, don't simply delete previous collection
   - determine additions/removals/changes
   - handle case where Discogs has merged/moved releases
     - ie, release_id has changed
