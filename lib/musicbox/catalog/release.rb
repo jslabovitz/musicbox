@@ -127,21 +127,21 @@ class MusicBox
           original_release_year || '-',
           artist,
           @title,
-          primary_format_name,
+          Format.to_s(@formats),
         ]
       end
 
       def details_to_s
         info = [
           ['ID', @id],
-          ['Master ID', @master_id],
+          ['Master ID', @master_id || '-'],
           ['Artist', ReleaseArtist.artists_to_s(@artists)],
           ['Title', @title],
           ['Formats', Format.to_s(@formats)],
           ['Released', release_year || '-'],
           ['Originally released', original_release_year || '-'],
           ['Discogs URI', @uri || '-'],
-          ['Dir', @dir || '-'],
+          ['Album dir', @album&.dir || '-'],
           ['Tracks', nil, tracklist_to_info],
         ]
         MusicBox.info_to_s(info)
