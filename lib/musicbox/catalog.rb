@@ -118,6 +118,8 @@ class MusicBox
           selected += group.items
         when ':recent'
           selected += group.items.select { |c| (Date.today - c.date_added) < 7 }
+        when ':recently-added'
+          selected += @collection.items.select { |c| (Date.today - c.date_added) < 30 }.map(&:release)
         when ':multiformat'
           selected += group.items.select { |r| r.formats&.length > 1 }
         when ':cd'
