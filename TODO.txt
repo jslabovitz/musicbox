@@ -2,11 +2,19 @@
 
 - make image class instead of hash
 
+- re-implement file-based Group?
+  - convert all Discogs structures
+
+- remove 'extract' logic?
+  - presume that ripping is handled externally
+  - only concerned with importing
+    - NOT: ripping, downloading, digitizing, converting, etc.
+
 - make covers 2-up
 
 - center cover horizontally on page
 
-- make crop marks
+- make crop marks on covers
 
 - ignore non-CDs when doing Discogs update?
   - but handle case where LP includes CD or digital download
