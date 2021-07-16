@@ -2,6 +2,10 @@
 
 - make image class instead of hash
 
+- split up Catalog
+  - Discogs-related classes under Discogs
+  - Album, AlbumTrack, Artist (new) under Catalog
+
 - re-implement file-based Group?
   - convert all Discogs structures
 
@@ -16,10 +20,10 @@
 
 - make crop marks on covers
 
-- ignore non-CDs when doing Discogs update?
-  - but handle case where LP includes CD or digital download
-
 - only use #cd? to determine need for ripping
+  - add default find selector to reject releases with non-rippable formats
+      https://www.discogs.com/help/formatslist
+  - can override to show full collection, find dups, or make LP/etc. labels
 
 - rework use of #album != nil to has_album?
 
@@ -29,9 +33,18 @@
   - consider case where digitized LP becomes album
   - if more than one format, prompt for choice
   - but how to handle multidisc releases 
-    - some have formats of [CD, CD]
-    - others have [CD x2]
-  - save format into album info
+    - some have formats of [CD, CD] ('expanded')
+    - others have [CD x2] ('compact')
+  - save selected format into album info
+  - in general:
+    - goal is to create list of tracks with minimal metadata:
+      - track #
+      - disc # (optional)
+      - title
+      - artist (optional)
+      - (others inherited from album)
+    - use Discogs data as a guide/template
+      - but allow assigning, collapsing, expanding, reordering as needed
 
 - allow creation of standalone album
   - for: unreleased, mixtape, etc.
@@ -40,7 +53,7 @@
 
 - save artist ID into album
 
-- consider using Album as master/truth?
+- consider using Album/AlbumTrack as master/truth?
   - keep in SQLite?
   - created/updated from Discogs, but treated separately
 
