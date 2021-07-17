@@ -94,6 +94,19 @@ class MusicBox
     # end
   end
 
+  def formats(args)
+    formats = {}
+    @catalog.find(args, group: :releases).each do |release|
+      release.formats.each do |format|
+        formats[format.name] ||= 0
+        formats[format.name] += 1
+      end
+    end
+    formats.each do |name, count|
+      puts '%5d %s' % [count, name]
+    end
+  end
+
   def extract_cover(args)
     @catalog.find(args, group: :releases).select(&:album).each do |release|
       release.album.extract_cover

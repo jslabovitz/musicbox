@@ -25,6 +25,10 @@ SimpleCommand.run do
     @musicbox.fix(args)
   end
 
+  command 'formats' do |args|
+    @musicbox.formats(args)
+  end
+
   command 'download-images' do |args|
     @musicbox.download_images(args)
   end
