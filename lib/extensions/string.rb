@@ -22,6 +22,7 @@ class String
     downcase.                     # lowercase
       unaccent.                   # 'normalize' accents
       delete(%q{'"‘’“”}).         # remove quotes
+      sub(/\(.*?\)/, '').         # remove parenthetical text
       gsub(/[^a-z0-9]+/, ' ').    # convert non-alphanumeric to whitespace
       strip.squeeze(' ')          # compress/remove whitespace
   end
