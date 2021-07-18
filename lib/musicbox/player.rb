@@ -12,6 +12,8 @@ class MusicBox
       '<' => :skip_backward,
       '>' => :skip_forward,
       '^' => :skip_to_beginning,
+      'e' => :toggle_equalizer,
+      'E' => :next_equalizer,
       'q' => :quit,
       '.' => :show_playlist,
       '?' => :show_keymap,
@@ -27,6 +29,7 @@ class MusicBox
     attr_accessor :albums
     attr_accessor :audio_device
     attr_accessor :mpv_log_level
+    attr_accessor :equalizers
 
     def initialize(**params)
       {
@@ -61,7 +64,10 @@ class MusicBox
       ObservedProperties.each do |name, key|
         @mpv.observe_property(name) { |n, v| property_changed(n, v) }
       end
-      @mpv.command('af', 'add', "equalizer=#{@equalizer.join(':')}") if @equalizer
+      if @equalizers
+        @equalizer_enabled = true
+        next_equalizer
+      end
       @dispatcher.add_io_handler(input: @mpv.socket) do |io|
         @mpv.process_response
       end
@@ -227,6 +233,29 @@ class MusicBox
       @playlist_file.dirname.mkpath
       @playlist_file.write(tracks.map(&:path).join("\n"))
       @mpv.command('loadlist', @playlist_file.to_s)
+    end
+
+    def toggle_equalizer
+      @equalizer_enabled = !@equalizer_enabled
+      set_current_equalizer
+    end
+
+    def next_equalizer
+      if @equalizers
+        @current_equalizer &&= @equalizers[@equalizers.index(@current_equalizer) + 1]
+        @current_equalizer ||= @equalizers.first
+        set_current_equalizer
+      end
+    end
+
+    def set_current_equalizer
+      if @current_equalizer
+        puts "[equalizer: %s <%s>]" % [
+          @current_equalizer.name,
+          @equalizer_enabled ? 'enabled' : 'disabled',
+        ]
+        @mpv.command('af', 'set', @current_equalizer.to_s(enabled: @equalizer_enabled))
+      end
     end
 
     #

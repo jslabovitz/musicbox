@@ -94,11 +94,12 @@ SimpleCommand.run do
     @musicbox.artist_keys(args)
   end
 
-  command 'play', prompt: nil, device: nil, log_level: nil do |args|
+  command 'play', prompt: nil, device: nil, log_level: nil, eq: nil do |args|
     @musicbox.play(args,
       prompt: @prompt,
       audio_device: @device,
-      mpv_log_level: @log_level)
+      mpv_log_level: @log_level,
+      equalizer_name: @eq)
   end
 
   command 'select' do |args|

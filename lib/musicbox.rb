@@ -10,6 +10,7 @@ require 'prawn'
 require 'prawn/measurement_extensions'
 require 'run-command'
 require 'set'
+require 'set_params'
 require 'sixarm_ruby_unaccent'
 require 'tty-prompt'
 require 'yaml'
@@ -38,6 +39,7 @@ require 'musicbox/catalog/track'
 
 require 'musicbox/cover_maker'
 require 'musicbox/discogs'
+require 'musicbox/equalizer'
 require 'musicbox/exporter'
 require 'musicbox/extractor'
 require 'musicbox/importer'
@@ -227,9 +229,19 @@ class MusicBox
     ;;pp @catalog.artist_keys(args)
   end
 
-  def play(args, prompt: false, **params)
+  def play(args, prompt: false, equalizer_name: nil, **params)
     albums = @catalog.find(args, prompt: prompt).map(&:album).compact
-    player = MusicBox::Player.new(albums: albums, **params)
+    if equalizer_name
+      equalizers = Equalizer.load_equalizers(
+        dir: Path.new(@catalog.config['equalizers_dir']),
+        name: equalizer_name)
+    else
+      equalizers = nil
+    end
+    player = MusicBox::Player.new(
+      albums: albums,
+      equalizers: equalizers,
+      **params)
     player.play
   end
 
