@@ -1,8 +1,14 @@
 # TODO
 
-- replace generic initializers with SetParams
+- implement new AutoEQ class
+  - handles lookup in AutoEQ
+  - knows about precedences
+  - has #to_equalizer that makes equalizers
 
-- make image class instead of hash
+- make most commands work on albums, not releases/etc.
+  - use Discogs as original source of truth
+  - but not for searching
+  - except for unripped, etc.
 
 - create better way of making sub-commands
   - as easy as shell script
@@ -76,7 +82,7 @@
 
 - use TTY::ProgressBar to show track playing progress?
 
-- move config handling into main class
+- move config handling into MusicBox class
   - also definition of import dir, etc.
   - use TTY::Config?
 
@@ -113,7 +119,7 @@
 - use exiftool instead of ffprobe/mp4tags
   $ exiftool -json -recurse . -ext m4a
 
-- handle importing logs like tracks
+- improve log handling
   - create Log class with attributes:
     - timestamp
     - media type
