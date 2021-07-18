@@ -125,7 +125,9 @@ class MusicBox
     end
 
     def make_cover
-      #FIXME
+      output_file = '/tmp/covers.pdf'
+      CoverMaker.make_covers(@release, output_file: output_file)
+      run_command('open', output_file)
     end
 
   end
