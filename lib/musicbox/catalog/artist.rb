@@ -7,7 +7,7 @@ class MusicBox
       attr_accessor :aliases
       attr_accessor :data_quality
       attr_accessor :groups
-      attr_accessor :images   #FIXME: make Image class?
+      attr_accessor :images
       attr_accessor :members
       attr_accessor :name
       attr_accessor :namevariations
@@ -28,6 +28,10 @@ class MusicBox
 
       def members=(members)
         @members = members.map { |a| ReleaseArtist.new(a) }
+      end
+
+      def images=(images)
+        @images = images.map { |i| Image.new(i) }
       end
 
       def to_s

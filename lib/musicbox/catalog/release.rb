@@ -70,6 +70,10 @@ class MusicBox
         @formats = formats.map { |f| Format.new(f) }
       end
 
+      def images=(images)
+        @images = images.map { |i| Image.new(i) }
+      end
+
       def tracklist=(tracklist)
         @tracklist = tracklist.map { |t| Track.new(t) }
       end
@@ -184,19 +188,18 @@ class MusicBox
       def link_images(images_dir)
         if @images
           @images.each do |image|
-            uri = URI.parse(image['uri'])
-            image['file'] = images_dir / Path.new(uri.path).basename
+            image.file = images_dir / Path.new(image.uri.path).basename
           end
         end
       end
 
       def download_images
-        image = @images.find { |image| image['type'] == 'primary' }
+        image = @images.find(&:primary?)
         if image
-          download_image(uri: image['uri'], file: image['file'])
+          download_image(uri: image.uri, file: image.file)
         else
           @images.each do |image|
-            download_image(uri: image['uri'], file: image['file'])
+            download_image(uri: image.uri, file: image.file)
           end
         end
         @master.download_images if @master
