@@ -2,6 +2,9 @@
 
 - make image class instead of hash
 
+- ensure any audio file is treated the same
+  - FLAC, MP3, etc.
+
 - create better way of making sub-commands
   - as easy as shell script
   - no class or methods needed
@@ -69,20 +72,6 @@
 
 - keep separate list of artists
   - integrate key, first/last name order
-
-- write basic docs
-  - overview
-  - assumptions/prerequisites
-    - Discogs account
-    - artist-key/release-year convention
-  - installation
-    - Homebrew tools
-    - gem install
-  - initial configuration
-  - operation
-    - examples
-
-- push to Github/RubyGems
 
 - save @cover_file in album info.json file?
   - just read cover_file (as path) instead of deriving via glob
