@@ -28,6 +28,7 @@ class MusicBox
 
     attr_accessor :albums
     attr_accessor :audio_device
+    attr_accessor :audio_exclusive
     attr_accessor :mpv_log_level
     attr_accessor :equalizers
 
@@ -53,6 +54,7 @@ class MusicBox
       @mpv = MPVClient.new(
         'mpv-log-level' => @mpv_log_level,
         'audio-device' => @audio_device,
+        'audio-exclusive' => @audio_exclusive ? 'yes' : 'no',
         'audio-display' => 'no',
         'vo' => 'null',
         'volume' => 100)
