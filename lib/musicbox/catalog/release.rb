@@ -220,8 +220,8 @@ class MusicBox
         download_images
         @album.extract_cover
         choices = [
-          @master&.images&.map { |i| i['file'] },
-          @images&.map { |i| i['file'] },
+          @master&.images&.map(&:file),
+          @images&.map(&:file),
           @album.cover_file,
         ].flatten.compact.uniq.select(&:exist?)
         if choices.empty?
