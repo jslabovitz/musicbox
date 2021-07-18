@@ -2,6 +2,16 @@
 
 - make image class instead of hash
 
+- create better way of making sub-commands
+  - as easy as shell script
+  - no class or methods needed
+  - one command -> one file
+  - auto-loaded from commands/ directory
+  - no need to modify bin/musicbox or lib/musicbox.rb
+  - predefined variables:
+    - $catalog (based on --root)
+    - $prompt
+
 - split up Catalog
   - Discogs-related classes under Discogs
   - Album, AlbumTrack, Artist (new) under Catalog
