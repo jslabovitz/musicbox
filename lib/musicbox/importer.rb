@@ -69,7 +69,7 @@ class MusicBox
         file: Path.new(name).add_extension(file.extname),
         tags: tags,
         album: @album)
-      puts "%-50s ==> %6s - %-50s ==> %-50s" % [
+      puts "%-45s => %6s - %-45s => %-45s" % [
         file.basename,
         release_track.position,
         release_track.title,
