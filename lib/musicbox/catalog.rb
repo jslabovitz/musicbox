@@ -5,8 +5,6 @@ class MusicBox
     attr_accessor :root_dir
     attr_accessor :import_dir
     attr_accessor :import_done_dir
-    attr_accessor :extract_dir
-    attr_accessor :extract_done_dir
     attr_accessor :catalog_dir
     attr_accessor :images_dir
     attr_accessor :config
@@ -23,8 +21,6 @@ class MusicBox
       load_config
       @import_dir = @root_dir / 'import'
       @import_done_dir = @root_dir / 'import-done'
-      @extract_dir = @root_dir / 'extract'
-      @extract_done_dir = @root_dir / 'extract-done'
       @catalog_dir = @root_dir / 'catalog'
       @collection = Collection.new(root: @catalog_dir / 'collection')
       @releases = Releases.new(root: @catalog_dir / 'releases')

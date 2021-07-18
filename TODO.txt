@@ -22,11 +22,6 @@
 - re-implement file-based Group?
   - convert all Discogs structures
 
-- remove 'extract' logic?
-  - presume that ripping is handled externally
-  - only concerned with importing
-    - NOT: ripping, downloading, digitizing, converting, etc.
-
 - make covers 2-up
 
 - center cover horizontally on page
@@ -83,7 +78,7 @@
 - use TTY::ProgressBar to show track playing progress?
 
 - move config handling into main class
-  - also definition of import/extract dir
+  - also definition of import dir, etc.
   - use TTY::Config?
 
 - sort #find results by relevance, not by artist/title

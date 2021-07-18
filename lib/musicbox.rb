@@ -41,7 +41,6 @@ require 'musicbox/cover_maker'
 require 'musicbox/discogs'
 require 'musicbox/equalizer'
 require 'musicbox/exporter'
-require 'musicbox/extractor'
 require 'musicbox/importer'
 require 'musicbox/label_maker'
 require 'musicbox/player'
@@ -60,13 +59,6 @@ class MusicBox
     @catalog.find(args, group: :releases).each do |release|
       album = release.album or raise Error, "Album does not exist for release #{release.id}"
       exporter.export_album(album)
-    end
-  end
-
-  def extract(args)
-    extractor = Extractor.new(catalog: @catalog)
-    @catalog.dirs_for_args(@catalog.extract_dir, args).each do |dir|
-      extractor.extract_dir(dir)
     end
   end
 
