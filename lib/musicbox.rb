@@ -124,9 +124,9 @@ class MusicBox
     run_command('open', output_file)
   end
 
-  def select_cover(args, prompt: false)
+  def select_cover(args, prompt: false, force: false)
     @catalog.find(args, group: :releases, prompt: prompt).select(&:album).each do |release|
-      release.select_cover
+      release.select_cover unless release.album.has_cover? && !force
     end
   end
 

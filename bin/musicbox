@@ -56,8 +56,8 @@ SimpleCommand.run do
       group: @group)
   end
 
-  command 'select-cover' do |args|
-    @musicbox.select_cover(args)
+  command 'select-cover', force: false do |args|
+    @musicbox.select_cover(args, force: @force)
   end
 
   command 'orphaned' do

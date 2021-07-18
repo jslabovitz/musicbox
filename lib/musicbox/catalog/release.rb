@@ -217,10 +217,6 @@ class MusicBox
       end
 
       def select_cover
-        if @album.has_cover?
-          puts "#{@id}: cover already exists"
-          return
-        end
         download_images
         @album.extract_cover
         choices = [
