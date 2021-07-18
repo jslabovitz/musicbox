@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'http', '~> 5.0'
   s.add_dependency 'io-dispatcher', '~> 0.1'
   s.add_dependency 'json', '~> 2.2'
+  s.add_dependency 'mime-types', '~> 3.3'
   s.add_dependency 'mpv_client', '~> 0.1'
   s.add_dependency 'path', '~> 2.0'
   s.add_dependency 'prawn', '~> 2.2'
