@@ -142,15 +142,14 @@ class MusicBox
       if prompt
         choices = selected.map { |r| [r.to_s, r.id] }.to_h
         if multiple
-          ids = @prompt.multi_select('Item?', filter: true, per_page: 100, quiet: true) do |menu|
-            # menu.default *(1..choices.length).to_a
+          ids = @prompt.multi_select('Item?', filter: true, per_page: 50, quiet: true) do |menu|
             choices.each do |name, value|
               menu.choice name, value
             end
           end
           selected = ids.map { |id| group[id] }
         else
-          id = @prompt.select('Item?', choices, filter: true, per_page: 100, quiet: true)
+          id = @prompt.select('Item?', choices, filter: true, per_page: 50, quiet: true)
           selected = [group[id]] if id
         end
       end
