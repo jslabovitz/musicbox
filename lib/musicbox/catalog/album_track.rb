@@ -12,9 +12,7 @@ class MusicBox
       attr_accessor :file
       attr_accessor :tags
 
-      def initialize(params={})
-        params.each { |k, v| send("#{k}=", v) }
-      end
+      include SetParams
 
       def file=(file)
         @file = Path.new(file)

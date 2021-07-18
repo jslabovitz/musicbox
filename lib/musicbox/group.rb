@@ -128,15 +128,13 @@ class MusicBox
       attr_accessor :id
       attr_accessor :dir
 
+      include SetParams
+
       def self.load(dir, params={})
         dir = Path.new(dir)
         info_file = dir / Group::InfoFileName
         raise Error, "Info file does not exist: #{info_file}" unless info_file.exist?
         new(JSON.load(info_file.read).merge(dir: dir).merge(params))
-      end
-
-      def initialize(params={})
-        params.each { |k, v| send("#{k}=", v) }
       end
 
       def info_file

@@ -21,6 +21,8 @@ class MusicBox
         year: 'y',          # release year
       }
 
+      include SetParams
+
       def self.load(file)
         new.tap { |t| t.load(file) }
       end
@@ -28,7 +30,7 @@ class MusicBox
       def initialize(params={})
         @current = {}
         @changes = {}
-        params.each { |k, v| send("#{k}=", v) }
+        set(params)
       end
 
       def [](key)

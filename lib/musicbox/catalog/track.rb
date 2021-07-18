@@ -12,9 +12,7 @@ class MusicBox
       attr_accessor :artists
       attr_accessor :sub_tracks
 
-      def initialize(params={})
-        params.each { |k, v| send("#{k}=", v) }
-      end
+      include SetParams
 
       def type_=(type)
         self.type = type

@@ -15,14 +15,12 @@ class MusicBox
       attr_accessor :tracks
       attr_accessor :artist    # linked on load
 
+      include SetParams
+
       def self.artists_to_s(artists)
         artists.map do |artist|
           artist.name + ((artist.join == ',') ? artist.join : (' ' + artist.join))
         end.flatten.join(' ').squeeze(' ').strip
-      end
-
-      def initialize(params={})
-        params.each { |k, v| send("#{k}=", v) }
       end
 
       def to_s
