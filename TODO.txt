@@ -1,9 +1,8 @@
 # TODO
 
-- make image class instead of hash
+- replace generic initializers with SetParams
 
-- ensure any audio file is treated the same
-  - FLAC, MP3, etc.
+- make image class instead of hash
 
 - create better way of making sub-commands
   - as easy as shell script
