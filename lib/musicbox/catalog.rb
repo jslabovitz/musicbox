@@ -172,21 +172,6 @@ class MusicBox
       end
     end
 
-    def categorize_files(dir)
-      categories = {}
-      dir.children.sort.each do |path|
-        type = case (ext = path.extname.downcase)
-        when '.m4a', '.m4p', '.mp3'
-          :audio
-        else
-          ext.delete_prefix('.').to_sym
-        end
-        categories[type] ||= []
-        categories[type] << path
-      end
-      categories
-    end
-
     def dirs_for_args(base_dir, args)
       if args.empty?
         dirs = base_dir.children.select(&:dir?)
