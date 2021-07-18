@@ -13,9 +13,10 @@ class MusicBox
       find_release
       determine_disc
       make_album
-      make_copy_plan
       if @prompt.yes?('Add?')
-        import_album
+        @album.save
+        copy_files
+        @release.select_cover   # also does update_tags
         make_label if @prompt.yes?('Make label?')
         make_cover if @prompt.yes?('Make cover?')
       end
@@ -51,6 +52,20 @@ class MusicBox
         discs: @release.format_quantity,
         dir: @catalog.albums.dir_for_id(@release.id))
       @release.album = @album
+      @copy_plan = {}
+      @source_dir.children.select(&:file?).reject { |f| f.basename.to_s.start_with?('.') }.sort.each do |source_file|
+        type = MIME::Types.of(source_file.to_s).first&.media_type
+        dest_file = case type
+        when 'audio'
+          album_track = make_album_track(source_file)
+          @album.tracks << album_track
+          album_track.file
+        else
+          source_file.basename
+        end
+        @copy_plan[source_file] = @album.dir / dest_file
+      end
+      raise Error, "No tracks were added to album" if @album.tracks.empty?
     end
 
     def make_album_track(file)
@@ -79,35 +94,14 @@ class MusicBox
     end
 
     def find_track_for_title(title)
-      release_track = @tracklist_flattened.find { |t| t.title.downcase == title.downcase }
+      normalized_title = title.normalize
+      release_track = @tracklist_flattened.find { |t| t.title.normalize == normalized_title }
       unless release_track
         puts "Can't find release track with title #{title.inspect}"
         choices = @tracklist_flattened.map { |t| [t.title, t] }.to_h
         release_track = @prompt.select('Track?', choices, per_page: 100)
       end
       release_track
-    end
-
-    def import_album
-      raise Error, "No tracks were added to album" if @album.tracks.empty?
-      @album.save
-      copy_files
-      @album.update_tags
-      extract_cover
-    end
-
-    def make_copy_plan
-      @copy_plan = @source_dir.children.select(&:file?).sort.map do |source_file|
-        dest_file = case source_file.extname.downcase
-        when '.m4a'
-          album_track = make_album_track(source_file) or next
-          @album.tracks << album_track
-          album_track.file
-        else
-          source_file.basename
-        end
-        [source_file, @album.dir / dest_file]
-      end.to_h
     end
 
     def copy_files
