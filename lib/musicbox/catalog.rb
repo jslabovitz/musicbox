@@ -32,8 +32,8 @@ class MusicBox
 
     def load_config
       @config = YAML.load((@root_dir / 'config.yaml').read)
-      ReleaseArtist.class_variable_set(:@@personal_names, @config['personal_names'])
-      ReleaseArtist.class_variable_set(:@@canonical_names, @config['canonical_names'])
+      Artist.class_variable_set(:@@personal_names, @config['personal_names'])
+      Artist.class_variable_set(:@@canonical_names, @config['canonical_names'])
     end
 
     def orphaned
@@ -60,7 +60,7 @@ class MusicBox
       keys = {}
       names = {}
       non_personal_names = Set.new
-      artists.map { |a| a.kind_of?(ReleaseArtist) ? a : ReleaseArtist.new(name: a) }.each do |artist|
+      artists.map { |a| a.kind_of?(Artist) ? a : Artist.new(name: a) }.each do |artist|
         non_personal_names << artist.name if artist.name == artist.canonical_name
         key = artist.key
         (keys[key] ||= Set.new) << artist.name

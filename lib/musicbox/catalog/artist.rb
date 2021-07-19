@@ -2,7 +2,7 @@ class MusicBox
 
   class Catalog
 
-    class ReleaseArtist
+    class Artist
 
       attr_accessor :active
       attr_accessor :anv

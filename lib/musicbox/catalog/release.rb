@@ -51,11 +51,11 @@ class MusicBox
       end
 
       def artists=(artists)
-        @artists = artists.map { |a| ReleaseArtist.new(a) }
+        @artists = artists.map { |a| Artist.new(a) }
       end
 
       def extraartists=(artists)
-        @extraartists = artists.map { |a| ReleaseArtist.new(a) }
+        @extraartists = artists.map { |a| Artist.new(a) }
       end
 
       def date_added=(date)
@@ -95,7 +95,7 @@ class MusicBox
       end
 
       def artist
-        ReleaseArtist.artists_to_s(@artists)
+        Artist.artists_to_s(@artists)
       end
 
       def artist_key
@@ -135,7 +135,7 @@ class MusicBox
         info = [
           ['ID', @id],
           ['Master ID', @master_id || '-'],
-          ['Artist', ReleaseArtist.artists_to_s(@artists)],
+          ['Artist', Artist.artists_to_s(@artists)],
           ['Title', @title],
           ['Formats', Format.to_s(@formats)],
           ['Released', release_year || '-'],
@@ -166,7 +166,7 @@ class MusicBox
             [
               !track.position.to_s.empty? ? ('%*s:' % [max_position_length, track.position]) : nil,
               track.title || '-',
-              track.artists ? "(#{ReleaseArtist.artists_to_s(track.artists)})" : nil,
+              track.artists ? "(#{Artist.artists_to_s(track.artists)})" : nil,
               !track.duration.to_s.empty? ? "[#{track.duration}]" : nil,
             ].compact.join(' '),
             track.sub_tracks ? tracklist_to_info(track.sub_tracks) : nil,
