@@ -221,7 +221,7 @@ class MusicBox
   end
 
   def play(args, prompt: false, equalizer_name: nil, **params)
-    albums = @catalog.find(args, prompt: prompt).map(&:has_album?).compact
+    albums = @catalog.find(args, prompt: prompt).map(&:album).compact
     if equalizer_name
       equalizers = Equalizer.load_equalizers(
         dir: Path.new(@catalog.config['equalizers_dir']),
