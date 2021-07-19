@@ -132,7 +132,7 @@ class MusicBox
   def import(args)
     @catalog.dirs_for_args(@catalog.import_dir, args).each do |dir|
       begin
-        Importer.new(catalog: @catalog).import_dir(dir)
+        Importer.new(catalog: @catalog, source_dir: dir).import
       rescue Error => e
         warn "Error: #{e}"
       end

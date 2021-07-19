@@ -2,64 +2,57 @@ class MusicBox
 
   class Importer
 
-    def initialize(catalog:)
+    def initialize(catalog:, source_dir:)
       @catalog = catalog
+      @source_dir = Path.new(source_dir).realpath
       @prompt = TTY::Prompt.new
     end
 
-    def import_dir(source_dir)
-      @source_dir = Path.new(source_dir).realpath
+    def import
       puts; puts "Importing from #{@source_dir}"
-      find_release
-      determine_disc
       make_album
       if @prompt.yes?('Add?')
         @album.save
         copy_files
+        archive_dir
         @release.select_cover   # also does update_tags
         make_label if @prompt.yes?('Make label?')
         make_cover if @prompt.yes?('Make cover?')
       end
     end
 
-    def determine_disc
-      @disc = nil
-      if @album
+    def make_album
+      @release = @catalog.find(@source_dir.basename.to_s, group: :releases, prompt: true, multiple: false).first
+      print @release.details_to_s
+      if (@album = @release.album)
         raise Error, "Album already exists" if @release.format_quantity.nil? || @release.format_quantity == 1
         puts "Release has multiple discs."
         n = @prompt.ask?('Which disc is this?', required: true, convert: :int)
         raise Error, "Disc number out of range" unless n >= 1 && n <= @release.format_quantity
         @disc = n
+      else
+        @album = Catalog::Album.new(
+          id: @release.id,
+          title: @release.title,
+          artist: @release.artist,
+          year: @release.original_release_year,
+          discs: @release.format_quantity,
+          dir: @catalog.albums.dir_for_id(@release.id))
+        @release.album = @album
       end
+      make_tracks
     end
 
-    def find_release
-      releases = @catalog.find(@source_dir.basename.to_s,
-        group: :releases,
-        prompt: true,
-        multiple: false)
-      @release = releases.first
+    def make_tracks
       @tracklist_flattened = @release.tracklist_flattened
-      print @release.details_to_s
-    end
-
-    def make_album
-      @album = Catalog::Album.new(
-        id: @release.id,
-        title: @release.title,
-        artist: @release.artist,
-        year: @release.original_release_year,
-        discs: @release.format_quantity,
-        dir: @catalog.albums.dir_for_id(@release.id))
-      @release.album = @album
       @copy_plan = {}
       @source_dir.children.select(&:file?).reject { |f| f.basename.to_s.start_with?('.') }.sort.each do |source_file|
         type = MIME::Types.of(source_file.to_s).first&.media_type
         dest_file = case type
         when 'audio'
-          album_track = make_album_track(source_file)
-          @album.tracks << album_track
-          album_track.file
+          track = make_track(source_file)
+          @album.tracks << track
+          track.file
         else
           source_file.basename
         end
@@ -68,7 +61,7 @@ class MusicBox
       raise Error, "No tracks were added to album" if @album.tracks.empty?
     end
 
-    def make_album_track(file)
+    def make_track(file)
       tags = Catalog::Tags.load(file)
       release_track = find_track_for_title(tags[:title])
       name = '%s%02d - %s' % [
@@ -99,7 +92,7 @@ class MusicBox
       unless release_track
         puts "Can't find release track with title #{title.inspect}"
         choices = @tracklist_flattened.map { |t| [t.title, t] }.to_h
-        release_track = @prompt.select('Track?', choices, per_page: 100)
+        release_track = @prompt.select('Track?', choices, per_page: 50)
       end
       release_track
     end
@@ -108,6 +101,9 @@ class MusicBox
       @copy_plan.each do |source_file, dest_file|
         source_file.cp(dest_file)
       end
+    end
+
+    def archive_dir
       @catalog.import_done_dir.mkpath unless @catalog.import_done_dir.exist?
       @source_dir.rename(@catalog.import_done_dir / @source_dir.basename)
     end
