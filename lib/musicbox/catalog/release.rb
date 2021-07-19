@@ -94,6 +94,10 @@ class MusicBox
         @formats.find(&:cd?) != nil
       end
 
+      def has_album?
+        @album != nil
+      end
+
       def artist
         Artist.join(@artists)
       end
@@ -121,7 +125,7 @@ class MusicBox
       def summary_to_s
         '%-8s | %1s%1s | %-4s %4s | %-50.50s | %-60.60s | %-6s' % [
           @id,
-          @album ? 'A' : '',
+          has_album? ? 'A' : '',
           @album&.has_cover? ? 'C' : '',
           artist_key,
           original_release_year || '-',

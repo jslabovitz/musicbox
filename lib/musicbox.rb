@@ -102,7 +102,7 @@ class MusicBox
   end
 
   def extract_cover(args)
-    @catalog.find(args, group: :releases).select(&:album).each do |release|
+    @catalog.find(args, group: :releases).select(&:has_album?).each do |release|
       release.album.extract_cover
     end
   end
@@ -115,7 +115,7 @@ class MusicBox
 
   def cover(args, prompt: false, output_file: '/tmp/cover.pdf')
     releases = []
-    @catalog.find(args, group: :releases, prompt: prompt).select(&:album).each do |release|
+    @catalog.find(args, group: :releases, prompt: prompt).select(&:has_album?).each do |release|
       release.select_cover unless release.album.has_cover?
       releases << release if release.album.has_cover?
     end
@@ -124,7 +124,7 @@ class MusicBox
   end
 
   def select_cover(args, prompt: false, force: false)
-    @catalog.find(args, group: :releases, prompt: prompt).select(&:album).each do |release|
+    @catalog.find(args, group: :releases, prompt: prompt).select(&:has_album?).each do |release|
       release.select_cover unless release.album.has_cover? && !force
     end
   end
@@ -221,7 +221,7 @@ class MusicBox
   end
 
   def play(args, prompt: false, equalizer_name: nil, **params)
-    albums = @catalog.find(args, prompt: prompt).map(&:album).compact
+    albums = @catalog.find(args, prompt: prompt).map(&:has_album?).compact
     if equalizer_name
       equalizers = Equalizer.load_equalizers(
         dir: Path.new(@catalog.config['equalizers_dir']),
@@ -250,7 +250,7 @@ class MusicBox
   end
 
   def update_tags(args, force: false)
-    @catalog.find(args, group: :releases).select(&:album).each do |release|
+    @catalog.find(args, group: :releases).select(&:has_album?).each do |release|
       puts release
       release.album.update_tags(force: force)
     end

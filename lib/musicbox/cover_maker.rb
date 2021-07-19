@@ -16,11 +16,8 @@ class MusicBox
       size = 4.75.in
       top = 10.in
       releases.each_with_index do |release, i|
-        album = release.album
-        unless album&.has_cover?
-          puts "Release #{release.id} has no cover"
-          next
-        end
+        album = release.album or raise Error, "Release #{release.id} has no album"
+        raise Error, "Release #{release.id} has no cover" unless album.has_cover?
         @pdf.start_new_page if i > 0
         @pdf.fill do
           @pdf.rectangle [0, top],

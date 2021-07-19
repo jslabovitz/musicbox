@@ -116,9 +116,9 @@ class MusicBox
         when ':cd'
           selected += group.items.select(&:cd?)
         when ':unripped'
-          selected += group.items.select(&:cd?).reject(&:album)
+          selected += group.items.select(&:cd?).reject(&:has_album?)
         when ':no-cover'
-          selected += group.items.select(&:album).reject { |r| r.album.has_cover? }
+          selected += group.items.select(&:has_album?).reject { |r| r.album.has_cover? }
         when ':odd-positions'
           selected += group.items.select(&:cd?).select { |r| r.tracklist_flattened.find { |t| t.position !~ /^\d+$/ } }
         when /^-?\d+$/
