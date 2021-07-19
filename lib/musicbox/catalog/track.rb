@@ -31,7 +31,7 @@ class MusicBox
       end
 
       def artist
-        @artists ? Artist.artists_to_s(@artists) : nil
+        @artists ? Artist.join(@artists) : nil
       end
 
     end

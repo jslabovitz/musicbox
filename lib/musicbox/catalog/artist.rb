@@ -16,10 +16,10 @@ class MusicBox
 
       include SetParams
 
-      def self.artists_to_s(artists)
+      def self.join(artists)
         artists.map do |artist|
-          artist.name + ((artist.join == ',') ? artist.join : (' ' + artist.join))
-        end.flatten.join(' ').squeeze(' ').strip
+          [artist.name, (artist.join == ',' ? '' : ' '), artist.join].join
+        end.join(' ').squeeze(' ').strip
       end
 
       def to_s

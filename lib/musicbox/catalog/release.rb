@@ -95,7 +95,7 @@ class MusicBox
       end
 
       def artist
-        Artist.artists_to_s(@artists)
+        Artist.join(@artists)
       end
 
       def artist_key
@@ -135,7 +135,7 @@ class MusicBox
         info = [
           ['ID', @id],
           ['Master ID', @master_id || '-'],
-          ['Artist', Artist.artists_to_s(@artists)],
+          ['Artist', Artist.join(@artists)],
           ['Title', @title],
           ['Formats', Format.to_s(@formats)],
           ['Released', release_year || '-'],
@@ -166,7 +166,7 @@ class MusicBox
             [
               !track.position.to_s.empty? ? ('%*s:' % [max_position_length, track.position]) : nil,
               track.title || '-',
-              track.artists ? "(#{Artist.artists_to_s(track.artists)})" : nil,
+              track.artists ? "(#{Artist.join(track.artists)})" : nil,
               !track.duration.to_s.empty? ? "[#{track.duration}]" : nil,
             ].compact.join(' '),
             track.sub_tracks ? tracklist_to_info(track.sub_tracks) : nil,
