@@ -1,5 +1,7 @@
 # TODO
 
+- consider using `cover_image` from collection item instead of `images` from release
+
 - implement new AutoEQ class
   - handles lookup in AutoEQ
   - knows about precedences
