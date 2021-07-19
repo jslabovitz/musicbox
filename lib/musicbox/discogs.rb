@@ -35,9 +35,6 @@ class MusicBox
       if info.master_id && info.master_id > 0
         @catalog.masters.save_item_if_new(id: info.master_id) { discogs_do(:get_master_release, info.master_id) }
       end
-      info.artists.each do |artist|
-        @catalog.artists.save_item_if_new(id: artist.id) { discogs_do(:get_artist, artist.id) }
-      end
     end
 
     def discogs_do(command, *args)

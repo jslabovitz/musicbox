@@ -13,7 +13,6 @@ class MusicBox
       attr_accessor :role
       attr_accessor :thumbnail_url
       attr_accessor :tracks
-      attr_accessor :artist    # linked on load
 
       include SetParams
 

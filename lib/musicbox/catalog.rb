@@ -11,7 +11,6 @@ class MusicBox
     attr_accessor :collection
     attr_accessor :releases
     attr_accessor :masters
-    attr_accessor :artists
     attr_accessor :albums
     attr_accessor :groups
 
@@ -25,7 +24,6 @@ class MusicBox
       @collection = Collection.new(root: @catalog_dir / 'collection')
       @releases = Releases.new(root: @catalog_dir / 'releases')
       @masters = Releases.new(root: @catalog_dir / 'masters')
-      @artists = Artists.new(root: @catalog_dir / 'artists')
       @albums = Albums.new(root: @catalog_dir / 'albums')
       @images_dir = @catalog_dir / 'images'
       link_groups
@@ -39,14 +37,11 @@ class MusicBox
     end
 
     def orphaned
-      orphaned = %i[releases masters artists albums].map { |k| [k, send(k).items.dup] }.to_h
+      orphaned = %i[releases masters albums].map { |k| [k, send(k).items.dup] }.to_h
       @collection.items.each do |item|
         release = item.release or raise
         orphaned[:releases].delete(release)
         orphaned[:masters].delete(release.master) if release.master
-        release.artists.each do |release_artist|
-          orphaned[:artists].delete(release_artist.artist)
-        end
         orphaned[:albums].delete(release.album) if release.album
       end
       orphaned
@@ -159,9 +154,6 @@ class MusicBox
     def link_groups
       @releases.items.each do |release|
         release.master = @masters[release.master_id] if release.master_id
-        release.artists.each do |release_artist|
-          release_artist.artist = @artists[release_artist.id]
-        end
         release.album = @albums[release.id]
         release.link_images(@images_dir)
         release.master&.link_images(@images_dir)
