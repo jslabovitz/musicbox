@@ -1,5 +1,9 @@
 # TODO
 
+- see if taglib-ruby will substitute for ffprobe/mp4tags/mp4art/etc.
+
+- make album reference release, instead of the other way around
+
 - consider using `cover_image` from collection item instead of `images` from release
 
 - implement new AutoEQ class
@@ -29,18 +33,15 @@
 - re-implement file-based Group?
   - convert all Discogs structures
 
-- make covers 2-up
-
-- center cover horizontally on page
-
-- make crop marks on covers
+- improve covers:
+  - make 2-up
+  - center horizontally on page
+  - make crop marks
 
 - only use #cd? to determine need for ripping
   - add default find selector to reject releases with non-rippable formats
       https://www.discogs.com/help/formatslist
   - can override to show full collection, find dups, or make LP/etc. labels
-
-- rework use of #album != nil to has_album?
 
 - fix 'dup' command to not treat multidisc release as duplicate
 
@@ -67,6 +68,11 @@
 - allow label font to be configured
 
 - save artist ID into album
+
+- when importing/updating, save track info JSON file
+  - bit rate
+  - bit depth
+  - sample rate
 
 - consider using Album/AlbumTrack as master/truth?
   - keep in SQLite?
@@ -118,7 +124,7 @@
   - do artist sort/rename using artist ID
     - instead of CanonicalArtists/PersonalNames hash maps
 
-- use exiftool instead of ffprobe/mp4tags
+- use exiftool instead of ffprobe/mp4tags?
   $ exiftool -json -recurse . -ext m4a
 
 - improve log handling
@@ -137,11 +143,6 @@
     - bad rips (actual read errors)
     - dubious rips (inconsistent checksums)
     - successful rips
-
-- improve validation
-  - validate logs
-  - ensure cover exists
-  - ensure track files exist
 
 - calculate loudness
   - see: info/replay-gain.md
