@@ -151,7 +151,16 @@ class MusicBox
         MusicBox.info_to_s(info)
       end
 
-      def tracklist_flattened(tracklist=nil)
+      def find_track_for_title(title)
+        normalized_title = title.normalize
+        tracklist_flattened.find { |t| t.title.normalize == normalized_title }
+      end
+
+      def tracklist_flattened
+        @tracklist_flattened ||= make_tracklist_flattened
+      end
+
+      def make_tracklist_flattened(tracklist=nil)
         tracklist ||= @tracklist
         tracks = []
         tracklist.each do |track|

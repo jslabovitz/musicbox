@@ -44,7 +44,6 @@ class MusicBox
     end
 
     def make_tracks
-      @tracklist_flattened = @release.tracklist_flattened
       @copy_plan = {}
       @source_dir.children.select(&:file?).reject { |f| f.basename.to_s.start_with?('.') }.sort.each do |source_file|
         type = MIME::Types.of(source_file.to_s).first&.media_type
@@ -63,7 +62,12 @@ class MusicBox
 
     def make_track(file)
       tags = Catalog::Tags.load(file)
-      release_track = find_track_for_title(tags[:title])
+      release_track = tags[:title] ? @release.find_track_for_title(tags[:title]) : nil
+      unless release_track
+        puts "Can't find release track with title #{title.inspect}"
+        choices = @release.tracklist_flattened.map { |t| [t.title, t] }.to_h
+        release_track = @prompt.select('Track?', choices, per_page: 50)
+      end
       name = '%s%02d - %s' % [
         @disc ? ('%1d-' % @disc) : '',
         tags[:track],
@@ -84,17 +88,6 @@ class MusicBox
         album_track.file,
       ]
       album_track
-    end
-
-    def find_track_for_title(title)
-      normalized_title = title.normalize
-      release_track = @tracklist_flattened.find { |t| t.title.normalize == normalized_title }
-      unless release_track
-        puts "Can't find release track with title #{title.inspect}"
-        choices = @tracklist_flattened.map { |t| [t.title, t] }.to_h
-        release_track = @prompt.select('Track?', choices, per_page: 50)
-      end
-      release_track
     end
 
     def copy_files
