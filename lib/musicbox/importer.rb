@@ -64,7 +64,7 @@ class MusicBox
       tags = Catalog::Tags.load(file)
       release_track = tags[:title] ? @release.find_track_for_title(tags[:title]) : nil
       unless release_track
-        puts "Can't find release track with title #{title.inspect}"
+        puts "Can't find release track with title #{tags[:title].inspect}"
         choices = @release.tracklist_flattened.map { |t| [t.title, t] }.to_h
         release_track = @prompt.select('Track?', choices, per_page: 50)
       end
