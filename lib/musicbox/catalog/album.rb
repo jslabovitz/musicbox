@@ -50,6 +50,17 @@ class MusicBox
         !cover_file.nil?
       end
 
+      def to_s
+        '%-8s | %1s | %-4s | %-50.50s | %-60.60s | %-6s' % [
+          @id,
+          has_cover? ? 'C' : '',
+          @year || '-',
+          artist,
+          @title,
+          @discs || '-',
+        ]
+      end
+
       def show_cover(width: nil, height: nil, preserve_aspect_ratio: nil)
         # see https://iterm2.com/documentation-images.html
         file = cover_file
