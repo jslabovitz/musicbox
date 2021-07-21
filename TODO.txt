@@ -1,8 +1,19 @@
 # TODO
 
-- see if taglib-ruby will substitute for ffprobe/mp4tags/mp4art/etc.
+- make album reference collection item, instead of the other way around
+  - add `collection_item_id` to Album
+  - write fix-up stage to rewrite all album files
 
-- make album reference release, instead of the other way around
+- make most commands work on albums, not releases/etc.
+  - use Discogs as original source of truth
+  - but not for searching
+  - except for unripped, etc.
+
+- add `ignore_folder` to config
+  - contains ID of folder with ignored items
+  - ignore when building collection?
+
+- see if taglib-ruby will substitute for ffprobe/mp4tags/mp4art/etc.
 
 - consider using `cover_image` from collection item instead of `images` from release
 
@@ -10,11 +21,6 @@
   - handles lookup in AutoEQ
   - knows about precedences
   - has #to_equalizer that makes equalizers
-
-- make most commands work on albums, not releases/etc.
-  - use Discogs as original source of truth
-  - but not for searching
-  - except for unripped, etc.
 
 - create better way of making sub-commands
   - as easy as shell script
@@ -69,7 +75,7 @@
 
 - save artist ID into album
 
-- when importing/updating, save track info JSON file
+- when importing/updating, save track info to JSON file
   - bit rate
   - bit depth
   - sample rate
@@ -96,11 +102,6 @@
 
 - sort #find results by relevance, not by artist/title
 
-- move #find into Group
-  - move hard-coded selectors into Group subclasses
-    - call dynamically
-    - eg, ':cd' => send("select_cd")
-
 - improve 'select' tool
   - save to $MUSIC_ROOT/selection.json?
   - optionally name
@@ -123,9 +124,6 @@
     - eg, to file release under main artist instead of artist-group of collaboration
   - do artist sort/rename using artist ID
     - instead of CanonicalArtists/PersonalNames hash maps
-
-- use exiftool instead of ffprobe/mp4tags?
-  $ exiftool -json -recurse . -ext m4a
 
 - improve log handling
   - create Log class with attributes:
