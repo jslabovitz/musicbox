@@ -17,6 +17,10 @@ class MusicBox
         @date_added = DateTime.parse(date.to_s)
       end
 
+      def recently_added?
+        (Date.today - @date_added) < 30
+      end
+
       def serialize(args={})
         super(
           basic_information: @basic_information,

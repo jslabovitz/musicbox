@@ -98,6 +98,10 @@ class MusicBox
         @album != nil
       end
 
+      def odd_positions?
+        tracklist_flattened.find { |t| t.position !~ /^\d+$/ }
+      end
+
       def artist
         Artist.join(@artists)
       end

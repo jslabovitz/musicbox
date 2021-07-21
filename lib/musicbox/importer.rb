@@ -22,7 +22,7 @@ class MusicBox
     end
 
     def make_album
-      @release = @catalog.find(@source_dir.basename.to_s, group: :releases, prompt: true, multiple: false).first
+      @release = @catalog.releases.find(@source_dir.basename.to_s, prompt: true, multiple: false).first
       print @release.details_to_s
       if (@album = @release.album)
         raise Error, "Album already exists" if @release.format_quantity.nil? || @release.format_quantity == 1

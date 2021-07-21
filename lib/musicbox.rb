@@ -56,7 +56,7 @@ class MusicBox
 
   def export(args, **params)
     exporter = Exporter.new(catalog: @catalog, **params)
-    @catalog.find(args, group: :releases).each do |release|
+    @catalog.releases.find(args).each do |release|
       album = release.album or raise Error, "Album does not exist for release #{release.id}"
       exporter.export_album(album)
     end
@@ -90,7 +90,7 @@ class MusicBox
 
   def formats(args)
     formats = {}
-    @catalog.find(args, group: :releases).each do |release|
+    @catalog.releases.find(args).each do |release|
       release.formats.each do |format|
         formats[format.name] ||= 0
         formats[format.name] += 1
@@ -102,20 +102,20 @@ class MusicBox
   end
 
   def extract_cover(args)
-    @catalog.find(args, group: :releases).select(&:has_album?).each do |release|
+    @catalog.releases.find(args).select(&:has_album?).each do |release|
       release.album.extract_cover
     end
   end
 
   def download_images(args)
-    @catalog.find(args, group: :releases).select(&:cd?).each do |release|
+    @catalog.releases.find(args).select(&:cd?).each do |release|
       release.download_images
     end
   end
 
   def cover(args, prompt: false, output_file: '/tmp/cover.pdf')
     releases = []
-    @catalog.find(args, group: :releases, prompt: prompt).select(&:has_album?).each do |release|
+    @catalog.releases.find(args, prompt: prompt).select(&:has_album?).each do |release|
       release.select_cover unless release.album.has_cover?
       releases << release if release.album.has_cover?
     end
@@ -124,7 +124,7 @@ class MusicBox
   end
 
   def select_cover(args, prompt: false, force: false)
-    @catalog.find(args, group: :releases, prompt: prompt).select(&:has_album?).each do |release|
+    @catalog.releases.find(args, prompt: prompt).select(&:has_album?).each do |release|
       release.select_cover unless release.album.has_cover? && !force
     end
   end
@@ -140,7 +140,7 @@ class MusicBox
   end
 
   def label(args)
-    labels = @catalog.find(args, group: :releases, prompt: true).map(&:to_label)
+    labels = @catalog.releases.find(args, prompt: true).map(&:to_label)
     output_file = '/tmp/labels.pdf'
     label_maker = LabelMaker.new
     label_maker.make_labels(labels)
@@ -148,15 +148,15 @@ class MusicBox
     run_command('open', output_file)
   end
 
-  def dir(args, group: nil)
-    @catalog.find(args, group: group).each do |release|
-      puts "%-10s %s" % [release.id, release.dir]
+  def dir(args)
+    @catalog.albums.find(args).each do |album|
+      puts "%-10s %s" % [album.id, album.dir]
     end
   end
 
-  def open(args, group: nil)
-    @catalog.find(args, group: group).each do |release|
-      run_command('open', release.dir)
+  def open(args)
+    @catalog.albums.find(args).each do |album|
+      run_command('open', album.dir)
     end
   end
 
@@ -180,11 +180,23 @@ class MusicBox
     end
   end
 
-  def show(args, group: nil, mode: :summary, prompt: false)
-    @catalog.find(args, group: group, prompt: prompt).each do |release|
+  def show_albums(args, mode: :summary)
+    @catalog.albums.find(args).each do |album|
       case mode
       when :cover
-        release.album.show_cover if release.album&.has_cover?
+        album.show_cover if album.has_cover?
+      when :details
+        puts album.details_to_s
+        puts
+      when :summary
+        puts album
+      end
+    end
+  end
+
+  def show_releases(args, mode: :summary)
+    @catalog.releases.find(args).each do |release|
+      case mode
       when :details
         puts release.details_to_s
         puts
@@ -196,13 +208,13 @@ class MusicBox
 
   def csv(args)
     print Catalog::Release.csv_header
-    @catalog.find(args, group: :releases).each do |release|
+    @catalog.releases.find(args).each do |release|
       print release.to_csv
     end
   end
 
   def dups(args)
-    dups = @catalog.find_dups(@catalog.find(args, group: :releases))
+    dups = @catalog.find_dups(@catalog.releases.find(args))
     dups.each do |id, formats|
       formats.each do |format, releases|
         if releases.length > 1
@@ -221,7 +233,7 @@ class MusicBox
   end
 
   def play(args, prompt: false, equalizer_name: nil, **params)
-    albums = @catalog.find(args, prompt: prompt).map(&:album).compact
+    albums = @catalog.albums.find(args, prompt: prompt).compact
     if equalizer_name
       equalizers = Equalizer.load_equalizers(
         dir: Path.new(@catalog.config['equalizers_dir']),
@@ -239,7 +251,7 @@ class MusicBox
   def select(args)
     ids = []
     loop do
-      releases = @catalog.find(args, group: :releases, prompt: true) or break
+      releases = @catalog.releases.find(args, prompt: true) or break
       ids += releases.map(&:id)
       puts ids.join(' ')
     end
@@ -250,7 +262,7 @@ class MusicBox
   end
 
   def update_tags(args, force: false)
-    @catalog.find(args, group: :releases).select(&:has_album?).each do |release|
+    @catalog.releases.find(args).select(&:has_album?).each do |release|
       puts release
       release.album.update_tags(force: force)
     end

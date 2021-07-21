@@ -46,14 +46,12 @@ SimpleCommand.run do
     @musicbox.label(args)
   end
 
-  command 'dir', group: nil do |args|
-    @musicbox.dir(args,
-      group: @group)
+  command 'dir' do |args|
+    @musicbox.dir(args)
   end
 
-  command 'open', group: nil do |args|
-    @musicbox.open(args,
-      group: @group)
+  command 'open' do |args|
+    @musicbox.open(args)
   end
 
   command 'select-cover', force: false do |args|
@@ -64,18 +62,22 @@ SimpleCommand.run do
     @musicbox.orphaned
   end
 
-  command 'show', group: nil, details: false, cover: false, prompt: false do |args|
-    if @details
-      mode = :details
-    elsif @cover
+  command 'show-albums', cover: false do |args|
+    if @cover
       mode = :cover
     else
       mode = :summary
     end
-    @musicbox.show(args,
-      group: @group,
-      mode: mode,
-      prompt: @prompt)
+    @musicbox.show_albums(args, mode: mode)
+  end
+
+  command 'show-releases', details: false do |args|
+    if @details
+      mode = :details
+    else
+      mode = :summary
+    end
+    @musicbox.show_releases(args, mode: mode)
   end
 
   command 'csv' do |args|

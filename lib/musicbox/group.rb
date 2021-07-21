@@ -10,6 +10,10 @@ class MusicBox
       Item
     end
 
+    def self.search_fields
+      []
+    end
+
     def initialize(root:)
       @root = Path.new(root).expand_path
       reset
@@ -46,13 +50,58 @@ class MusicBox
       add_item(item)
     end
 
-    def search(query:, fields:, limit: nil)
-      found = []
+    def find(*selectors, prompt: false, multiple: true)
+      ;;puts "searching #{self.class}"
+      selectors = [selectors].compact.flatten
+      if selectors.empty?
+        selected = items
+      else
+        selected = []
+        selectors.each do |selector|
+          case selector.to_s
+          when /^:(.*)$/
+            begin
+              selected += send("#{$1}?").call
+            rescue NameError => e
+              raise Error, "Unknown selector #{selector.inspect} in #{self.class}"
+            end
+          when /^-?\d+$/
+            n = selector.to_i
+            item = self[n.abs] or raise Error, "Can't find item #{selector.inspect} in #{self.class}"
+            if n > 0
+              selected += [item]
+            else
+              selected -= [item]
+            end
+          else
+            selected += search(selector)
+          end
+        end
+      end
+      selected.uniq.sort!
+      if prompt
+        choices = selected.map { |i| [i.to_s, i.id] }.to_h
+        if multiple
+          ids = TTY::Prompt.new.multi_select('Item?', filter: true, per_page: 50, quiet: true) do |menu|
+            choices.each do |name, value|
+              menu.choice name, value
+            end
+          end
+          selected = ids.map { |id| self[id] }
+        else
+          id = TTY::Prompt.new.select('Item?', choices, filter: true, per_page: 50, quiet: true)
+          selected = [self[id]] if id
+        end
+      end
+      selected
+    end
+
+    def search(query)
       words = [query].flatten.join(' ').tokenize.sort.uniq - ['-']
-      words.each do |word|
+      words.map do |word|
         regexp = Regexp.new(Regexp.quote(word), true)
         found += @items.values.select do |item|
-          fields.find do |field|
+          self.class.search_fields.find do |field|
             case (value = item.send(field))
             when Array
               value.find { |v| v.to_s =~ regexp }
@@ -61,10 +110,7 @@ class MusicBox
             end
           end
         end
-      end
-      found = found.flatten.compact.uniq
-      found = found[0..limit - 1] if limit
-      found
+      end.flatten.compact.uniq
     end
 
     def dir_for_id(id)
