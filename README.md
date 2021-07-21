@@ -102,37 +102,45 @@ Future versions of MusicBox may incorporate standalone/headless instances, or pl
 
 ## Installation
 
-1. Confirm that you are using a Mac running macOS, preferably with [Homebrew](https://brew.sh) installed and working. Although MusicBox does not explicitly require macOS, there are a few places where other systems will likely break at the moment. MusicBox was developed using Ruby 3.0. It may not be compatible with earlier versions.
+- Confirm that you are using a Mac running macOS, preferably with [Homebrew](https://brew.sh) installed and working. Although MusicBox does not explicitly require macOS, there are a few places where other systems will likely break at the moment. MusicBox was developed using Ruby 3.0. It may not be compatible with earlier versions.
 
-2. Install this gem, and dependent gems:
+- Install required Homebrew packages:
+
+```
+brew install mpv mp4v taglib
+```
+
+<!--
+- Manually install `taglib-ruby` (change `1.12` below to whatever version the previous `brew install` command installed):
+
+```
+TAGLIB_DIR=$HOMEBREW_CELLAR/taglib/1.12 gem install taglib-ruby
+```
+-->
+
+- Install this gem, and dependent gems:
 
 ```
 gem install musicbox
 ```
 
-3. Install required Homebrew packages:
-
-```
-brew install mpv mp4v ffmpeg
-```
-
-4. If you want MusicBox to store its files other than the default location of `~/Music/MusicBox`, then set the `MUSICBOX_ROOT` environment variable in your shell:
+- If you want MusicBox to store its files other than the default location of `~/Music/MusicBox`, then set the `MUSICBOX_ROOT` environment variable in your shell:
 
 ```
 export MUSICBOX_ROOT=somewhere_else
 ```
 
-5. Create the directory:
+- Create the directory:
 
 ```
 mkdir ~/Music/MusicBox
 ```
 
-6. Create a Discogs account, if you haven't already, and add at least one release to your collection.
+- Create a Discogs account, if you haven't already, and add at least one release to your collection.
 
-7. Create a personal access token on Discogs by going to [this page](https://www.discogs.com/settings/developers) and clicking the blue button labeled 'Generate new token'. Copy the generated token for the next step.
+- Create a personal access token on Discogs by going to [this page](https://www.discogs.com/settings/developers) and clicking the blue button labeled 'Generate new token'. Copy the generated token for the next step.
 
-8. Create a simple configuration file named `config.yaml` in your main MusicBox directory:
+- Create a simple configuration file named `config.yaml` in your main MusicBox directory:
 
 ```
 # $MUSICBOX_ROOT/config.yaml
