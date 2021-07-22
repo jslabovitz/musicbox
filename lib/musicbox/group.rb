@@ -100,7 +100,7 @@ class MusicBox
       words = [query].flatten.join(' ').tokenize.sort.uniq - ['-']
       words.map do |word|
         regexp = Regexp.new(Regexp.quote(word), true)
-        found += @items.values.select do |item|
+        @items.values.select do |item|
           self.class.search_fields.find do |field|
             case (value = item.send(field))
             when Array
