@@ -9,12 +9,10 @@ class MusicBox
       attr_accessor :qty
       attr_accessor :text
 
+      include SetParams
+
       def self.to_s(formats)
         formats.map(&:short_to_s).join(', ')
-      end
-
-      def initialize(params={})
-        params.each { |k, v| send("#{k}=", v) }
       end
 
       def qty=(n)
