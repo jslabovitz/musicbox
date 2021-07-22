@@ -138,10 +138,6 @@ class MusicBox
       @items.has_key?(id)
     end
 
-    def delete_item(item)
-      @items.delete(item.id)
-    end
-
     def save_item(id:, item: nil, &block)
       raise Error, "ID is nil" unless id
       item = yield if block_given?
@@ -159,14 +155,13 @@ class MusicBox
       end
     end
 
-    def destroy_item(item)
-      dir = dir_for_id(id)
-      dir.rmtree if dir.exist?
-      delete_item(item)
-    end
-
     def destroy!
       @root.rmtree if @root.exist?
+    end
+
+    def destroy_item!(item)
+      @items.delete(item.id)
+      item.destroy!
     end
 
     class Item
@@ -192,6 +187,10 @@ class MusicBox
         raise Error, "dir not defined" unless @dir
         @dir.mkpath unless @dir.exist?
         info_file.write(JSON.pretty_generate(serialize))
+      end
+
+      def destroy!
+        @dir.rmtree if @dir.exist?
       end
 
       def serialize(args={})
