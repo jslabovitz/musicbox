@@ -12,24 +12,18 @@ class MusicBox
       attr_accessor :rating
       attr_accessor :resource_url
       attr_accessor :release    # linked on load
+      attr_accessor :album      # linked on load
 
       def date_added=(date)
         @date_added = DateTime.parse(date.to_s)
       end
 
-      def recently_added?
-        (Date.today - @date_added) < 30
+      def basic_information=(info)
+        @basic_information = BasicInformation.new(info)
       end
 
-      def serialize(args={})
-        super(
-          basic_information: @basic_information,
-          date_added: @date_added,
-          folder_id: @folder_id,
-          instance_id: @instance_id,
-          notes: @notes,
-          rating: @rating,
-          resource_url: @resource_url)
+      def recently_added?
+        (Date.today - @date_added) < 30
       end
 
     end

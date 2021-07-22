@@ -94,7 +94,8 @@ class MusicBox
         release.master&.link_images(@images_dir)
       end
       @collection.items.each do |item|
-        item.release = @releases[item.id]
+        item.release = @releases[item.id] or raise Error, "Can't find release for collection item ID #{item.id.inspect}"
+        item.album = @albums[item.id]
       end
     end
 
