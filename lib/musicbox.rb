@@ -103,8 +103,8 @@ class MusicBox
   end
 
   def extract_cover(args)
-    @catalog.releases.find(args).select(&:has_album?).each do |release|
-      release.album.extract_cover
+    @catalog.albums.find(args).each do |album|
+      album.extract_cover
     end
   end
 
