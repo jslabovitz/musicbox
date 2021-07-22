@@ -42,7 +42,7 @@ class MusicBox
 
       def cover_file
         files = @dir.glob('cover.{jpg,png}')
-        raise Error, "Multiple cover files" if files.length > 1
+        raise Error, "Multiple cover files: #{files.join(', ')}" if files.length > 1
         files.first
       end
 
