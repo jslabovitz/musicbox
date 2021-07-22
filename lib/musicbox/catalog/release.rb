@@ -135,7 +135,7 @@ class MusicBox
           original_release_year || '-',
           artist,
           @title,
-          Format.to_s(@formats),
+          @formats ? Format.to_s(@formats) : '-',
         ]
       end
 
