@@ -162,13 +162,17 @@ class MusicBox
   end
 
   def orphaned
-    @catalog.orphaned.each do |group, items|
+    @catalog.orphaned.each do |group_name, items|
       unless items.empty?
-        puts "#{group}:"
+        puts "#{group_name}:"
         items.sort.each do |item|
           puts item
         end
         puts
+        if TTY::Prompt.new.yes?("Remove orphaned items from #{group_name}?")
+          group = @catalog.send(group_name)
+          items.each { |item| group.destroy_item!(item) }
+        end
       end
     end
     images = @catalog.orphaned_images
@@ -178,6 +182,11 @@ class MusicBox
         puts "\t" + image.to_s
       end
       puts
+      if TTY::Prompt.new.yes?('Remove orphaned images?')
+        images.each do |image|
+          (@catalog.images_dir / images.file).unlink
+        end
+      end
     end
   end
 
