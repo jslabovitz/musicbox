@@ -15,6 +15,12 @@
 
 - see if taglib-ruby will substitute for ffprobe/mp4tags/mp4art/etc.
 
+- integrate/expand ripping HOWTO
+  - SACD
+    https://tmkk.undo.jp/xld/dsd.html.en
+    https://forums.stevehoffman.tv/threads/converting-dsd-to-24-bit-help-please.454536/
+    http://dsdmaster.blogspot.com
+
 - consider using `cover_image` from collection item instead of `images` from release
 
 - implement new AutoEQ class
@@ -90,6 +96,13 @@
 - save @cover_file in album info.json file?
   - just read cover_file (as path) instead of deriving via glob
 
+- have player read default settings from config
+  - audio-device, exclusive, EQ, etc.
+  - either global (single), or as profiles (multiple)
+    - so can have one for headphones, and another for speakers
+    - add --profile=X flag to specify profile
+    - or specify multiple configs?
+
 - reimplement player state checkpointing, to resume exactly where left off
 
 - use curses or tty for full-screen player TTY mode?
@@ -99,6 +112,13 @@
 - move config handling into MusicBox class
   - also definition of import dir, etc.
   - use TTY::Config?
+  - chain/merge configs?
+    - order:
+      - hardcoded defaults
+      - env vars
+      - main config file
+      - auxiliary config file(s)
+      - CLI options
 
 - sort #find results by relevance, not by artist/title
 
