@@ -19,23 +19,6 @@ class MusicBox
         @tracks = tracks.map { |h| AlbumTrack.new(h.merge(album: self)) }
       end
 
-      def date=(date)
-        @year = case date
-        when Date
-          date.year
-        when String
-          date.to_i
-        else
-          date
-        end
-      end
-
-      def release_id=(id)
-        @id = id
-      end
-
-      def log_files=(*); end
-
       def artist
         @artist || @tracks&.first&.artist
       end
