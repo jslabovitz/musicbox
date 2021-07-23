@@ -8,6 +8,7 @@ class MusicBox
     def initialize(catalog:)
       @catalog = catalog
       @user, @token = @catalog.config.values_at('user', 'token')
+      @ignore_folder_id = @catalog.config['ignore_folder_id']
       @discogs = ::Discogs::Wrapper.new(AppName, user_token: @token)
     end
 
@@ -18,7 +19,7 @@ class MusicBox
         result = discogs_do(:get_user_collection, @user, page: page, per_page: ResultsPerPage)
         result.releases.each do |release|
           begin
-            update_release(release)
+            update_release(release) unless @ignore_folder_id && release.folder_id == @ignore_folder_id
           rescue Error => e
             warn "Error: #{e}"
           end
