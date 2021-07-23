@@ -9,6 +9,8 @@ class MusicBox
       attr_accessor :year
       attr_accessor :discs
       attr_accessor :tracks
+      attr_accessor :collection_item    # linked on load
+      attr_accessor :release            # linked on load
 
       def initialize(params={})
         @tracks = []
