@@ -64,29 +64,36 @@ class MusicBox
   end
 
   def fix(args)
-    # key_map = {
-    #   :title => :title,
-    #   :artist => :artist,
-    #   :original_release_year => :year,
-    #   :format_quantity => :discs,
-    # }
-    # find(args, group: :releases).select(&:cd?).each do |release|
-    #   diffs = {}
-    #   key_map.each do |release_key, album_key|
-    #     release_value = release.send(release_key)
-    #     album_value = release.album.send(album_key)
-    #     if album_value && release_value != album_value
-    #       diffs[release_key] = [release_value, album_value]
-    #     end
-    #   end
-    #   unless diffs.empty?
-    #     puts release
-    #     diffs.each do |key, values|
-    #       puts "\t" + '%s: %p => %p' % [key, *values]
-    #     end
-    #     puts
-    #   end
-    # end
+  end
+
+  def diff_info(args)
+    key_map = {
+      :title => :title,
+      :artist => :artist,
+      :original_release_year => :year,
+      :format_quantity => :discs,
+    }
+    @catalog.releases.find(args).select(&:has_album?).each do |release|
+      diffs = {}
+      key_map.each do |release_key, album_key|
+        release_value = release.send(release_key)
+        album_value = release.album.send(album_key)
+        if album_value && release_value != album_value
+          diffs[release_key] = [release_value, album_value]
+        end
+      end
+      unless diffs.empty?
+        puts release
+        diffs.each do |key, values|
+          puts "\t" + '%s: %p != %p' % [key, *values]
+        end
+        puts
+        if @prompt.yes?('Update?')
+          release.album.update_info
+          release.album.update_tags
+        end
+      end
+    end
   end
 
   def formats(args)
@@ -275,6 +282,13 @@ class MusicBox
     @catalog.releases.find(args).select(&:has_album?).each do |release|
       puts release
       release.album.update_tags(force: force)
+    end
+  end
+
+  def update_info(args, force: false)
+    @catalog.albums.find(args).each do |album|
+      puts album
+      album.update_info
     end
   end
 
