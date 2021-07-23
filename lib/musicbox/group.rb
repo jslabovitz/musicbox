@@ -129,7 +129,7 @@ class MusicBox
     end
 
     def add_item(item)
-      raise Error, "Item does not have ID" if item.id.nil?
+      raise Error, "Item does not have ID" unless item.id
       raise Error, "Item already exists in #{@root}: #{item.id.inspect}" if @items[item.id]
       @items[item.id] = item
     end
