@@ -88,23 +88,32 @@ class MusicBox
         end
       end
 
+      def update_info
+        @id = @release.id
+        @title = @release.title
+        @artist = @release.artist
+        @year = @release.original_release_year
+        @discs = @release.format_quantity
+        save
+      end
+
       def update_tags(force: false)
-        changes = []
+        changed_tracks = []
         @tracks.each do |track|
           track.update_tags
-          changes << track if track.tags.changed?
+          changed_tracks << track if track.tags.changed?
         end
-        unless changes.empty?
+        unless changed_tracks.empty?
           puts
           puts "#{@title} [#{@dir}]"
-          changes.each do |track|
+          changed_tracks.each do |track|
             puts "\t" + track.file.to_s
-            track.tags.changes.each do |change|
-              puts "\t\t" + change.inspect
+            track.tags.changes.each do |key, change|
+              puts "\t\t%s: %p => %p" % [key, *change]
             end
           end
           if force || TTY::Prompt.new.yes?('Update track files?')
-            changes.each do |track|
+            changed_tracks.each do |track|
               track.save_tags
             end
           end

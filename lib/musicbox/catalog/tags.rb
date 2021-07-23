@@ -5,7 +5,6 @@ class MusicBox
     class Tags
 
       attr_accessor :current
-      attr_accessor :changes
 
       TagFlags = {
         album: 'A',         # album title
@@ -40,6 +39,18 @@ class MusicBox
       def []=(key, value)
         raise unless TagFlags[key]
         @changes[key] = value unless @current[key] == value
+      end
+
+      def tag_changed?(key)
+        @changes.has_key?(key) && @changes[key] != @current[key]
+      end
+
+      def changes
+        (@current.keys + @changes.keys).map do |key|
+          if tag_changed?(key)
+            [key, [@current[key], @changes[key]]]
+          end
+        end.compact.to_h
       end
 
       def changed?
