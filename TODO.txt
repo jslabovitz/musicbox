@@ -1,5 +1,8 @@
 # TODO
 
+- ignore info.json in imported album
+  - otherwise causes problems because overwrites current album's info.json
+
 - make album reference collection item, instead of the other way around
   - add `collection_item_id` to Album
   - write fix-up stage to rewrite all album files
