@@ -176,7 +176,7 @@ class MusicBox
           puts item
         end
         puts
-        if TTY::Prompt.new.yes?("Remove orphaned items from #{group_name}?")
+        if @prompt.yes?("Remove orphaned items from #{group_name}?")
           group = @catalog.send(group_name)
           items.each { |item| group.destroy_item!(item) }
         end
@@ -189,7 +189,7 @@ class MusicBox
         puts "\t" + image.to_s
       end
       puts
-      if TTY::Prompt.new.yes?('Remove orphaned images?')
+      if @prompt.yes?('Remove orphaned images?')
         images.each do |image|
           (@catalog.images_dir / images.file).unlink
         end
