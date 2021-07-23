@@ -96,12 +96,12 @@ class MusicBox
       @collection.items.each do |item|
         item.release = @releases[item.id] or raise Error, "Can't find release for collection item ID #{item.id.inspect}"
         item.album = @albums[item.id]
-        unless item.album
-          ;;warn "No album: #{item.release}"
-          next
+        if item.album
+          item.album.collection_item = item
+          item.album.release = item.release
+        else
+          warn "No album: #{item.release}"
         end
-        item.album.collection_item = item
-        item.album.release = item.release
       end
     end
 
