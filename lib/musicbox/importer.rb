@@ -45,7 +45,7 @@ class MusicBox
 
     def make_tracks
       @copy_plan = {}
-      @source_dir.children.select(&:file?).reject { |f| f.basename.to_s.start_with?('.') }.sort.each do |source_file|
+      @source_dir.children.select(&:file?).reject(&:hidden?).reject { |f| f.basename.to_s == 'info.json' }.sort.each do |source_file|
         type = MIME::Types.of(source_file.to_s).first&.media_type
         dest_file = case type
         when 'audio'
