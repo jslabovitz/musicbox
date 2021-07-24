@@ -1,11 +1,17 @@
 # TODO
 
-- experiment with other AutoEQ/FFMPEG filters
-    https://ffmpeg.org/ffmpeg-filters.html#toc-headphone
-    https://ffmpeg.org/ffmpeg-filters.html#firequalizer
+- move Equalizer to separate AutoEQ gem
+  - handles lookup in AutoEQ results
+  - knows about precedences
+  - has methods to make equalizer specifications for ffmpeg/afilter, etc.
+  - try convolution equalizers
+      https://github.com/jaakkopasanen/AutoEq#convolution-equalizers
+      https://ffmpeg.org/ffmpeg-filters.html#toc-headphone
+      https://ffmpeg.org/ffmpeg-filters.html#firequalizer
 
-- try AutoEQ's Convolution Equalizers
-    https://github.com/jaakkopasanen/AutoEq#convolution-equalizers
+- experiment with volume up/down keys
+  - in exclusive mode
+  - does it work with Musicstreamer?
 
 - describe player modes in README
   - 3-function player: play random album, play random tracks (typical shuffle mode), or play the album for the current track
@@ -24,11 +30,6 @@
     http://dsdmaster.blogspot.com
 
 - consider using `cover_image` from collection item instead of `images` from release
-
-- implement new AutoEQ class
-  - handles lookup in AutoEQ
-  - knows about precedences
-  - has #to_equalizer that makes equalizers
 
 - create better way of making sub-commands
   - as easy as shell script
