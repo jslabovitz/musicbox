@@ -12,31 +12,46 @@ class MusicBox
       '<' => :skip_backward,
       '>' => :skip_forward,
       '^' => :skip_to_beginning,
+      's' => :stop,
       'e' => :toggle_equalizer,
       'E' => :next_equalizer,
       'q' => :quit,
       '.' => :show_playlist,
       '?' => :show_keymap,
     }
-    ObservedProperties = {
-      'playlist' => :playlist,
-      'playlist-pos' => :playlist_position,
-      'pause' => :pause_state,
-      'time-pos' => :time_position,
-    }
-    SeekSeconds = 30
 
     attr_accessor :albums
     attr_accessor :audio_device
     attr_accessor :audio_exclusive
     attr_accessor :mpv_log_level
     attr_accessor :equalizers
+    attr_accessor :ignore_state
+    attr_accessor :checkpoint_timeout
+    attr_accessor :state_file
+    attr_accessor :playlist_file
+    attr_accessor :seek_seconds
+
+    include SetParams
 
     def initialize(**params)
-      {
-        mpv_log_level: 'error',
-      }.merge(params).each { |k, v| send("#{k}=", v) }
-      @playlist_file = Path.new('/tmp/mpv_playlist')
+      set(
+        {
+          mpv_log_level: 'error',
+          checkpoint_timeout: 10,
+          state_file: '/tmp/musicbox.state.json',
+          playlist_file: '/tmp/musicbox.playlist.m3u8',
+          seek_seconds: 30,
+          ignore_state: false,
+        }.merge(params)
+      )
+    end
+
+    def state_file=(file)
+      @state_file = Path.new(file)
+    end
+
+    def playlist_file=(file)
+      @playlist_file = Path.new(file)
     end
 
     def play
@@ -46,7 +61,6 @@ class MusicBox
       setup_interface
       setup_mpv
       puts "[ready]"
-      play_random_album
       @dispatcher.run
     end
 
@@ -58,13 +72,15 @@ class MusicBox
         'audio-display' => 'no',
         'vo' => 'null',
         'volume' => 100)
-      @mpv.register_event('log-message') do |event|
-        ;;pp(log: event)
-      end
+      @mpv.register_event('log-message') { |e| pp(log: event) }
+      @mpv.register_event('start-file') { |e| start_file(e) }
+      @mpv.register_event('playback-restart') { |e| playback_restart(e) }
       @mpv.command('request_log_messages', @mpv_log_level) if @mpv_log_level
-      @properties = HashStruct.new
-      ObservedProperties.each do |name, key|
-        @mpv.observe_property(name) { |n, v| property_changed(n, v) }
+      @mpv.observe_property('playlist') do |name, value|
+        update_playlist(value)
+      end
+      @mpv.observe_property('pause') do |name, value|
+        puts '[%s]' % [value ? 'paused' : 'playing']
       end
       if @equalizers
         @equalizer_enabled = true
@@ -76,11 +92,14 @@ class MusicBox
       @dispatcher.add_io_handler(exception: @mpv.socket) do |io|
         shutdown_mpv
       end
+      restore_state unless @ignore_state
+      @dispatcher.set_timeout_handler(@checkpoint_timeout) { save_state }
       at_exit { shutdown_mpv }
     end
 
     def shutdown_mpv
       if @mpv
+        save_state
         @mpv.command('quit')
         @dispatcher.remove_io_handler(input: @mpv.socket, exception: @mpv.socket)
         @mpv.stop
@@ -100,6 +119,65 @@ class MusicBox
         else
           puts "unknown key: %p" % key
         end
+      end
+    end
+
+    def save_state
+      state = {}
+      if @current_tracks
+        state['playlist'] = @current_tracks.map(&:path).map(&:to_s)
+        if (pos = @mpv.get_property('playlist-pos')) && pos >= 0
+          state['playlist-pos'] = pos
+          state['time-pos'] = @mpv.get_property('time-pos')
+        end
+      end
+      @state_file.dirname.mkpath unless @state_file.dirname.exist?
+      @state_file.write(JSON.dump(state))
+    end
+
+    def restore_state
+      if state_file.exist?
+        state = JSON.load(state_file.read)
+        if state['playlist']
+          paths = state['playlist'].map do |path|
+            path = Path.new(path)
+            unless @album_for_track_path[path]
+              puts "Invalid state: #{path} not in albums"
+              reset_state
+              return
+            end
+            path
+          end
+          play_tracks(paths,
+            pos: state['playlist-pos'],
+            time: state['time-pos'])
+        end
+      end
+    end
+
+    def reset_state
+      @state_file.unlink
+    end
+
+    def play_tracks(tracks, pos: nil, time: nil)
+      @playlist_file.dirname.mkpath
+      @playlist_file.write(tracks.map { |t| t.respond_to?(:path) ? t.path : t }.join("\n"))
+      @mpv.command('loadlist', @playlist_file.to_s)
+      @future_playlist_pos = pos if pos && pos >= 0
+      @future_time_pos = time if time && time > 0
+    end
+
+    def start_file(event)
+      if @future_playlist_pos
+        @mpv.set_property('playlist-pos', @future_playlist_pos)
+        @future_playlist_pos = nil
+      end
+    end
+
+    def playback_restart(event)
+      if @future_time_pos
+        @mpv.set_property('time-pos', @future_time_pos)
+        @future_time_pos = nil
       end
     end
 
@@ -124,17 +202,21 @@ class MusicBox
       tracks.to_a
     end
 
-    def playlist_changed(value)
-      @current_track = @playlist = nil
-      if @properties.playlist
-        @playlist = @properties.playlist.map do |entry|
-          track_path = Path.new(entry.filename)
+    def update_playlist(value)
+      @current_track = @current_pos = @current_tracks = nil
+      if value
+        value.each_with_index do |entry, pos|
+          track_path = Path.new(entry['filename'])
           album = @album_for_track_path[track_path] \
             or raise Error, "Can't determine album for track file: #{track_path}"
           track = album.tracks.find { |t| t.path == track_path } \
             or raise Error, "Can't determine track for track file: #{track_path}"
-          @current_track = track if entry.current
-          track
+          if entry['current']
+            @current_track = track
+            @current_pos = pos
+          end
+          @current_tracks ||= []
+          @current_tracks << track
         end
       end
       show_playlist
@@ -149,7 +231,7 @@ class MusicBox
     end
 
     def play_next_track
-      if @properties.playlist_position && @properties.playlist_position < @properties.playlist.count - 1
+      if @current_pos && @current_pos < @current_tracks.length - 1
         @mpv.command('playlist-next')
       else
         puts 'no next track'
@@ -157,7 +239,7 @@ class MusicBox
     end
 
     def play_previous_track
-      if @properties.playlist_position && @properties.playlist_position > 0
+      if @current_pos && @current_pos > 0
         @mpv.command('playlist-prev')
       else
         puts 'no previous track'
@@ -173,10 +255,8 @@ class MusicBox
     end
 
     def play_album_for_current_track
-      if @properties.playlist_position
-        entry = @properties.playlist[@properties.playlist_position]
-        track_path = Path.new(entry.filename)
-        album = @album_for_track_path[track_path] \
+      if @current_track
+        album = @album_for_track_path[@current_track.path] \
           or raise Error, "Can't determine album for track file: #{track_path}"
         play_tracks(album.tracks)
       else
@@ -185,35 +265,50 @@ class MusicBox
     end
 
     def toggle_pause
-      @mpv.set_property('pause', !@properties.pause_state)
+      if @current_track
+        @mpv.set_property('pause', !@mpv.get_property('pause'))
+      else
+        puts "no current track"
+      end
     end
 
     def skip_backward
-      if @properties.time_position && @properties.time_position > 0
-        @mpv.command('seek', -SeekSeconds)
+      if @current_track
+        @mpv.command('seek', -@seek_seconds)
+      else
+        puts "no current track"
       end
     end
 
     def skip_forward
-      if @properties.time_position
-        @mpv.command('seek', SeekSeconds)
+      if @current_track
+        @mpv.command('seek', @seek_seconds)
+      else
+        puts "no current track"
       end
     end
 
     def skip_to_beginning
-      if @properties.time_position && @properties.time_position > 0
+      if @current_track
         @mpv.command('seek', 0, 'absolute-percent')
+      else
+        puts "no current track"
       end
     end
 
+    def stop
+      @mpv.command('stop')
+      reset_state
+    end
+
     def show_playlist
-      if @playlist
-        system('clear')
+      system('clear')
+      if @current_tracks
         if @current_track
           @current_track.album.show_cover(width: 'auto', height: 20, preserve_aspect_ratio: false)
           puts
         end
-        @playlist.each_with_index do |track, i|
+        @current_tracks.each_with_index do |track, i|
           puts '%1s %2d. %-40.40s | %-40.40s | %-40.40s' % [
             track == @current_track ? '>' : '',
             i + 1,
@@ -222,6 +317,8 @@ class MusicBox
             track.album.artist,
           ]
         end
+      else
+        puts "no current tracks"
       end
     end
 
@@ -229,12 +326,6 @@ class MusicBox
       Keymap.each do |key, command|
         puts "%-8s %s" % [key_description(key), command_description(command)]
       end
-    end
-
-    def play_tracks(tracks)
-      @playlist_file.dirname.mkpath
-      @playlist_file.write(tracks.map(&:path).join("\n"))
-      @mpv.command('loadlist', @playlist_file.to_s)
     end
 
     def toggle_equalizer
@@ -258,17 +349,6 @@ class MusicBox
         ]
         @mpv.command('af', 'set', @current_equalizer.to_s(enabled: @equalizer_enabled))
       end
-    end
-
-    #
-    # callbacks from MPV
-    #
-
-    def property_changed(name, value)
-# ;;pp(name => value) unless name == 'time-pos'
-      key = ObservedProperties[name] or raise
-      @properties[key] = value
-      send("#{key}_changed", value) rescue NoMethodError
     end
 
     private
