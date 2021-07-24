@@ -1,20 +1,19 @@
 # TODO
 
-- ignore info.json in imported album
-  - otherwise causes problems because overwrites current album's info.json
+- experiment with other AutoEQ/FFMPEG filters
+    https://ffmpeg.org/ffmpeg-filters.html#toc-headphone
+    https://ffmpeg.org/ffmpeg-filters.html#firequalizer
 
-- make album reference collection item, instead of the other way around
-  - add `collection_item_id` to Album
-  - write fix-up stage to rewrite all album files
+- try AutoEQ's Convolution Equalizers
+    https://github.com/jaakkopasanen/AutoEq#convolution-equalizers
+
+- describe player modes in README
+  - 3-function player: play random album, play random tracks (typical shuffle mode), or play the album for the current track
 
 - make most commands work on albums, not releases/etc.
   - use Discogs as original source of truth
   - but not for searching
   - except for unripped, etc.
-
-- add `ignore_folder` to config
-  - contains ID of folder with ignored items
-  - ignore when building collection?
 
 - see if taglib-ruby will substitute for ffprobe/mp4tags/mp4art/etc.
 
@@ -43,7 +42,7 @@
 
 - split up Catalog
   - Discogs-related classes under Discogs
-  - Album, AlbumTrack, Artist (new) under Catalog
+  - Album, AlbumTrack, Artist (new) under Catalog (or Collection)
 
 - re-implement file-based Group?
   - convert all Discogs structures
@@ -90,7 +89,6 @@
   - sample rate
 
 - consider using Album/AlbumTrack as master/truth?
-  - keep in SQLite?
   - created/updated from Discogs, but treated separately
 
 - keep separate list of artists
@@ -105,8 +103,6 @@
     - so can have one for headphones, and another for speakers
     - add --profile=X flag to specify profile
     - or specify multiple configs?
-
-- reimplement player state checkpointing, to resume exactly where left off
 
 - use curses or tty for full-screen player TTY mode?
 
