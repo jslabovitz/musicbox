@@ -16,6 +16,7 @@ require 'sixarm_ruby_unaccent'
 require 'tty-prompt'
 require 'yaml'
 
+require 'extensions/path'
 require 'extensions/string'
 
 require 'musicbox/version'
