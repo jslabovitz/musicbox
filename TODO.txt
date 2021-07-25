@@ -53,11 +53,6 @@
   - center horizontally on page
   - make crop marks
 
-- only use #cd? to determine need for ripping
-  - add default find selector to reject releases with non-rippable formats
-      https://www.discogs.com/help/formatslist
-  - can override to show full collection, find dups, or make LP/etc. labels
-
 - fix 'dup' command to not treat multidisc release as duplicate
 
 - import: handle multiple formats/discs better

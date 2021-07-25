@@ -117,7 +117,7 @@ class MusicBox
   end
 
   def download_images(args)
-    @catalog.releases.find(args).select(&:cd?).each do |release|
+    @catalog.releases.find(args).each do |release|
       release.download_images
     end
   end

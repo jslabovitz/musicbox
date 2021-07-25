@@ -90,10 +90,6 @@ class MusicBox
         @master&.release_year || release_year
       end
 
-      def cd?
-        @formats.find(&:cd?) != nil
-      end
-
       def has_album?
         @album != nil
       end

@@ -35,14 +35,6 @@ class MusicBox
         (@qty && @qty > 1) ? " [#{@qty}]" : ''
       end
 
-      def cd?
-        @name == 'CD'
-      end
-
-      def vinyl?
-        @name == 'Vinyl'
-      end
-
     end
 
   end
