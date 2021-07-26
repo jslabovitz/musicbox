@@ -100,6 +100,10 @@
     - add --profile=X flag to specify profile
     - or specify multiple configs?
 
+- build player that works with BlueSound
+  - same logic, but asks BluOS to pull music from shared library on Mac
+  - see ~/bin/bluos
+
 - use curses or tty for full-screen player TTY mode?
 
 - use TTY::ProgressBar to show track playing progress?
