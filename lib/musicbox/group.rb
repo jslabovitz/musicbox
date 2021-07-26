@@ -36,7 +36,7 @@ class MusicBox
       reset
       if @root.exist?
         @root.glob("*/#{InfoFileName}").each do |info_file|
-          add_item(item_class.load(info_file.dirname))
+          @items[item.id] = item_class.load(info_file)
         end
         ;;warn "* loaded #{@items.length} items from #{@root}"
       end
@@ -44,10 +44,6 @@ class MusicBox
 
     def [](id)
       @items[id]
-    end
-
-    def <<(item)
-      add_item(item)
     end
 
     def find(*selectors, prompt: false, multiple: true)
@@ -117,42 +113,23 @@ class MusicBox
       @root / id
     end
 
-    def new_item(id, args={})
-      item = item_class.new(
-        {
-          id: id,
-          dir: dir_for_id(id),
-        }.merge(args)
-      )
-      add_item(item)
+    def save_item(item)
+      item.json_file = dir_for_id(item.id) / InfoFileName
+      item.save
+      @items[item.id] = item unless @items[item.id]
       item
     end
 
-    def add_item(item)
-      raise Error, "Item does not have ID" unless item.id
-      raise Error, "Item already exists in #{@root}: #{item.id.inspect}" if @items[item.id]
-      @items[item.id] = item
+    def save_hash(hash)
+      raise Error, "Hash does not have ID" unless hash[:id]
+      json_file = dir_for_id(hash[:id]) / InfoFileName
+      ;;warn "* saving item to #{json_file}"
+      json_file.dirname.mkpath unless json_file.dirname.exist?
+      json_file.write(JSON.pretty_generate(hash))
     end
 
     def has_item?(id)
       @items.has_key?(id)
-    end
-
-    def save_item(id:, item: nil, &block)
-      raise Error, "ID is nil" unless id
-      item = yield if block_given?
-      raise Error, "Item is nil" unless item
-      dir = dir_for_id(id)
-      info_file = dir / InfoFileName
-      dir.mkpath unless dir.exist?
-;;warn "writing to #{info_file}"
-      info_file.write(JSON.pretty_generate(item))
-    end
-
-    def save_item_if_new(id:, item: nil, &block)
-      unless has_item?(id)
-        save_item(id: id, item: item, &block)
-      end
     end
 
     def destroy!
@@ -161,40 +138,36 @@ class MusicBox
 
     def destroy_item!(item)
       @items.delete(item.id)
-      item.destroy!
+      dir = dir_for_id(id)
+      dir.rmtree if dir.exist?
     end
 
     class Item
 
+      attr_accessor :json_file
       attr_accessor :id
-      attr_accessor :dir
 
       include SetParams
 
-      def self.load(dir, params={})
-        dir = Path.new(dir)
-        info_file = dir / Group::InfoFileName
-        raise Error, "Info file does not exist: #{info_file}" unless info_file.exist?
-        new(JSON.load(info_file.read).merge(dir: dir).merge(params))
+      def self.load(json_file)
+        raise Error, "Info file does not exist: #{json_file}" unless json_file.exist?
+        new(json_file: json_file, **JSON.load(json_file.read))
       end
 
-      def info_file
-        @dir / Group::InfoFileName
+      def dir
+        @json_file.dirname
       end
 
       def save
-        ;;warn "* saving item to #{@dir}"
-        raise Error, "dir not defined" unless @dir
-        @dir.mkpath unless @dir.exist?
-        info_file.write(JSON.pretty_generate(serialize))
+        ;;warn "* saving item to #{@json_file}"
+        @json_file.dirname.mkpath unless @json_file.dirname.exist?
+        @json_file.write(JSON.pretty_generate(item))
       end
 
-      def destroy!
-        @dir.rmtree if @dir.exist?
-      end
-
-      def serialize(args={})
-        { id: @id }.merge(args).compact
+      def as_json(*)
+        {
+          id: @id,
+        }
       end
 
       def fields(keys)

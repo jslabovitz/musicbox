@@ -12,7 +12,7 @@ class MusicBox
       puts; puts "Importing from #{@source_dir}"
       make_album
       if @prompt.yes?('Add?')
-        @album.save
+        @catalog.albums.save_item(@album)
         copy_files
         archive_dir
         @release.select_cover   # also does update_tags
@@ -36,8 +36,7 @@ class MusicBox
           title: @release.title,
           artist: @release.artist,
           year: @release.original_release_year,
-          discs: @release.format_quantity,
-          dir: @catalog.albums.dir_for_id(@release.id))
+          discs: @release.format_quantity)
         @release.album = @album
       end
       make_tracks

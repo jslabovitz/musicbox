@@ -12,10 +12,6 @@ class MusicBox
         @search_fields ||= [:title, :artist]
       end
 
-      def new_album(id, args={})
-        new_item(id, args)
-      end
-
     end
 
   end

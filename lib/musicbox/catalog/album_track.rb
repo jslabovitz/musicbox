@@ -47,7 +47,7 @@ class MusicBox
         )
       end
 
-      def to_h
+      def as_json(*)
         {
           title: @title,
           artist: @artist,

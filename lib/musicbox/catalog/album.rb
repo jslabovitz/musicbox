@@ -26,7 +26,7 @@ class MusicBox
       end
 
       def cover_file
-        files = @dir.glob('cover.{jpg,png}')
+        files = dir.glob('cover.{jpg,png}')
         raise Error, "Multiple cover files: #{files.join(', ')}" if files.length > 1
         files.first
       end
@@ -67,7 +67,7 @@ class MusicBox
       end
 
       def validate_logs
-        log_files = @dir.glob('*.log')
+        log_files = dir.glob('*.log')
         raise Error, "No rip logs" if log_files.empty?
         state = :initial
         log_files.each do |log_file|
@@ -105,7 +105,7 @@ class MusicBox
         end
         unless changed_tracks.empty?
           puts
-          puts "#{@title} [#{@dir}]"
+          puts "#{@title} [#{dir}]"
           changed_tracks.each do |track|
             puts "\t" + track.file.to_s
             track.tags.changes.each do |key, change|
@@ -143,7 +143,7 @@ class MusicBox
           puts "#{@id}: already has cover"
           return
         end
-        file = @dir / @tracks.first.file
+        file = dir / @tracks.first.file
         begin
           run_command('mp4art',
             '--extract',
@@ -155,20 +155,20 @@ class MusicBox
           # ignore
         end
         # cover is in FILE.art[0].TYPE
-        files = @dir.glob('*.art*.*').reject { |f| f.extname.downcase == '.gif' }
+        files = dir.glob('*.art*.*').reject { |f| f.extname.downcase == '.gif' }
         if files.length == 0
           puts "#{@id}: no cover to extract"
         elsif files.length > 1
           raise Error, "Multiple covers found"
         else
           file = files.first
-          new_cover_file = (@dir / 'cover').add_extension(file.extname)
+          new_cover_file = (dir / 'cover').add_extension(file.extname)
           puts "#{@id}: extracted cover: #{new_cover_file.basename}"
           file.rename(new_cover_file)
         end
       end
 
-      def serialize
+      def as_json(*)
         super(
           title: @title,
           artist: @artist,
