@@ -12,11 +12,6 @@ class MusicBox
       attr_accessor :collection_item    # linked on load
       attr_accessor :release            # linked on load
 
-      def initialize(params={})
-        @tracks = []
-        super
-      end
-
       def tracks=(tracks)
         @tracks = tracks.map { |h| AlbumTrack.new(h.merge(album: self)) }
       end
@@ -174,7 +169,7 @@ class MusicBox
           artist: @artist,
           year: @year,
           discs: @discs,
-          tracks: @tracks.map(&:to_h))
+          tracks: @tracks&.map(&:to_h))
       end
 
     end

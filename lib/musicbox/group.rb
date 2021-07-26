@@ -16,30 +16,19 @@ class MusicBox
 
     def initialize(root:)
       @root = Path.new(root).expand_path
-      reset
-      load
+      @items = {}
+      if @root.exist?
+        @root.glob("*/#{InfoFileName}").each do |info_file|
+          raise Error, "Info file does not exist: #{info_file}" unless info_file.exist?
+          item = self.class.item_class.new(json_file: info_file, **JSON.load(info_file.read))
+          @items[item.id] = item
+        end
+        ;;warn "* loaded #{@items.length} items from #{@root}"
+      end
     end
 
     def items
       @items.values
-    end
-
-    def item_class
-      self.class.item_class
-    end
-
-    def reset
-      @items = {}
-    end
-
-    def load
-      reset
-      if @root.exist?
-        @root.glob("*/#{InfoFileName}").each do |info_file|
-          @items[item.id] = item_class.load(info_file)
-        end
-        ;;warn "* loaded #{@items.length} items from #{@root}"
-      end
     end
 
     def [](id)
@@ -115,9 +104,10 @@ class MusicBox
 
     def save_item(item)
       item.json_file = dir_for_id(item.id) / InfoFileName
-      item.save
-      @items[item.id] = item unless @items[item.id]
-      item
+      ;;warn "* saving item to #{item.json_file}"
+      item.json_file.dirname.mkpath unless item.json_file.dirname.exist?
+      item.json_file.write(JSON.pretty_generate(item))
+      @items[item.id] ||= item
     end
 
     def save_hash(hash)
@@ -149,19 +139,8 @@ class MusicBox
 
       include SetParams
 
-      def self.load(json_file)
-        raise Error, "Info file does not exist: #{json_file}" unless json_file.exist?
-        new(json_file: json_file, **JSON.load(json_file.read))
-      end
-
       def dir
         @json_file.dirname
-      end
-
-      def save
-        ;;warn "* saving item to #{@json_file}"
-        @json_file.dirname.mkpath unless @json_file.dirname.exist?
-        @json_file.write(JSON.pretty_generate(item))
       end
 
       def as_json(*)
