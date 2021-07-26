@@ -30,7 +30,7 @@ class MusicBox
         when /^Preamp: ([-.\d]+) dB$/
           @volume_filter = VolumeFilter.new(volume: $1.to_f)
         when /^Filter \d+: ON PK Fc (\d+) Hz Gain ([-.\d]+) dB Q ([-.\d]+)$/
-          @equalizer_filters << EqualizerFilter.new(
+          @equalizer_filters << ParametricEqualizerFilter.new(
             frequency: $1.to_i,
             gain: $2.to_f,
             width: $3.to_f,
@@ -61,7 +61,7 @@ class MusicBox
 
     end
 
-    class EqualizerFilter
+    class ParametricEqualizerFilter
 
       attr_accessor :frequency
       attr_accessor :gain
