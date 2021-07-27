@@ -47,7 +47,7 @@ class MusicBox
       orphaned
     end
 
-    def orphaned_images
+    def orphaned_image_files
       all_files = [@releases, @masters].map do |group|
         group.items.select(&:images).map do |release|
           release.images.map { |image| image.file.basename.to_s }

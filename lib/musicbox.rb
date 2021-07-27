@@ -183,16 +183,16 @@ class MusicBox
         end
       end
     end
-    images = @catalog.orphaned_images
-    unless images.empty?
+    image_files = @catalog.orphaned_image_files
+    unless image_files.empty?
       puts "Images:"
-      images.sort.each do |image|
-        puts "\t" + image.to_s
+      image_files.sort.each do |file|
+        puts "\t" + file.to_s
       end
       puts
       if @prompt.yes?('Remove orphaned images?')
-        images.each do |image|
-          (@catalog.images_dir / images.file).unlink
+        image_files.each do |file|
+          (@catalog.images_dir / file).unlink
         end
       end
     end
