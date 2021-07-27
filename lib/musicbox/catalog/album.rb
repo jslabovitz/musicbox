@@ -167,8 +167,8 @@ class MusicBox
         end
       end
 
-      def as_json(*)
-        super(
+      def as_json(*options)
+        super(*options).merge(
           title: @title,
           artist: @artist,
           year: @year,

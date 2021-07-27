@@ -98,24 +98,26 @@ class MusicBox
       end.flatten.compact.uniq
     end
 
-    def dir_for_id(id)
-      @root / id
+    def json_file_for_id(id)
+      @root / id / InfoFileName
     end
 
     def save_item(item)
-      item.json_file = dir_for_id(item.id) / InfoFileName
+      item.json_file = json_file_for_id(item.id)
       ;;warn "* saving item to #{item.json_file}"
+      json = JSON.pretty_generate(item)
       item.json_file.dirname.mkpath unless item.json_file.dirname.exist?
-      item.json_file.write(JSON.pretty_generate(item))
+      item.json_file.write(json)
       @items[item.id] ||= item
     end
 
     def save_hash(hash)
       raise Error, "Hash does not have ID" unless hash[:id]
-      json_file = dir_for_id(hash[:id]) / InfoFileName
+      json_file = json_file_for_id(hash[:id])
       ;;warn "* saving item to #{json_file}"
+      json = JSON.pretty_generate(hash)
       json_file.dirname.mkpath unless json_file.dirname.exist?
-      json_file.write(JSON.pretty_generate(hash))
+      json_file.write(json)
     end
 
     def has_item?(id)
@@ -128,7 +130,7 @@ class MusicBox
 
     def destroy_item!(item)
       @items.delete(item.id)
-      dir = dir_for_id(id)
+      dir = json_file_for_id(item.id).dirname
       dir.rmtree if dir.exist?
     end
 
@@ -143,7 +145,11 @@ class MusicBox
         @json_file.dirname
       end
 
-      def as_json(*)
+      def to_json(*options)
+        as_json(*options).to_json(*options)
+      end
+
+      def as_json(*options)
         {
           id: @id,
         }
