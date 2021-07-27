@@ -31,18 +31,19 @@ class MusicBox
         raise Error, "Disc number out of range" unless n >= 1 && n <= @release.format_quantity
         @disc = n
       else
-        @album = Catalog::Album.new(
+        @release.album = @album = Catalog::Album.new(
           id: @release.id,
           title: @release.title,
           artist: @release.artist,
           year: @release.original_release_year,
-          discs: @release.format_quantity)
-        @release.album = @album
+          discs: @release.format_quantity,
+          json_file: @catalog.albums.json_file_for_id(@release.id))
       end
       make_tracks
     end
 
     def make_tracks
+      @album.tracks ||= []
       @copy_plan = {}
       @source_dir.children.select(&:file?).reject(&:hidden?).reject { |f| f.basename.to_s == 'info.json' }.sort.each do |source_file|
         type = MIME::Types.of(source_file.to_s).first&.media_type
