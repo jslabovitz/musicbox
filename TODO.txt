@@ -1,5 +1,8 @@
 # TODO
 
+- figure out why first run of 'update' removes collection
+  - but 2nd run gets it all
+
 - move Equalizer to separate AutoEQ gem
   - handles lookup in AutoEQ results
   - knows about precedences
@@ -28,6 +31,7 @@
     https://tmkk.undo.jp/xld/dsd.html.en
     https://forums.stevehoffman.tv/threads/converting-dsd-to-24-bit-help-please.454536/
     http://dsdmaster.blogspot.com
+    https://forums.stevehoffman.tv/threads/converting-dsd-to-24-bit-help-please.454536/
 
 - consider using `cover_image` from collection item instead of `images` from release
 
