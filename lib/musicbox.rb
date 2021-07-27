@@ -204,7 +204,7 @@ class MusicBox
       when :cover
         album.show_cover if album.has_cover?
       when :details
-        puts album.details_to_s
+        puts album.details
         puts
       when :summary
         puts album
@@ -216,7 +216,7 @@ class MusicBox
     @catalog.releases.find(args).each do |release|
       case mode
       when :details
-        puts release.details_to_s
+        puts release.details
         puts
       when :summary
         puts release

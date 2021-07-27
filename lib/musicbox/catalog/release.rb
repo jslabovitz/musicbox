@@ -119,10 +119,10 @@ class MusicBox
       end
 
       def to_s
-        summary_to_s
+        summary
       end
 
-      def summary_to_s
+      def summary
         '%-8s | %1s%1s | %-4s %4s | %-50.50s | %-60.60s | %-6s' % [
           @id,
           has_album? ? 'A' : '',
@@ -135,7 +135,7 @@ class MusicBox
         ]
       end
 
-      def details_to_s
+      def details
         info = [
           ['ID', @id],
           ['Master ID', @master_id || '-'],

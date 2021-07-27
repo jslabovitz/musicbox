@@ -23,7 +23,7 @@ class MusicBox
 
     def make_album
       @release = @catalog.releases.find(@source_dir.basename.to_s, prompt: true, multiple: false).first
-      print @release.details_to_s
+      print @release.details
       if (@album = @release.album)
         raise Error, "Album already exists" if @release.format_quantity.nil? || @release.format_quantity == 1
         puts "Release has multiple discs."

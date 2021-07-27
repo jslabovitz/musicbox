@@ -31,6 +31,10 @@ class MusicBox
       end
 
       def to_s
+        summary
+      end
+
+      def summary
         '%-8s | %1s | %-4s | %-50.50s | %-60.60s | %-6s' % [
           @id,
           has_cover? ? 'C' : '',
