@@ -125,6 +125,7 @@ class MusicBox
     end
 
     def destroy!
+      @items.values.each { |item| @items.delete(item.id) }
       @root.rmtree if @root.exist?
     end
 
