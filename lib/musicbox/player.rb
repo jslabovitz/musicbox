@@ -304,8 +304,12 @@ class MusicBox
     def show_playlist
       system('clear')
       if @current_tracks
-        if @current_track
-          @current_track.album.show_cover(width: 'auto', height: 20, preserve_aspect_ratio: false)
+        if @current_track&.album.has_cover?
+          MusicBox.show_image(
+            file: @current_track.album.cover_file,
+            width: 'auto',
+            height: 20,
+            preserve_aspect_ratio: false)
           puts
         end
         @current_tracks.each_with_index do |track, i|

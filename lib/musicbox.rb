@@ -51,6 +51,23 @@ class MusicBox
 
   attr_accessor :catalog
 
+  def self.show_image(file:, width: nil, height: nil, preserve_aspect_ratio: nil)
+    # see https://iterm2.com/documentation-images.html
+    data = Base64.strict_encode64(file.read)
+    args = {
+      name: Base64.strict_encode64(file.to_s),
+      size: data.length,
+      width: width,
+      height: height,
+      preserveAspectRatio: preserve_aspect_ratio,
+      inline: 1,
+    }.compact
+    puts "\033]1337;File=%s:%s\a" % [
+      args.map { |a| a.join('=') }.join(';'),
+      data,
+    ]
+  end
+
   def initialize(root:)
     @catalog = Catalog.new(root: root)
     @prompt = TTY::Prompt.new
@@ -202,7 +219,7 @@ class MusicBox
     @catalog.albums.find(args).each do |album|
       case mode
       when :cover
-        album.show_cover if album.has_cover?
+        MusicBox.show_image(file: album.cover_file) if album.has_cover?
       when :details
         puts album.details
         puts
