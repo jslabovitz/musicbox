@@ -1,5 +1,8 @@
 # TODO
 
+- when selecting cover, show cover images & info in iTerm instead of shelling out to Preview
+  - show resolution, file size, file name
+
 - move Equalizer to separate AutoEQ gem
   - handles lookup in AutoEQ results
   - knows about precedences
