@@ -138,7 +138,7 @@ class MusicBox
         if files.length == 0
           puts "#{@id}: no cover to extract"
         elsif files.length > 1
-          raise Error, "Multiple covers found"
+          raise Error, "#{@id}: multiple covers found"
         else
           file = files.first
           new_cover_file = (dir / 'cover').add_extension(file.extname)
