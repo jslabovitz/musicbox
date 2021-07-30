@@ -304,7 +304,7 @@ class MusicBox
     def show_playlist
       system('clear')
       if @current_tracks
-        if @current_track&.album.has_cover?
+        if @current_track&.album&.has_cover?
           MusicBox.show_image(
             file: @current_track.album.cover_file,
             width: 'auto',
