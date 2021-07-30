@@ -1,6 +1,7 @@
 # TODO
 
-- when selecting cover, show cover images & info in iTerm instead of shelling out to Preview
+- when selecting cover, show cover images & info in iTerm
+  - instead of shelling out to Preview
   - show resolution, file size, file name
 
 - move Equalizer to separate AutoEQ gem
@@ -56,7 +57,7 @@
 - fix 'dup' command to not treat multidisc release as duplicate
 
 - import: handle multiple formats/discs better
-  - consider case where digitized LP becomes album
+  - consider case where digitized LP or downloaded tracks becomes album
   - if more than one format, prompt for choice
   - but how to handle multidisc releases 
     - some have formats of [CD, CD] ('expanded')
