@@ -42,7 +42,7 @@ class MusicBox
           playlist_file: '/tmp/musicbox.playlist.m3u8',
           seek_seconds: 30,
           ignore_state: false,
-        }.merge(params)
+        }.merge(params.compact)
       )
     end
 
@@ -68,13 +68,19 @@ class MusicBox
 
     def setup_mpv
       @mpv = MPVClient.new(
-        'mpv-log-level' => @mpv_log_level,
+        'msg-level' => "all=#{@mpv_log_level}",
         'audio-device' => @audio_device,
         'audio-exclusive' => @audio_exclusive ? 'yes' : 'no',
         'audio-display' => 'no',
         'vo' => 'null',
         'volume' => 100)
-      @mpv.register_event('log-message') { |e| pp(log: e) }
+      @mpv.register_event('log-message') do |event|
+        puts "%-6s | %-20s | %s" % [
+          event['level'],
+          event['prefix'],
+          event['text'].strip,
+        ]
+      end
       @mpv.register_event('start-file') { |e| start_file(e) }
       @mpv.register_event('playback-restart') { |e| playback_restart(e) }
       @mpv.command('request_log_messages', @mpv_log_level) if @mpv_log_level
