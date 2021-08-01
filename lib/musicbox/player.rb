@@ -60,6 +60,8 @@ class MusicBox
       @dispatcher = IO::Dispatcher.new
       setup_interface
       setup_mpv
+      next_equalizer
+      restore_state unless @ignore_state
       puts "[ready]"
       @dispatcher.run
     end
@@ -72,7 +74,7 @@ class MusicBox
         'audio-display' => 'no',
         'vo' => 'null',
         'volume' => 100)
-      @mpv.register_event('log-message') { |e| pp(log: event) }
+      @mpv.register_event('log-message') { |e| pp(log: e) }
       @mpv.register_event('start-file') { |e| start_file(e) }
       @mpv.register_event('playback-restart') { |e| playback_restart(e) }
       @mpv.command('request_log_messages', @mpv_log_level) if @mpv_log_level
@@ -82,15 +84,9 @@ class MusicBox
       @mpv.observe_property('pause') do |name, value|
         puts '[%s]' % [value ? 'paused' : 'playing']
       end
-      @dispatcher.add_io_handler(input: @mpv.socket) do |io|
-        @mpv.process_response
-      end
-      @dispatcher.add_io_handler(exception: @mpv.socket) do |io|
-        shutdown_mpv
-      end
+      @dispatcher.add_io_handler(input: @mpv.socket) { |io| @mpv.process_response }
+      @dispatcher.add_io_handler(exception: @mpv.socket) { |io| shutdown_mpv }
       @dispatcher.set_timeout_handler(@checkpoint_timeout) { save_state }
-      next_equalizer
-      restore_state unless @ignore_state
       at_exit { shutdown_mpv }
     end
 
