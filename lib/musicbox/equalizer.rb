@@ -8,6 +8,7 @@ class MusicBox
     attr_accessor :name
     attr_accessor :volume_filter
     attr_accessor :equalizer_filters
+    attr_accessor :enabled
 
     include SetParams
 
@@ -20,6 +21,7 @@ class MusicBox
 
     def initialize(params={})
       @equalizer_filters = []
+      @enabled = true
       set(params)
     end
 
@@ -28,13 +30,9 @@ class MusicBox
         key, value = line.split(/:\s+/, 1)
         case key
         when /^Preamp: ([-.\d]+) dB$/
-          @volume_filter = VolumeFilter.new(volume: $1.to_f)
+          @volume_filter = VolumeFilter.new($1.to_f)
         when /^Filter \d+: ON PK Fc (\d+) Hz Gain ([-.\d]+) dB Q ([-.\d]+)$/
-          @equalizer_filters << ParametricEqualizerFilter.new(
-            frequency: $1.to_i,
-            gain: $2.to_f,
-            width: $3.to_f,
-            type: 'q')
+          @equalizer_filters << ParametricEqualizerFilter.new($1.to_i, $2.to_f, $3.to_f, 'q')
         else
           warn "Ignoring eq line: #{line.inspect}"
         end
@@ -45,38 +43,29 @@ class MusicBox
       @name <=> other.name
     end
 
-    def to_s(enabled: true)
-      [@volume_filter, enabled ? @equalizer_filters : nil].flatten.compact.join(',')
+    def to_af
+      [@volume_filter, @enabled ? @equalizer_filters : nil].flatten.compact.map(&:to_af).join(',')
     end
 
-    class VolumeFilter
+    def to_s
+      '%s <%s>' % [
+        @name,
+        @enabled ? 'enabled' : 'disabled',
+      ]
+    end
 
-      attr_accessor :volume
+    class VolumeFilter < Struct.new(:volume)
 
-      include SetParams
-
-      def to_s
-        "volume=#{@volume}dB"
+      def to_af
+        "volume=#{volume}dB"
       end
 
     end
 
-    class ParametricEqualizerFilter
+    class ParametricEqualizerFilter < Struct.new(:f, :g, :w, :t)
 
-      attr_accessor :frequency
-      attr_accessor :gain
-      attr_accessor :width
-      attr_accessor :type
-
-      include SetParams
-
-      def to_s
-        "equalizer=%s" % {
-          f: @frequency,
-          g: @gain,
-          w: @width,
-          t: @type,
-        }.map { |kv| kv.join('=') }.join(':')
+      def to_af
+        "equalizer=%s" % %w[f g w t].map { |k| '%s=%s' % [k, send(k)] }.join(':')
       end
 
     end
