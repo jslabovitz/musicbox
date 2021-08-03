@@ -260,11 +260,33 @@ class MusicBox
     end
   end
 
-  def artist_keys(args)
-    if args.empty?
-      args = @catalog.releases.items.map { |r| r.artists.map(&:name) }.flatten
+  def artist_keys
+    artists = (@catalog.releases.items + @catalog.masters.items).map(&:artists).flatten
+    # for some reason #uniq doesn't do the job
+    artists = artists.map { |a| [a.id, a] }.to_h.values.sort
+    keys = {}
+    names = {}
+    non_personal_names = Set.new
+    artists.each do |artist|
+      name, key = artist.name, artist.key
+      non_personal_names << name if name == artist.canonical_name
+      (keys[key] ||= Set.new) << name
+      if names[name] && names[name] != key
+        raise Error, "Name #{name.inspect} maps to different key #{key.inspect}"
+      end
+      names[name] = key
     end
-    ;;pp @catalog.artist_keys(args)
+    puts "Non-personal names:"
+    non_personal_names.sort.each { |n| puts "\t" + n }
+    puts "Keys:"
+    keys.sort.each do |key, names|
+      puts "\t" + key
+      names.each { |n| puts "\t\t" + n }
+    end
+    puts "Artists:"
+    artists.each do |artist|
+      puts artist.summary
+    end
   end
 
   def play(args, prompt: false, equalizer_name: nil, **params)

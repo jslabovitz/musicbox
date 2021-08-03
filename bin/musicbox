@@ -92,8 +92,8 @@ SimpleCommand.run do
     @musicbox.dups(args)
   end
 
-  command 'artist-keys' do |args|
-    @musicbox.artist_keys(args)
+  command 'artist-keys' do
+    @musicbox.artist_keys
   end
 
   command 'play', prompt: nil, device: nil, exclusive: nil, mpv_log_level: nil, eq: nil, ignore_state: nil do |args|

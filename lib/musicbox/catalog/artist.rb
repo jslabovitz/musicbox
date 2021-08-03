@@ -17,13 +17,25 @@ class MusicBox
       include SetParams
 
       def self.join(artists)
-        artists.map do |artist|
-          [artist.name, (artist.join == ',' ? '' : ' '), artist.join].join
-        end.join(' ').squeeze(' ').strip
+        artists.map(&:name_for_join).join(' ').squeeze(' ').strip
       end
 
-      def to_s
-        @name
+      def <=>(other)
+        @name <=> other.name
+      end
+
+      def name_for_join
+        [@name, (@join == ',' ? '' : ' '), @join].join
+      end
+
+      def summary
+        cname = canonical_name
+        '%8s | %-6s | %-40s | %-40s' % [
+          @id,
+          key,
+          @name,
+          (cname == @name) ? '-' : cname,
+        ]
       end
 
       def canonical_name

@@ -56,23 +56,6 @@ class MusicBox
       @images_dir.children.map(&:basename).map(&:to_s) - all_files
     end
 
-    def artist_keys(artists)
-      keys = {}
-      names = {}
-      non_personal_names = Set.new
-      artists.map { |a| a.kind_of?(Artist) ? a : Artist.new(name: a) }.each do |artist|
-        non_personal_names << artist.name if artist.name == artist.canonical_name
-        key = artist.key
-        (keys[key] ||= Set.new) << artist.name
-        (names[artist.name] ||= Set.new) << key
-      end
-      {
-        non_personal_names: non_personal_names.sort,
-        keys: keys.sort.map { |k, s| [k, s.to_a] }.to_h,
-        names: names.sort.map { |k, s| [k, s.to_a] }.to_h,
-      }
-    end
-
     def find_dups(releases)
       dups = {}
       releases.select(&:master_id).each do |release|
