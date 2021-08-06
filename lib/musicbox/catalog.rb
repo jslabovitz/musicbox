@@ -75,15 +75,6 @@ class MusicBox
       end
     end
 
-    def dirs_for_args(base_dir, args)
-      if args.empty?
-        dirs = base_dir.children.select(&:dir?)
-      else
-        dirs = args.map { |p| Path.new(p) }
-      end
-      dirs.sort_by { |d| d.to_s.downcase }
-    end
-
   end
 
 end

@@ -106,7 +106,13 @@ class MusicBox
   end
 
   def import(args)
-    @catalog.dirs_for_args(@catalog.import_dir, args).each do |dir|
+    if args.empty?
+      return unless @catalog.import_dir.exist?
+      dirs = @catalog.import_dir.children.sort_by { |d| d.to_s.downcase }
+    else
+      dirs = args.map { |p| Path.new(p) }
+    end
+    dirs.select(&:dir?).each do |dir|
       begin
         Importer.new(catalog: @catalog, source_dir: dir).import
       rescue Error => e
