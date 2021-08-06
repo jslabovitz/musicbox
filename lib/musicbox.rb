@@ -136,7 +136,7 @@ class MusicBox
   def cover(args, prompt: false, output_file: '/tmp/cover.pdf')
     cover_files = []
     @catalog.albums.find(args, prompt: prompt).each do |album|
-      release.select_cover unless album.has_cover?
+      album.select_cover unless album.has_cover?
       cover_files << album.cover_file if album.has_cover?
     end
     CoverMaker.make_covers(cover_files, output_file: output_file)
@@ -144,8 +144,8 @@ class MusicBox
   end
 
   def select_cover(args, prompt: false, force: false)
-    @catalog.releases.find(args, prompt: prompt).select(&:has_album?).each do |release|
-      release.select_cover unless release.album.has_cover? && !force
+    @catalog.albums.find(args, prompt: prompt).each do |album|
+      album.select_cover unless album.has_cover? && !force
     end
   end
 

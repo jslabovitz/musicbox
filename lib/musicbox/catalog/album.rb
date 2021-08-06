@@ -117,6 +117,25 @@ class MusicBox
         end
       end
 
+      def select_cover
+        @release.download_images
+        extract_cover
+        choices = [
+          @release.master&.images&.map(&:file),
+          @release.images&.map(&:file),
+          cover_file,
+        ].flatten.compact.uniq.select(&:exist?)
+        if choices.empty?
+          puts "#{@id}: no covers exist"
+        else
+          choices.each { |f| run_command('open', f) }
+          choice = TTY::Prompt.new.select('Cover?', choices)
+          cover_file = (album.dir / 'cover').add_extension(choice.extname)
+          choice.cp(cover_file) unless choice == cover_file
+          update_tags
+        end
+      end
+
       def extract_cover
         if has_cover?
           puts "#{@id}: already has cover"

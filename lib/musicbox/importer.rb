@@ -15,7 +15,7 @@ class MusicBox
         @catalog.albums.save_item(@album)
         copy_files
         archive_dir
-        @release.select_cover   # also does update_tags
+        select_cover   # also does update_tags
         make_label if @prompt.yes?('Make label?')
         make_cover if @prompt.yes?('Make cover?')
       end
