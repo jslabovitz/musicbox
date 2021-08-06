@@ -302,8 +302,8 @@ class MusicBox
   def select(args)
     ids = []
     loop do
-      releases = @catalog.releases.find(args, prompt: true) or break
-      ids += releases.map(&:id)
+      albums = @catalog.albums.find(args, prompt: true) or break
+      ids += albums.map(&:id)
       puts ids.join(' ')
     end
   end
