@@ -1,5 +1,14 @@
 # TODO
 
+- when importing/updating, prompt for artist
+  - new
+  - personal name
+
+- ensure artist key is unique
+  - doesn't represent multiple artists
+
+- experiment with SQLite/Sequel version of albums/tracks/artists
+
 - when selecting cover, show cover images & info in iTerm
   - instead of shelling out to Preview
   - show resolution, file size, file name
@@ -22,7 +31,6 @@
 
 - make most commands work on albums, not releases/etc.
   - use Discogs as original source of truth
-
   - but not for searching
   - except for unripped, etc.
 
