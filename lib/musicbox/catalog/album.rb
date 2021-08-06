@@ -45,6 +45,17 @@ class MusicBox
         ]
       end
 
+      def to_label
+        {
+          artist: @artist,
+          title: @title,
+          key: @release.artist_key,
+          year: @year,
+          format: Format.to_s(@release.formats),
+          id: @id,
+        }
+      end
+
       def validate_logs
         log_files = dir.glob('*.log')
         raise Error, "No rip logs" if log_files.empty?

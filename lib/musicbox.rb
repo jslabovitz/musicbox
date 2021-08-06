@@ -160,11 +160,9 @@ class MusicBox
   end
 
   def label(args)
-    labels = @catalog.releases.find(args, prompt: true).map(&:to_label)
+    labels = @catalog.albums.find(args, prompt: true).map(&:to_label)
     output_file = '/tmp/labels.pdf'
-    label_maker = LabelMaker.new
-    label_maker.make_labels(labels)
-    label_maker.write(output_file)
+    label_maker = LabelMaker.make_labels(labels, output_file: output_file)
     run_command('open', output_file)
   end
 

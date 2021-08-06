@@ -16,8 +16,8 @@ class MusicBox
       @pdf.font_size(12)
     end
 
-    def make_labels(labels)
-      labels.sort_by { |l| l.values_at(:key, :year) }.each_with_index do |label, i|
+    def make_labels(*labels)
+      labels.flatten.sort_by { |l| l.values_at(:key, :year) }.each_with_index do |label, i|
         @pdf.start_new_page if i > 0
         @pdf.bounding_box([0, 1.in], width: 2.5.in, height: 1.in) do
           # ;;@pdf.transparent(0.5) { @pdf.stroke_bounds }

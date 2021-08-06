@@ -187,17 +187,6 @@ class MusicBox
         end
       end
 
-      def to_label
-        {
-          artist: artist,
-          title: title,
-          key: artist_key,
-          year: original_release_year,
-          format: Format.to_s(@formats),
-          id: id,
-        }
-      end
-
       def link_images(images_dir)
         if @images
           @images.each do |image|
