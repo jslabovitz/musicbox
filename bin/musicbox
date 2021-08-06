@@ -25,10 +25,6 @@ SimpleCommand.run do
     @musicbox.fix(args)
   end
 
-  command 'formats' do |args|
-    @musicbox.formats(args)
-  end
-
   command 'extract-cover' do |args|
     @musicbox.extract_cover(args)
   end
