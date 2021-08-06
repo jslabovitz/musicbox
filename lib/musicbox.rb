@@ -234,9 +234,9 @@ class MusicBox
   end
 
   def csv(args)
-    print Catalog::Release.csv_header
-    @catalog.releases.find(args).each do |release|
-      print release.to_csv
+    print Catalog::Album.csv_header
+    @catalog.albums.find(args).each do |album|
+      print album.to_csv
     end
   end
 

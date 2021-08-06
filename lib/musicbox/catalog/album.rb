@@ -12,12 +12,12 @@ class MusicBox
       attr_accessor :collection_item    # linked on load
       attr_accessor :release            # linked on load
 
-      def tracks=(tracks)
-        @tracks = tracks.map { |h| AlbumTrack.new(h.merge(album: self)) }
+      def self.csv_header
+        %w[ID year artist title].to_csv
       end
 
-      def artist
-        @artist || @tracks&.first&.artist
+      def tracks=(tracks)
+        @tracks = tracks.map { |h| AlbumTrack.new(h.merge(album: self)) }
       end
 
       def cover_file
@@ -39,7 +39,7 @@ class MusicBox
           @id,
           has_cover? ? 'C' : '',
           @year || '-',
-          artist,
+          @artist,
           @title,
           @discs || '-',
         ]
@@ -54,6 +54,10 @@ class MusicBox
           format: Format.to_s(@release.formats),
           id: @id,
         }
+      end
+
+      def to_csv
+        [@id, @year, @artist, @title].to_csv
       end
 
       def validate_logs

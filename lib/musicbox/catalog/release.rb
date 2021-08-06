@@ -46,10 +46,6 @@ class MusicBox
       attr_accessor :master    # linked on load
       attr_accessor :album     # linked on load
 
-      def self.csv_header
-        %w[ID year artist title].to_csv
-      end
-
       def artists=(artists)
         @artists = artists.map { |a| Artist.new(a) }
       end
@@ -112,10 +108,6 @@ class MusicBox
 
       def sort_tuple
         [artist_key, original_release_year || 0, @title]
-      end
-
-      def to_csv
-        [@id, original_release_year, artist, @title].to_csv
       end
 
       def to_s
