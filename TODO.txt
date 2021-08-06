@@ -13,17 +13,16 @@
     - instead of CanonicalArtists/PersonalNames hash maps
   - ensure artist key is unique
     - doesn't represent multiple artists
+  - save artist ID into album
 
 - split up Catalog
-  - Discogs-related classes under Discogs
-  - Album, AlbumTrack, Artist (new) under Catalog (or Collection)
+  - Discogs: Discogs-related 
+  - Collection: Album, AlbumTrack, Artist (new), Tags
 
 - re-implement file-based Group
   - convert all Discogs structures
 
 - store albums/tracks/artists in SQLite/Sequel
-
-- save artist ID into album
 
 - when selecting cover, show cover images & info in iTerm
   - instead of shelling out to Preview
