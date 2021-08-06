@@ -76,10 +76,6 @@ SimpleCommand.run do
     @musicbox.csv(args)
   end
 
-  command 'dups' do |args|
-    @musicbox.dups(args)
-  end
-
   command 'artist-keys' do
     @musicbox.artist_keys
   end

@@ -196,18 +196,6 @@ class MusicBox
     end
   end
 
-  def dups(args)
-    dups = @catalog.find_dups(@catalog.releases.find(args))
-    dups.each do |id, formats|
-      formats.each do |format, releases|
-        if releases.length > 1
-          puts
-          releases.each { |r| puts r }
-        end
-      end
-    end
-  end
-
   def artist_keys
     artists = (@catalog.releases.items + @catalog.masters.items).map(&:artists).flatten
     # for some reason #uniq doesn't do the job
