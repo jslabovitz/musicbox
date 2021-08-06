@@ -83,37 +83,6 @@ class MusicBox
   def fix(args)
   end
 
-  def diff_info(args)
-    key_map = {
-      :title => :title,
-      :artist => :artist,
-      :original_release_year => :year,
-      :format_quantity => :discs,
-    }
-    @catalog.albums.find(args).each do |album|
-      release = album.release or raise
-      diffs = {}
-      key_map.each do |release_key, album_key|
-        release_value = release.send(release_key)
-        album_value = release.album.send(album_key)
-        if album_value && release_value != album_value
-          diffs[release_key] = [release_value, album_value]
-        end
-      end
-      unless diffs.empty?
-        puts album
-        diffs.each do |key, values|
-          puts "\t" + '%s: %p != %p' % [key, *values]
-        end
-        puts
-        if @prompt.yes?('Update?')
-          album.update_info
-          album.update_tags
-        end
-      end
-    end
-  end
-
   def extract_cover(args)
     @catalog.albums.find(args).each do |album|
       album.extract_cover
@@ -306,8 +275,18 @@ class MusicBox
 
   def update_info(args, force: false)
     @catalog.albums.find(args).each do |album|
-      puts album
-      album.update_info
+      diffs = album.diff_info
+      unless diffs.empty?
+        puts album
+        diffs.each do |key, values|
+          puts "\t" + '%s: %p != %p' % [key, *values]
+        end
+        puts
+        if force || @prompt.yes?('Update?')
+          album.update_info
+          album.update_tags
+        end
+      end
     end
   end
 

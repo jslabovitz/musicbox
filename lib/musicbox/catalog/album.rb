@@ -82,6 +82,25 @@ class MusicBox
         end
       end
 
+      InfoKeyMap = {
+        :title => :title,
+        :artist => :artist,
+        :original_release_year => :year,
+        :format_quantity => :discs,
+      }
+
+      def diff_info
+        diffs = {}
+        InfoKeyMap.each do |release_key, album_key|
+          release_value = release.send(release_key)
+          album_value = send(album_key)
+          if album_value && release_value != album_value
+            diffs[release_key] = [release_value, album_value]
+          end
+        end
+        diffs
+      end
+
       def update_info
         @id = @release.id
         @title = @release.title

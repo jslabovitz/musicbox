@@ -17,10 +17,6 @@ SimpleCommand.run do
       parallel: @parallel)
   end
 
-  command 'diff-info' do |args|
-    @musicbox.diff_info(args)
-  end
-
   command 'fix' do |args|
     @musicbox.fix(args)
   end
@@ -106,8 +102,8 @@ SimpleCommand.run do
     @musicbox.update
   end
 
-  command 'update-info' do |args|
-    @musicbox.update_info(args)
+  command 'update-info', force: false do |args|
+    @musicbox.update_info(args, force: @force)
   end
 
   command 'update-tags', force: false do |args|
