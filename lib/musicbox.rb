@@ -267,7 +267,7 @@ class MusicBox
   end
 
   def update_tags(args, force: false)
-    @catalog.album.find(args).each do |album|
+    @catalog.albums.find(args).each do |album|
       puts album
       album.update_tags(force: force)
     end
