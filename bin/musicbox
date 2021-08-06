@@ -29,10 +29,6 @@ SimpleCommand.run do
     @musicbox.formats(args)
   end
 
-  command 'download-images' do |args|
-    @musicbox.download_images(args)
-  end
-
   command 'extract-cover' do |args|
     @musicbox.extract_cover(args)
   end

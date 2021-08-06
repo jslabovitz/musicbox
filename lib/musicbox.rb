@@ -133,12 +133,6 @@ class MusicBox
     end
   end
 
-  def download_images(args)
-    @catalog.releases.find(args).each do |release|
-      release.download_images
-    end
-  end
-
   def cover(args, prompt: false, output_file: '/tmp/cover.pdf')
     releases = []
     @catalog.releases.find(args, prompt: prompt).select(&:has_album?).each do |release|
