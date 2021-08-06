@@ -2,9 +2,9 @@ class MusicBox
 
   class CoverMaker
 
-    def self.make_covers(*releases, output_file:)
+    def self.make_covers(*cover_files, output_file:)
       cover_maker = new
-      cover_maker.make_covers(releases)
+      cover_maker.make_covers(cover_files)
       cover_maker.write(output_file)
     end
 
@@ -12,19 +12,17 @@ class MusicBox
       @pdf = Prawn::Document.new
     end
 
-    def make_covers(releases)
+    def make_covers(*cover_files)
       size = 4.75.in
       top = 10.in
-      releases.each_with_index do |release, i|
-        album = release.album or raise Error, "Release #{release.id} has no album"
-        raise Error, "Release #{release.id} has no cover" unless album.has_cover?
+      cover_files.flatten.each_with_index do |cover_file, i|
         @pdf.start_new_page if i > 0
         @pdf.fill do
           @pdf.rectangle [0, top],
             size,
             size
         end
-        @pdf.image album.cover_file.to_s,
+        @pdf.image cover_file.to_s,
           at: [0, top],
           width: size,
           fit: [size, size],

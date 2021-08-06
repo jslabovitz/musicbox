@@ -109,7 +109,7 @@ class MusicBox
 
     def make_cover
       output_file = '/tmp/covers.pdf'
-      CoverMaker.make_covers(@release, output_file: output_file)
+      CoverMaker.make_covers(@album.cover_file, output_file: output_file)
       run_command('open', output_file)
     end
 
