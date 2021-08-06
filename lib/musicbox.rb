@@ -75,8 +75,7 @@ class MusicBox
 
   def export(args, **params)
     exporter = Exporter.new(catalog: @catalog, **params)
-    @catalog.releases.find(args).each do |release|
-      album = release.album or raise Error, "Album does not exist for release #{release.id}"
+    @catalog.albums.find(args).each do |album|
       exporter.export_album(album)
     end
   end
@@ -91,7 +90,8 @@ class MusicBox
       :original_release_year => :year,
       :format_quantity => :discs,
     }
-    @catalog.releases.find(args).select(&:has_album?).each do |release|
+    @catalog.albums.find(args).each do |album|
+      release = album.release or raise
       diffs = {}
       key_map.each do |release_key, album_key|
         release_value = release.send(release_key)
@@ -101,14 +101,14 @@ class MusicBox
         end
       end
       unless diffs.empty?
-        puts release
+        puts album
         diffs.each do |key, values|
           puts "\t" + '%s: %p != %p' % [key, *values]
         end
         puts
         if @prompt.yes?('Update?')
-          release.album.update_info
-          release.album.update_tags
+          album.update_info
+          album.update_tags
         end
       end
     end
@@ -313,9 +313,9 @@ class MusicBox
   end
 
   def update_tags(args, force: false)
-    @catalog.releases.find(args).select(&:has_album?).each do |release|
-      puts release
-      release.album.update_tags(force: force)
+    @catalog.album.find(args).each do |album|
+      puts album
+      album.update_tags(force: force)
     end
   end
 
