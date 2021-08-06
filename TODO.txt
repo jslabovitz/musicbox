@@ -4,10 +4,26 @@
   - new
   - personal name
 
-- ensure artist key is unique
-  - doesn't represent multiple artists
+- allow artist key to be user-defined
+  - save in group database
+  - allow for modification as needed
+  - allow override of primary artist
+    - eg, to file release under main artist instead of artist-group of collaboration
+  - do artist sort/rename using artist ID
+    - instead of CanonicalArtists/PersonalNames hash maps
+  - ensure artist key is unique
+    - doesn't represent multiple artists
 
-- experiment with SQLite/Sequel version of albums/tracks/artists
+- split up Catalog
+  - Discogs-related classes under Discogs
+  - Album, AlbumTrack, Artist (new) under Catalog (or Collection)
+
+- re-implement file-based Group
+  - convert all Discogs structures
+
+- store albums/tracks/artists in SQLite/Sequel
+
+- save artist ID into album
 
 - when selecting cover, show cover images & info in iTerm
   - instead of shelling out to Preview
@@ -29,11 +45,6 @@
 - describe player modes in README
   - 3-function player: play random album, play random tracks (typical shuffle mode), or play the album for the current track
 
-- make most commands work on albums, not releases/etc.
-  - use Discogs as original source of truth
-  - but not for searching
-  - except for unripped, etc.
-
 - see if taglib-ruby will substitute for ffprobe/mp4tags/mp4art/etc.
 
 - integrate/expand ripping HOWTO
@@ -50,19 +61,10 @@
     - $catalog (based on --root)
     - $prompt
 
-- split up Catalog
-  - Discogs-related classes under Discogs
-  - Album, AlbumTrack, Artist (new) under Catalog (or Collection)
-
-- re-implement file-based Group?
-  - convert all Discogs structures
-
 - improve covers:
   - make 2-up
   - center horizontally on page
   - make crop marks
-
-- fix 'dup' command to not treat multidisc release as duplicate
 
 - import: handle multiple formats/discs better
   - consider case where digitized LP or downloaded tracks becomes album
@@ -72,12 +74,6 @@
     - others have [CD x2] ('compact')
   - save selected format into album info
   - in general:
-    - goal is to create list of tracks with minimal metadata:
-      - track #
-      - disc # (optional)
-      - title
-      - artist (optional)
-      - (others inherited from album)
     - use Discogs data as a guide/template
       - but allow assigning, collapsing, expanding, reordering as needed
 
@@ -86,18 +82,11 @@
 
 - allow label font to be configured
 
-- save artist ID into album
-
 - when importing/updating, save track info to JSON file
-  - bit rate
   - bit depth
   - sample rate
-
-- consider using Album/AlbumTrack as master/truth?
-  - created/updated from Discogs, but treated separately
-
-- keep separate list of artists
-  - integrate key, first/last name order
+  - channels
+  - format/codec
 
 - save @cover_file in album info.json file?
   - just read cover_file (as path) instead of deriving via glob
@@ -140,18 +129,6 @@
   - handle case where Discogs has merged/moved releases
     - ie, release_id has changed
     - need to move related album
-
-- when finding unripped CDs, also look for dups
-  - to avoid needing to rip dup CDs
-
-- allow artist key to be user-defined
-  - save in group database
-  - allow for modification as needed
-  - ensure uniqueness
-  - allow override of primary artist
-    - eg, to file release under main artist instead of artist-group of collaboration
-  - do artist sort/rename using artist ID
-    - instead of CanonicalArtists/PersonalNames hash maps
 
 - improve log handling
   - create Log class with attributes:
