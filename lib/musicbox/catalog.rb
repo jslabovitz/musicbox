@@ -56,19 +56,6 @@ class MusicBox
       @images_dir.children.map(&:basename).map(&:to_s) - all_files
     end
 
-    def find_dups(releases)
-      dups = {}
-      releases.select(&:master_id).each do |release|
-        dups[release.master_id] ||= {}
-        #FIXME: wrong
-        release.formats.map(&:name).each do |format_name|
-          dups[release.master_id][format_name] ||= []
-          dups[release.master_id][format_name] << release
-        end
-      end
-      dups
-    end
-
     def link_groups
       @releases.items.each do |release|
         release.master = @masters[release.master_id] if release.master_id
