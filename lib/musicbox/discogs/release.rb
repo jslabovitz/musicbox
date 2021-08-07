@@ -180,12 +180,14 @@ class MusicBox
       end
 
       def download_images
-        image = @images.find(&:primary?)
-        if image
-          download_image(uri: image.uri, file: image.file)
-        else
-          @images.each do |image|
+        if @images
+          image = @images.find(&:primary?)
+          if image
             download_image(uri: image.uri, file: image.file)
+          else
+            @images.each do |image|
+              download_image(uri: image.uri, file: image.file)
+            end
           end
         end
         @master.download_images if @master
