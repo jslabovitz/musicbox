@@ -235,10 +235,14 @@ class MusicBox
     end
 
     def playlist_pos_changed(value)
-      entry = @mpv.get_property('playlist')[value] or raise
-      @current_track = track_for_path(entry['filename'])
-      @current_pos = value
-      show_current_track
+      if value >= 0
+        entry = @mpv.get_property('playlist')[value] or raise
+        @current_track = track_for_path(entry['filename'])
+        @current_pos = value
+        show_current_track
+      else
+        @current_track = @current_pos = nil
+      end
     end
 
     def pause_changed(value)
