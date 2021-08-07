@@ -6,7 +6,7 @@ class MusicBox
       cover_maker = new
       cover_maker.make_covers(cover_files)
       cover_maker.write(output_file)
-      run_command('open', output_file) if openx
+      run_command('open', output_file) if open
     end
 
     def initialize
