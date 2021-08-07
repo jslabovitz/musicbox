@@ -91,6 +91,10 @@ class MusicBox
     @prompt = TTY::Prompt.new
   end
 
+  def inspect
+    "<#{self.class}>"
+  end
+
   def config
     self.class.config
   end
