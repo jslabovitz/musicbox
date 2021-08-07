@@ -7,17 +7,15 @@ class MusicBox
     attr_accessor :import_done_dir
     attr_accessor :catalog_dir
     attr_accessor :images_dir
-    attr_accessor :config
     attr_accessor :collection
     attr_accessor :releases
     attr_accessor :masters
     attr_accessor :albums
     attr_accessor :groups
 
-    def initialize(root: nil)
-      @root_dir = Path.new(root || ENV['MUSICBOX_ROOT'] || '~/Music/MusicBox').expand_path
+    def initialize
+      @root_dir = Path.new(MusicBox.config.fetch(:root_dir)).expand_path
       raise Error, "#{@root_dir} doesn't exist" unless @root_dir.exist?
-      load_config
       @import_dir = @root_dir / 'import'
       @import_done_dir = @root_dir / 'import-done'
       @catalog_dir = @root_dir / 'catalog'
@@ -29,12 +27,6 @@ class MusicBox
       link_groups
       link_albums
       @prompt = TTY::Prompt.new
-    end
-
-    def load_config
-      @config = YAML.load((@root_dir / 'config.yaml').read)
-      Artist.class_variable_set(:@@personal_names, @config['personal_names'])
-      Artist.class_variable_set(:@@canonical_names, @config['canonical_names'])
     end
 
     def orphaned

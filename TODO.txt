@@ -105,17 +105,6 @@
 
 - use TTY::ProgressBar to show track playing progress?
 
-- move config handling into MusicBox class
-  - also definition of import dir, etc.
-  - use TTY::Config?
-  - chain/merge configs?
-    - order:
-      - hardcoded defaults
-      - env vars
-      - main config file
-      - auxiliary config file(s)
-      - CLI options
-
 - sort #find results by relevance, not by artist/title
 
 - improve 'select' tool

@@ -30,6 +30,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'set_params', '~> 0.1'
   s.add_dependency 'simple-command', '~> 0.2'
   s.add_dependency 'sixarm_ruby_unaccent', '~> 1.2'
+  s.add_dependency 'tty-config', '~> 0.5'
   s.add_dependency 'tty-prompt', '~> 0.23'
 
   s.add_development_dependency 'bundler', '~> 2.2'

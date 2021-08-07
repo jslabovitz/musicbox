@@ -5,8 +5,8 @@ require 'musicbox'
 
 SimpleCommand.run do
 
-  global root: nil do
-    @musicbox = MusicBox.new(root: @root)
+  global do
+    @musicbox = MusicBox.new
   end
 
   command 'export', dir: nil, compress: false, force: false, parallel: true do |args|

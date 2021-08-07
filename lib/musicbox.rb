@@ -13,6 +13,7 @@ require 'run-command'
 require 'set'
 require 'set_params'
 require 'sixarm_ruby_unaccent'
+require 'tty-config'
 require 'tty-prompt'
 require 'yaml'
 
@@ -68,9 +69,26 @@ class MusicBox
     ]
   end
 
-  def initialize(root:)
-    @catalog = Catalog.new(root: root)
+  def self.config
+    unless @config
+      @config = TTY::Config.new
+      root_dir = ENV['MUSICBOX_ROOT'] || '~/Music/MusicBox'
+      @config.set(:root_dir, value: root_dir)
+      @config.append_path(root_dir)
+      @config.env_prefix = 'MUSICBOX'
+      @config.autoload_env
+      @config.read
+    end
+    @config
+  end
+
+  def initialize
+    @catalog = Catalog.new
     @prompt = TTY::Prompt.new
+  end
+
+  def config
+    self.class.config
   end
 
   def export(args, **params)
@@ -238,7 +256,7 @@ class MusicBox
     albums = @catalog.albums.find(args, prompt: prompt).compact
     if equalizer_name
       equalizers = Equalizer.load_equalizers(
-        dir: Path.new(@catalog.config['equalizers_dir']),
+        dir: Path.new(config.fetch(:equalizers_dir)),
         name: equalizer_name)
     else
       equalizers = nil
@@ -262,9 +280,9 @@ class MusicBox
   def update
     Discogs.new(
       catalog: @catalog,
-      user: @catalog.config['user'],
-      token: @catalog.config['token'],
-      ignore_folder_id: @catalog.config['ignore_folder_id'],
+      user: config.fetch(:discogs, :user),
+      token: config.fetch(:discogs, :token),
+      ignore_folder_id: config.fetch(:discogs, :ignore_folder_id),
     ).update
   end
 

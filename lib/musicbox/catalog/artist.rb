@@ -39,8 +39,8 @@ class MusicBox
       end
 
       def canonical_name
-        name = (@@canonical_names[@name] || @name).sub(/\s\(\d+\)/, '')  # handle 'Nico (3)'
-        if @@personal_names.include?(name)
+        name = (MusicBox.config.fetch(:canonical_names)[@name] || @name).sub(/\s\(\d+\)/, '')  # handle 'Nico (3)'
+        if MusicBox.config.fetch(:personal_names).include?(name)
           elems = name.split(/\s+/)
           [elems[-1], elems[0..-2].join(' ')].join(', ')
         else
