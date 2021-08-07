@@ -159,11 +159,11 @@ class MusicBox
     end
   end
 
-  def label(args)
-    labels = @albums.find(args, prompt: true).map(&:to_label)
-    output_file = '/tmp/labels.pdf'
-    label_maker = LabelMaker.make_labels(labels, output_file: output_file)
-    run_command('open', output_file)
+  def label(args, prompt: false, output_file: '/tmp/labels.pdf')
+    labels = @albums.find(args, prompt: prompt).map(&:to_label)
+    LabelMaker.make_labels(labels,
+      output_file: output_file,
+      open: true)
   end
 
   def dir(args)

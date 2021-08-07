@@ -34,8 +34,9 @@ SimpleCommand.run do
     @musicbox.import(args)
   end
 
-  command 'label' do |args|
-    @musicbox.label(args)
+  command 'label', prompt: false do |args|
+    @musicbox.label(args,
+      prompt: @prompt)
   end
 
   command 'dir' do |args|
