@@ -115,16 +115,6 @@ class MusicBox
   end
 
   def fix(args)
-    load_discogs
-    @discogs.releases.items.each do |release|
-      puts release
-      release.download_images
-    end
-    @albums.items.each do |album|
-      release = @discogs.releases[album.id] or raise
-      album.artist_key = release.artist_key
-      @albums.save_item(album)
-    end
   end
 
   def cover(args, prompt: false, output_file: '/tmp/cover.pdf')
