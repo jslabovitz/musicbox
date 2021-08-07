@@ -203,7 +203,7 @@ class MusicBox
         artist: @artist,
         year: @year,
         discs: @discs,
-        tracks: @tracks&.map(&:to_h))
+        tracks: @tracks&.map(&:to_h)).compact
     end
 
   end
