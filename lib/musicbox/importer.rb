@@ -3,6 +3,7 @@ class MusicBox
   class Importer
 
     attr_accessor :catalog
+    attr_accessor :albums
     attr_accessor :source_dir
     attr_accessor :archive_dir
 
@@ -21,7 +22,7 @@ class MusicBox
       puts; puts "Importing from #{@source_dir}"
       make_album
       if @prompt.yes?('Add?')
-        @catalog.albums.save_item(@album)
+        @albums.save_item(@album)
         copy_files
         archive
         select_cover   # also does update_tags
@@ -33,7 +34,7 @@ class MusicBox
     def make_album
       @release = @catalog.releases.find(@source_dir.basename.to_s, prompt: true, multiple: false).first
       print @release.details
-      @album = @catalog.albums[@release.id]
+      @album = @albums[@release.id]
       if @album
         raise Error, "Album already exists" if @release.format_quantity.nil? || @release.format_quantity == 1
         puts "Release has multiple discs."
@@ -47,7 +48,7 @@ class MusicBox
           artist: @release.artist,
           year: @release.original_release_year,
           discs: @release.format_quantity,
-          json_file: @catalog.albums.json_file_for_id(@release.id))
+          json_file: @albums.json_file_for_id(@release.id))
       end
       make_tracks
     end

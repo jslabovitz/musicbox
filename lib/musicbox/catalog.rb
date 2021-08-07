@@ -3,27 +3,19 @@ class MusicBox
   class Catalog
 
     attr_accessor :root_dir
-    attr_accessor :import_dir
-    attr_accessor :import_done_dir
-    attr_accessor :catalog_dir
     attr_accessor :images_dir
     attr_accessor :collection
     attr_accessor :releases
     attr_accessor :masters
-    attr_accessor :albums
-    attr_accessor :groups
 
     def initialize(root_dir:)
       @root_dir = Path.new(root_dir)
       raise Error, "#{@root_dir} doesn't exist" unless @root_dir.exist?
-      @catalog_dir = @root_dir / 'catalog'
-      @collection = Collection.new(root: @catalog_dir / 'collection')
-      @releases = Releases.new(root: @catalog_dir / 'releases')
-      @masters = Releases.new(root: @catalog_dir / 'masters')
-      @albums = Albums.new(root: @catalog_dir / 'albums')
-      @images_dir = @catalog_dir / 'images'
+      @collection = Collection.new(root: @root_dir / 'collection')
+      @releases = Releases.new(root: @root_dir / 'releases')
+      @masters = Releases.new(root: @root_dir / 'masters')
+      @images_dir = @root_dir / 'images'
       link_groups
-      link_albums
     end
 
     def orphaned
@@ -55,12 +47,6 @@ class MusicBox
         release.master&.link_images(@images_dir)
         collection_item = @collection[release.id] or raise
         collection_item.release = release
-      end
-    end
-
-    def link_albums
-      @albums.items.each do |album|
-        album.release = @releases[album.id] or raise Error, "No release for album ID #{album.id}"
       end
     end
 

@@ -51,6 +51,7 @@ require 'musicbox/player'
 class MusicBox
 
   attr_accessor :catalog
+  attr_accessor :albums
 
   def self.show_image(file:, width: nil, height: nil, preserve_aspect_ratio: nil)
     # see https://iterm2.com/documentation-images.html
@@ -85,7 +86,10 @@ class MusicBox
   end
 
   def initialize
-    @catalog = Catalog.new(root_dir: Path.new(config.fetch(:root_dir)))
+    @root_dir = Path.new(config.fetch(:root_dir))
+    @catalog = Catalog.new(root_dir: @root_dir / 'catalog')
+    @albums = Catalog::Albums.new(root: @root_dir / 'albums')
+    link_albums
     @prompt = TTY::Prompt.new
   end
 
@@ -95,7 +99,7 @@ class MusicBox
 
   def export(args, **params)
     exporter = Exporter.new(catalog: @catalog, **params)
-    @catalog.albums.find(args).each do |album|
+    @albums.find(args).each do |album|
       exporter.export_album(album)
     end
   end
@@ -104,14 +108,14 @@ class MusicBox
   end
 
   def extract_cover(args)
-    @catalog.albums.find(args).each do |album|
+    @albums.find(args).each do |album|
       album.extract_cover
     end
   end
 
   def cover(args, prompt: false, output_file: '/tmp/cover.pdf')
     cover_files = []
-    @catalog.albums.find(args, prompt: prompt).each do |album|
+    @albums.find(args, prompt: prompt).each do |album|
       album.select_cover unless album.has_cover?
       cover_files << album.cover_file if album.has_cover?
     end
@@ -121,7 +125,7 @@ class MusicBox
   end
 
   def select_cover(args, prompt: false, force: false)
-    @catalog.albums.find(args, prompt: prompt).each do |album|
+    @albums.find(args, prompt: prompt).each do |album|
       album.select_cover unless album.has_cover? && !force
     end
   end
@@ -138,6 +142,7 @@ class MusicBox
       begin
         Importer.import(
           catalog: @catalog,
+          albums: @albums,
           source_dir: dir,
           archive_dir: Path.new(config.fetch(:import_done_dir)))
       rescue Error => e
@@ -147,20 +152,20 @@ class MusicBox
   end
 
   def label(args)
-    labels = @catalog.albums.find(args, prompt: true).map(&:to_label)
+    labels = @albums.find(args, prompt: true).map(&:to_label)
     output_file = '/tmp/labels.pdf'
     label_maker = LabelMaker.make_labels(labels, output_file: output_file)
     run_command('open', output_file)
   end
 
   def dir(args)
-    @catalog.albums.find(args).each do |album|
+    @albums.find(args).each do |album|
       puts "%-10s %s" % [album.id, album.dir]
     end
   end
 
   def open(args)
-    @catalog.albums.find(args).each do |album|
+    @albums.find(args).each do |album|
       run_command('open', album.dir)
     end
   end
@@ -198,7 +203,7 @@ class MusicBox
   end
 
   def show_albums(args, mode: :summary)
-    @catalog.albums.find(args).each do |album|
+    @albums.find(args).each do |album|
       case mode
       when :cover
         MusicBox.show_image(file: album.cover_file) if album.has_cover?
@@ -225,7 +230,7 @@ class MusicBox
 
   def csv(args)
     print Catalog::Album.csv_header
-    @catalog.albums.find(args).each do |album|
+    @albums.find(args).each do |album|
       print album.to_csv
     end
   end
@@ -260,7 +265,7 @@ class MusicBox
   end
 
   def play(args, prompt: false, equalizer_name: nil, **params)
-    albums = @catalog.albums.find(args, prompt: prompt).compact
+    albums = @albums.find(args, prompt: prompt).compact
     if equalizer_name
       equalizers = Equalizer.load_equalizers(
         dir: Path.new(config.fetch(:equalizers_dir)),
@@ -278,7 +283,7 @@ class MusicBox
   def select(args)
     ids = []
     loop do
-      albums = @catalog.albums.find(args, prompt: true) or break
+      albums = @albums.find(args, prompt: true) or break
       ids += albums.map(&:id)
       puts ids.join(' ')
     end
@@ -294,14 +299,14 @@ class MusicBox
   end
 
   def update_tags(args, force: false)
-    @catalog.albums.find(args).each do |album|
+    @albums.find(args).each do |album|
       puts album
       album.update_tags(force: force)
     end
   end
 
   def update_info(args, force: false)
-    @catalog.albums.find(args).each do |album|
+    @albums.find(args).each do |album|
       diffs = album.diff_info
       unless diffs.empty?
         puts album
@@ -317,9 +322,14 @@ class MusicBox
     end
   end
 
-  def orphaned_albums
-    @catalog.albums.items.reject { |a| @catalog.releases[a.id] }
+  def link_albums
+    @albums.items.each do |album|
+      album.release = @catalog.releases[album.id] or raise Error, "No release for album ID #{album.id}"
+    end
   end
 
+  def orphaned_albums
+    @albums.items.reject { |a| @catalog.releases[a.id] }
+  end
 
 end
