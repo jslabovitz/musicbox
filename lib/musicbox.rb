@@ -144,15 +144,18 @@ class MusicBox
     @catalog.orphaned.each do |group_name, items|
       unless items.empty?
         puts "#{group_name}:"
-        items.sort.each do |item|
-          puts item
-        end
+        items.sort.each { |i| puts i }
         puts
         if @prompt.yes?("Remove orphaned items from #{group_name}?")
           group = @catalog.send(group_name)
           items.each { |item| group.destroy_item!(item) }
         end
       end
+    end
+    unless (orphaned = orphaned_albums).empty?
+      puts 'Albums:'
+      orphaned.sort.each { |a| puts a }
+      puts
     end
     image_files = @catalog.orphaned_image_files
     unless image_files.empty?
@@ -288,5 +291,10 @@ class MusicBox
       end
     end
   end
+
+  def orphaned_albums
+    @catalog.albums.items.reject { |a| @catalog.releases[a.id] }
+  end
+
 
 end

@@ -38,14 +38,14 @@ class MusicBox
     end
 
     def orphaned
-      orphaned = %i[releases masters albums].map { |k| [k, send(k).items.dup] }.to_h
+      orphaned = {
+        releases: @releases.items.dup,
+        masters: @masters.items.dup,
+      }
       @collection.items.each do |item|
-        release = item.release or raise
+        release = item.release or raise Error, "No release for collection item ID #{item.id}"
         orphaned[:releases].delete(release)
         orphaned[:masters].delete(release.master) if release.master
-      end
-      @albums.items.each do |album|
-        orphaned[:albums].delete(album) if @releases[album.id]
       end
       orphaned
     end
@@ -64,11 +64,6 @@ class MusicBox
         release.master = @masters[release.master_id] if release.master_id
         release.link_images(@images_dir)
         release.master&.link_images(@images_dir)
-        if (album = @albums[release.id])
-          album.release = release
-        else
-          warn "No album for release ID #{release.id.inspect}"
-        end
         collection_item = @collection[release.id] or raise
         collection_item.release = release
       end
