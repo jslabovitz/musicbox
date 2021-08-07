@@ -16,7 +16,6 @@ class MusicBox
       set(params)
       raise Error, "Must specify catalog" unless @catalog
       raise Error, "Must specify user/token" unless @user && @token
-      @discogs = ::Discogs::Wrapper.new(AppName, user_token: @token)
     end
 
     def update
@@ -57,7 +56,8 @@ class MusicBox
     def discogs_do(command, *args)
       sleep(1)
 ;;pp(command: command, args: args)
-      result = @discogs.send(command, *args)
+      @wrapper ||= ::Discogs::Wrapper.new(AppName, user_token: @token)
+      result = @wrapper.send(command, *args)
       raise Error, "Bad result: #{result.inspect}" if result.nil? || result.message
       result
     end
