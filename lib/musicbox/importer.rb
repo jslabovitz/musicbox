@@ -10,7 +10,7 @@ class MusicBox
     include SetParams
 
     def self.import(params)
-      new(params).tap { |o| o.import }
+      new(params).tap(&:import)
     end
 
     def initialize(params={})
