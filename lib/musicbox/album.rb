@@ -4,10 +4,10 @@ class MusicBox
 
     attr_accessor :title
     attr_accessor :artist
+    attr_accessor :artist_key
     attr_accessor :year
     attr_accessor :discs
     attr_accessor :tracks
-    attr_accessor :release            # linked on load
 
     def self.csv_header
       %w[ID year artist title].to_csv
@@ -32,9 +32,10 @@ class MusicBox
     end
 
     def summary
-      '%-8s | %1s | %-4s | %-50.50s | %-60.60s | %-6s' % [
+      '%-8s | %1s | %-4s | %-4s | %-50.50s | %-60.60s | %-6s' % [
         @id,
         has_cover? ? 'C' : '',
+        @artist_key,
         @year || '-',
         @artist,
         @title,
@@ -45,10 +46,9 @@ class MusicBox
     def to_label
       {
         artist: @artist,
+        artist_key: @artist_key,
         title: @title,
-        key: @release.artist_key,
         year: @year,
-        format: Discogs::Format.to_s(@release.formats),
         id: @id,
       }
     end
@@ -82,11 +82,12 @@ class MusicBox
     InfoKeyMap = {
       :title => :title,
       :artist => :artist,
+      :artist_key => :artist_key,
       :original_release_year => :year,
       :format_quantity => :discs,
     }
 
-    def diff_info
+    def diff_info(release)
       diffs = {}
       InfoKeyMap.each do |release_key, album_key|
         release_value = release.send(release_key)
@@ -98,12 +99,10 @@ class MusicBox
       diffs
     end
 
-    def update_info
-      @id = @release.id
-      @title = @release.title
-      @artist = @release.artist
-      @year = @release.original_release_year
-      @discs = @release.format_quantity
+    def update_info(release)
+      InfoKeyMap.each do |release_key, album_key|
+        send("#{album_key}=", release.send(release_key))
+      end
       save
     end
 
@@ -148,12 +147,10 @@ class MusicBox
       end
     end
 
-    def select_cover
-      @release.download_images
-      extract_cover
+    def select_cover(release)
       choices = [
-        @release.master&.images&.map(&:file),
-        @release.images&.map(&:file),
+        release.master&.images&.map(&:file),
+        release.images&.map(&:file),
         cover_file,
       ].flatten.compact.uniq.select(&:exist?)
       if choices.empty?
@@ -161,10 +158,14 @@ class MusicBox
       else
         choices.each { |f| run_command('open', f) }
         choice = TTY::Prompt.new.select('Cover?', choices)
-        cover_file = (album.dir / 'cover').add_extension(choice.extname)
-        choice.cp(cover_file) unless choice == cover_file
+        save_cover(choice)
         update_tags
       end
+    end
+
+    def save_cover(file)
+      cover_file = (dir / 'cover').add_extension(file.extname)
+      file.cp(cover_file) unless file == cover_file
     end
 
     def extract_cover
@@ -191,9 +192,8 @@ class MusicBox
         raise Error, "#{@id}: multiple covers found"
       else
         file = files.first
-        new_cover_file = (dir / 'cover').add_extension(file.extname)
-        puts "#{@id}: extracted cover: #{new_cover_file.basename}"
-        file.rename(new_cover_file)
+        save_cover(file)
+        file.unlink
       end
     end
 
@@ -201,6 +201,7 @@ class MusicBox
       super(*options).merge(
         title: @title,
         artist: @artist,
+        artist_key: @artist_key,
         year: @year,
         discs: @discs,
         tracks: @tracks&.map(&:to_h)).compact

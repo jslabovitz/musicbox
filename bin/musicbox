@@ -21,10 +21,6 @@ SimpleCommand.run do
     @musicbox.fix(args)
   end
 
-  command 'extract-cover' do |args|
-    @musicbox.extract_cover(args)
-  end
-
   command 'cover', prompt: false do |args|
     @musicbox.cover(args,
       prompt: @prompt)

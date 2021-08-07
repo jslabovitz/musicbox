@@ -87,7 +87,6 @@ class MusicBox
   def initialize
     @root_dir = Path.new(config.fetch(:root_dir))
     @albums = Albums.new(root: @root_dir / 'albums')
-    link_albums
     @prompt = TTY::Prompt.new
   end
 
@@ -116,18 +115,25 @@ class MusicBox
   end
 
   def fix(args)
-  end
-
-  def extract_cover(args)
-    @albums.find(args).each do |album|
-      album.extract_cover
+    load_discogs
+    @discogs.releases.items.each do |release|
+      puts release
+      release.download_images
+    end
+    @albums.items.each do |album|
+      release = @discogs.releases[album.id] or raise
+      album.artist_key = release.artist_key
+      @albums.save_item(album)
     end
   end
 
   def cover(args, prompt: false, output_file: '/tmp/cover.pdf')
     cover_files = []
     @albums.find(args, prompt: prompt).each do |album|
-      album.select_cover unless album.has_cover?
+      unless album.has_cover?
+        release = @discogs.releases[album.id] or raise Error, "No release for album ID #{album.id}"
+        album.select_cover(release)
+      end
       cover_files << album.cover_file if album.has_cover?
     end
     CoverMaker.make_covers(cover_files,
@@ -137,7 +143,10 @@ class MusicBox
 
   def select_cover(args, prompt: false, force: false)
     @albums.find(args, prompt: prompt).each do |album|
-      album.select_cover unless album.has_cover? && !force
+      unless album.has_cover? && !force
+        release = @discogs.releases[album.id] or raise Error, "No release for album ID #{album.id}"
+        album.select_cover(release)
+      end
     end
   end
 
@@ -318,7 +327,8 @@ class MusicBox
 
   def update_info(args, force: false)
     @albums.find(args).each do |album|
-      diffs = album.diff_info
+      release = @discogs.releases[album.id] or raise Error, "No release for album ID #{album.id}"
+      diffs = album.diff_info(release)
       unless diffs.empty?
         puts album
         diffs.each do |key, values|
@@ -326,17 +336,10 @@ class MusicBox
         end
         puts
         if force || @prompt.yes?('Update?')
-          album.update_info
+          album.update_info(release)
           album.update_tags
         end
       end
-    end
-  end
-
-  def link_albums
-    load_discogs
-    @albums.items.each do |album|
-      album.release = @discogs.releases[album.id] or raise Error, "No release for album ID #{album.id}"
     end
   end
 

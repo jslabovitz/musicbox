@@ -30,10 +30,10 @@ class MusicBox
         @pdf.bounding_box([2.7.in, 1.in], width: 0.8.in, height: 1.in) do
           # ;;@pdf.transparent(0.5) { @pdf.stroke_bounds }
           @pdf.text_box <<~END, align: :right, inline_format: true
-            <b>#{label[:key]}
+            <b>#{label[:artist_key]}
             #{label[:year]}</b>
 
-            #{label[:format]}
+
             #{label[:id]}
           END
         end
