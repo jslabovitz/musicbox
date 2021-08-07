@@ -72,9 +72,11 @@ class MusicBox
   def self.config
     unless @config
       @config = TTY::Config.new
-      root_dir = ENV['MUSICBOX_ROOT'] || '~/Music/MusicBox'
+      root_dir = Path.new(ENV['MUSICBOX_ROOT'] || '~/Music/MusicBox')
       @config.set(:root_dir, value: root_dir)
-      @config.append_path(root_dir)
+      @config.set(:import_dir, value: root_dir / 'import')
+      @config.set(:import_done_dir, value: root_dir / 'import-done')
+      @config.append_path(root_dir.to_s)
       @config.env_prefix = 'MUSICBOX'
       @config.autoload_env
       @config.read
@@ -83,7 +85,7 @@ class MusicBox
   end
 
   def initialize
-    @catalog = Catalog.new
+    @catalog = Catalog.new(root_dir: Path.new(config.fetch(:root_dir)))
     @prompt = TTY::Prompt.new
   end
 
@@ -126,14 +128,18 @@ class MusicBox
 
   def import(args)
     if args.empty?
-      return unless @catalog.import_dir.exist?
-      dirs = @catalog.import_dir.children.sort_by { |d| d.to_s.downcase }
+      import_dir = Path.new(config.fetch(:import_dir))
+      return unless import_dir.exist?
+      dirs = import_dir.children.select(&:dir?).sort_by { |d| d.to_s.downcase }
     else
       dirs = args.map { |p| Path.new(p) }
     end
-    dirs.select(&:dir?).each do |dir|
+    dirs.each do |dir|
       begin
-        Importer.new(catalog: @catalog, source_dir: dir).import
+        Importer.import(
+          catalog: @catalog,
+          source_dir: dir,
+          archive_dir: Path.new(config.fetch(:import_done_dir)))
       rescue Error => e
         warn "Error: #{e}"
       end

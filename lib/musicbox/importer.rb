@@ -2,9 +2,18 @@ class MusicBox
 
   class Importer
 
-    def initialize(catalog:, source_dir:)
-      @catalog = catalog
-      @source_dir = Path.new(source_dir).realpath
+    attr_accessor :catalog
+    attr_accessor :source_dir
+    attr_accessor :archive_dir
+
+    include SetParams
+
+    def self.import(params)
+      new(params).tap { |o| o.import }
+    end
+
+    def initialize(params={})
+      set(params)
       @prompt = TTY::Prompt.new
     end
 
@@ -14,7 +23,7 @@ class MusicBox
       if @prompt.yes?('Add?')
         @catalog.albums.save_item(@album)
         copy_files
-        archive_dir
+        archive
         select_cover   # also does update_tags
         make_label if @prompt.yes?('Make label?')
         make_cover if @prompt.yes?('Make cover?')
@@ -97,9 +106,9 @@ class MusicBox
       end
     end
 
-    def archive_dir
-      @catalog.import_done_dir.mkpath unless @catalog.import_done_dir.exist?
-      @source_dir.rename(@catalog.import_done_dir / @source_dir.basename)
+    def archive
+      @archive_dir.mkpath unless @archive_dir.exist?
+      @source_dir.rename(@archive_dir / @source_dir.basename)
     end
 
     def make_label

@@ -13,11 +13,9 @@ class MusicBox
     attr_accessor :albums
     attr_accessor :groups
 
-    def initialize
-      @root_dir = Path.new(MusicBox.config.fetch(:root_dir)).expand_path
+    def initialize(root_dir:)
+      @root_dir = Path.new(root_dir)
       raise Error, "#{@root_dir} doesn't exist" unless @root_dir.exist?
-      @import_dir = @root_dir / 'import'
-      @import_done_dir = @root_dir / 'import-done'
       @catalog_dir = @root_dir / 'catalog'
       @collection = Collection.new(root: @catalog_dir / 'collection')
       @releases = Releases.new(root: @catalog_dir / 'releases')
