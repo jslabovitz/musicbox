@@ -26,7 +26,6 @@ class MusicBox
       @images_dir = @catalog_dir / 'images'
       link_groups
       link_albums
-      @prompt = TTY::Prompt.new
     end
 
     def orphaned
