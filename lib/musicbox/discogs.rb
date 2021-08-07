@@ -93,6 +93,11 @@ class MusicBox
         page = result.pagination.page + 1
         break if page > result.pagination.pages
       end
+      [@releases, @masters].each do |group|
+        group.items.each do |release|
+          release.download_images
+        end
+      end
     end
 
     def discogs_do(command, *args)
