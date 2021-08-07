@@ -30,7 +30,7 @@ class MusicBox
 
       def summary
         cname = canonical_name
-        '%8s | %-6s | %-40s | %-40s' % [
+        '%8s | %-4s | %-40s | %-40s' % [
           @id,
           key,
           @name,
