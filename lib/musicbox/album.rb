@@ -48,7 +48,7 @@ class MusicBox
         title: @title,
         key: @release.artist_key,
         year: @year,
-        format: Format.to_s(@release.formats),
+        format: Discogs::Format.to_s(@release.formats),
         id: @id,
       }
     end
