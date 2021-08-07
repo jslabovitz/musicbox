@@ -25,32 +25,31 @@ require 'musicbox/error'
 require 'musicbox/group'
 require 'musicbox/info_to_s'
 
-require 'musicbox/catalog'
-require 'musicbox/catalog/album'
-require 'musicbox/catalog/album_track'
-require 'musicbox/catalog/albums'
-require 'musicbox/catalog/artist'
-require 'musicbox/catalog/basic_information'
-require 'musicbox/catalog/format'
-require 'musicbox/catalog/image'
-require 'musicbox/catalog/collection_item'
-require 'musicbox/catalog/collection'
-require 'musicbox/catalog/release'
-require 'musicbox/catalog/releases'
-require 'musicbox/catalog/tags'
-require 'musicbox/catalog/track'
+require 'musicbox/discogs'
+require 'musicbox/discogs/artist'
+require 'musicbox/discogs/basic_information'
+require 'musicbox/discogs/format'
+require 'musicbox/discogs/image'
+require 'musicbox/discogs/collection_item'
+require 'musicbox/discogs/collection'
+require 'musicbox/discogs/release'
+require 'musicbox/discogs/releases'
+require 'musicbox/discogs/track'
 
 require 'musicbox/cover_maker'
-require 'musicbox/discogs'
 require 'musicbox/equalizer'
 require 'musicbox/exporter'
 require 'musicbox/importer'
 require 'musicbox/label_maker'
 require 'musicbox/player'
+require 'musicbox/album'
+require 'musicbox/track'
+require 'musicbox/albums'
+require 'musicbox/tags'
 
 class MusicBox
 
-  attr_accessor :catalog
+  attr_accessor :discogs
   attr_accessor :albums
 
   def self.show_image(file:, width: nil, height: nil, preserve_aspect_ratio: nil)
@@ -87,8 +86,7 @@ class MusicBox
 
   def initialize
     @root_dir = Path.new(config.fetch(:root_dir))
-    @catalog = Catalog.new(root_dir: @root_dir / 'catalog')
-    @albums = Catalog::Albums.new(root: @root_dir / 'albums')
+    @albums = Albums.new(root: @root_dir / 'albums')
     link_albums
     @prompt = TTY::Prompt.new
   end
@@ -97,8 +95,17 @@ class MusicBox
     self.class.config
   end
 
+  def load_discogs
+    @discogs ||= Discogs.new(
+      root_dir: @root_dir / 'discogs',
+      user: config.fetch(:discogs, :user),
+      token: config.fetch(:discogs, :token),
+      ignore_folder_id: config.fetch(:discogs, :ignore_folder_id),
+    )
+  end
+
   def export(args, **params)
-    exporter = Exporter.new(catalog: @catalog, **params)
+    exporter = Exporter.new(params)
     @albums.find(args).each do |album|
       exporter.export_album(album)
     end
@@ -131,6 +138,7 @@ class MusicBox
   end
 
   def import(args)
+    load_discogs
     if args.empty?
       import_dir = Path.new(config.fetch(:import_dir))
       return unless import_dir.exist?
@@ -141,7 +149,7 @@ class MusicBox
     dirs.each do |dir|
       begin
         Importer.import(
-          catalog: @catalog,
+          discogs: @discogs,
           albums: @albums,
           source_dir: dir,
           archive_dir: Path.new(config.fetch(:import_done_dir)))
@@ -171,13 +179,14 @@ class MusicBox
   end
 
   def orphaned
-    @catalog.orphaned.each do |group_name, items|
+    load_discogs
+    @discogs.orphaned.each do |group_name, items|
       unless items.empty?
         puts "#{group_name}:"
         items.sort.each { |i| puts i }
         puts
         if @prompt.yes?("Remove orphaned items from #{group_name}?")
-          group = @catalog.send(group_name)
+          group = @discogs.send(group_name)
           items.each { |item| group.destroy_item!(item) }
         end
       end
@@ -187,7 +196,7 @@ class MusicBox
       orphaned.sort.each { |a| puts a }
       puts
     end
-    image_files = @catalog.orphaned_image_files
+    image_files = @discogs.orphaned_image_files
     unless image_files.empty?
       puts "Images:"
       image_files.sort.each do |file|
@@ -196,7 +205,7 @@ class MusicBox
       puts
       if @prompt.yes?('Remove orphaned images?')
         image_files.each do |file|
-          (@catalog.images_dir / file).unlink
+          (@discogs.images_dir / file).unlink
         end
       end
     end
@@ -217,7 +226,8 @@ class MusicBox
   end
 
   def show_releases(args, mode: :summary)
-    @catalog.releases.find(args).each do |release|
+    load_discogs
+    @discogs.releases.find(args).each do |release|
       case mode
       when :details
         puts release.details
@@ -229,14 +239,15 @@ class MusicBox
   end
 
   def csv(args)
-    print Catalog::Album.csv_header
+    print Album.csv_header
     @albums.find(args).each do |album|
       print album.to_csv
     end
   end
 
   def artist_keys
-    artists = (@catalog.releases.items + @catalog.masters.items).map(&:artists).flatten
+    load_discogs
+    artists = (@discogs.releases.items + @discogs.masters.items).map(&:artists).flatten
     # for some reason #uniq doesn't do the job
     artists = artists.map { |a| [a.id, a] }.to_h.values.sort
     keys = {}
@@ -290,12 +301,8 @@ class MusicBox
   end
 
   def update
-    Discogs.new(
-      catalog: @catalog,
-      user: config.fetch(:discogs, :user),
-      token: config.fetch(:discogs, :token),
-      ignore_folder_id: config.fetch(:discogs, :ignore_folder_id),
-    ).update
+    load_discogs
+    @discogs.update
   end
 
   def update_tags(args, force: false)
@@ -323,13 +330,14 @@ class MusicBox
   end
 
   def link_albums
+    load_discogs
     @albums.items.each do |album|
-      album.release = @catalog.releases[album.id] or raise Error, "No release for album ID #{album.id}"
+      album.release = @discogs.releases[album.id] or raise Error, "No release for album ID #{album.id}"
     end
   end
 
   def orphaned_albums
-    @albums.items.reject { |a| @catalog.releases[a.id] }
+    @albums.items.reject { |a| @discogs.releases[a.id] }
   end
 
 end

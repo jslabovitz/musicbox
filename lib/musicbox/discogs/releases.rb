@@ -1,11 +1,11 @@
 class MusicBox
 
-  class Catalog
+  class Discogs
 
-    class Albums < Group
+    class Releases < Group
 
       def self.item_class
-        Album
+        Release
       end
 
       def self.search_fields

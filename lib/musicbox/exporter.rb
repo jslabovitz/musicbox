@@ -2,8 +2,7 @@ class MusicBox
 
   class Exporter
 
-    def initialize(catalog:, dir:, compress: false, force: false, parallel: false)
-      @catalog = catalog
+    def initialize(dir:, compress: false, force: false, parallel: false)
       @dir = Path.new(dir).expand_path
       @compress = compress
       @force = force
@@ -44,7 +43,7 @@ class MusicBox
 
     def compress_track(src_file, dst_file)
       begin
-        tags = Catalog::Tags.load(src_file)
+        tags = Tags.load(src_file)
         caf_file = dst_file.replace_extension('.caf')
         run_command('afconvert',
           src_file,

@@ -2,7 +2,7 @@ class MusicBox
 
   class Importer
 
-    attr_accessor :catalog
+    attr_accessor :discogs
     attr_accessor :albums
     attr_accessor :source_dir
     attr_accessor :archive_dir
@@ -32,7 +32,7 @@ class MusicBox
     end
 
     def make_album
-      @release = @catalog.releases.find(@source_dir.basename.to_s, prompt: true, multiple: false).first
+      @release = @discogs.releases.find(@source_dir.basename.to_s, prompt: true, multiple: false).first
       print @release.details
       @album = @albums[@release.id]
       if @album
@@ -42,7 +42,7 @@ class MusicBox
         raise Error, "Disc number out of range" unless n >= 1 && n <= @release.format_quantity
         @disc = n
       else
-        @album = Catalog::Album.new(
+        @album = Album.new(
           id: @release.id,
           title: @release.title,
           artist: @release.artist,
@@ -72,7 +72,7 @@ class MusicBox
     end
 
     def make_track(file)
-      tags = Catalog::Tags.load(file)
+      tags = Tags.load(file)
       release_track = tags[:title] ? @release.find_track_for_title(tags[:title]) : nil
       unless release_track
         puts "Can't find release track with title #{tags[:title].inspect}"
@@ -84,7 +84,7 @@ class MusicBox
         tags[:track],
         release_track.title.gsub(%r{[/:]}, '_'),
       ]
-      album_track = Catalog::AlbumTrack.new(
+      album_track = Track.new(
         title: release_track.title,
         artist: release_track.artist || @release.artist,
         track: tags[:track],

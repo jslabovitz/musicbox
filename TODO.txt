@@ -15,10 +15,6 @@
     - doesn't represent multiple artists
   - save artist ID into album
 
-- split up Catalog
-  - Discogs: Discogs-related 
-  - Collection: Album, AlbumTrack, Artist (new), Tags
-
 - re-implement file-based Group
   - convert all Discogs structures
 
@@ -102,8 +98,6 @@
   - see ~/bin/bluos
 
 - use curses or tty for full-screen player TTY mode?
-
-- use TTY::ProgressBar to show track playing progress?
 
 - sort #find results by relevance, not by artist/title
 

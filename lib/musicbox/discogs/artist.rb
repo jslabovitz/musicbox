@@ -1,6 +1,6 @@
 class MusicBox
 
-  class Catalog
+  class Discogs
 
     class Artist
 
