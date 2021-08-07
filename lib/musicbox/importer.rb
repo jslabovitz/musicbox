@@ -103,9 +103,9 @@ class MusicBox
     end
 
     def make_label
-      output_file = '/tmp/labels.pdf'
-      LabelMaker.make_labels(@release.to_label, output_file: output_file)
-      run_command('open', output_file)
+      LabelMaker.make_labels(@album.to_label,
+        output_file: '/tmp/labels.pdf',
+        open: true)
     end
 
     def make_cover

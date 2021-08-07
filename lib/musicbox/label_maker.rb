@@ -2,10 +2,11 @@ class MusicBox
 
   class LabelMaker
 
-    def self.make_labels(*labels, output_file:)
+    def self.make_labels(*labels, output_file:, open: false)
       label_maker = new
       label_maker.make_labels(labels)
       label_maker.write(output_file)
+      run_command('open', output_file) if open
     end
 
     def initialize

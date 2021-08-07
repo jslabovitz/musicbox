@@ -113,8 +113,9 @@ class MusicBox
       album.select_cover unless album.has_cover?
       cover_files << album.cover_file if album.has_cover?
     end
-    CoverMaker.make_covers(cover_files, output_file: output_file)
-    run_command('open', output_file)
+    CoverMaker.make_covers(cover_files,
+      output_file: output_file,
+      open: true)
   end
 
   def select_cover(args, prompt: false, force: false)
