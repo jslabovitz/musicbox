@@ -257,7 +257,12 @@ class MusicBox
   end
 
   def update
-    Discogs.new(catalog: @catalog).update
+    Discogs.new(
+      catalog: @catalog,
+      user: @catalog.config['user'],
+      token: @catalog.config['token'],
+      ignore_folder_id: @catalog.config['ignore_folder_id'],
+    ).update
   end
 
   def update_tags(args, force: false)

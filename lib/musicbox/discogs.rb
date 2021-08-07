@@ -2,13 +2,20 @@ class MusicBox
 
   class Discogs
 
+    attr_accessor :catalog
+    attr_accessor :user
+    attr_accessor :token
+    attr_accessor :ignore_folder_id
+
     AppName = 'musicbox-discogs'
     ResultsPerPage = 100
 
-    def initialize(catalog:)
-      @catalog = catalog
-      @user, @token = @catalog.config.values_at('user', 'token')
-      @ignore_folder_id = @catalog.config['ignore_folder_id']
+    include SetParams
+
+    def initialize(params={})
+      set(params)
+      raise Error, "Must specify catalog" unless @catalog
+      raise Error, "Must specify user/token" unless @user && @token
       @discogs = ::Discogs::Wrapper.new(AppName, user_token: @token)
     end
 
