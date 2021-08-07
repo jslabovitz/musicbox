@@ -12,10 +12,6 @@ class MusicBox
 
     include SetParams
 
-    def file=(file)
-      @file = Path.new(file)
-    end
-
     def path
       @album.dir / @file
     end
@@ -51,7 +47,7 @@ class MusicBox
         artist: @artist,
         track: @track,
         disc: @disc,
-        file: @file.to_s,
+        file: @file,
       }.compact
     end
 
