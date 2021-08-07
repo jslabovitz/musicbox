@@ -24,14 +24,15 @@ class MusicBox
     def make_album
       @release = @catalog.releases.find(@source_dir.basename.to_s, prompt: true, multiple: false).first
       print @release.details
-      if (@album = @release.album)
+      @album = @catalog.albums[@release.id]
+      if @album
         raise Error, "Album already exists" if @release.format_quantity.nil? || @release.format_quantity == 1
         puts "Release has multiple discs."
         n = @prompt.ask?('Which disc is this?', required: true, convert: :int)
         raise Error, "Disc number out of range" unless n >= 1 && n <= @release.format_quantity
         @disc = n
       else
-        @release.album = @album = Catalog::Album.new(
+        @album = Catalog::Album.new(
           id: @release.id,
           title: @release.title,
           artist: @release.artist,

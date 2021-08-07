@@ -27,6 +27,7 @@ class MusicBox
       @albums = Albums.new(root: @catalog_dir / 'albums')
       @images_dir = @catalog_dir / 'images'
       link_groups
+      link_albums
       @prompt = TTY::Prompt.new
     end
 
@@ -42,7 +43,9 @@ class MusicBox
         release = item.release or raise
         orphaned[:releases].delete(release)
         orphaned[:masters].delete(release.master) if release.master
-        orphaned[:albums].delete(release.album) if release.album
+      end
+      @albums.items.each do |album|
+        orphaned[:albums].delete(album) if @releases[album.id]
       end
       orphaned
     end
@@ -59,19 +62,21 @@ class MusicBox
     def link_groups
       @releases.items.each do |release|
         release.master = @masters[release.master_id] if release.master_id
-        release.album = @albums[release.id]
         release.link_images(@images_dir)
         release.master&.link_images(@images_dir)
-      end
-      @collection.items.each do |item|
-        item.release = @releases[item.id] or raise Error, "Can't find release for collection item ID #{item.id.inspect}"
-        item.album = @albums[item.id]
-        if item.album
-          item.album.collection_item = item
-          item.album.release = item.release
+        if (album = @albums[release.id])
+          album.release = release
         else
-          warn "No album: #{item.release}"
+          warn "No album for release ID #{release.id.inspect}"
         end
+        collection_item = @collection[release.id] or raise
+        collection_item.release = release
+      end
+    end
+
+    def link_albums
+      @albums.items.each do |album|
+        album.release = @releases[album.id] or raise Error, "No release for album ID #{album.id}"
       end
     end
 

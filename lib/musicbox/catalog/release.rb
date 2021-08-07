@@ -44,7 +44,6 @@ class MusicBox
       attr_accessor :videos
       attr_accessor :year
       attr_accessor :master    # linked on load
-      attr_accessor :album     # linked on load
 
       def artists=(artists)
         @artists = artists.map { |a| Artist.new(a) }
@@ -86,10 +85,6 @@ class MusicBox
         @master&.release_year || release_year
       end
 
-      def has_album?
-        @album != nil
-      end
-
       def odd_positions?
         tracklist_flattened.find { |t| t.position !~ /^\d+$/ }
       end
@@ -115,10 +110,8 @@ class MusicBox
       end
 
       def summary
-        '%-8s | %1s%1s | %-4s %4s | %-50.50s | %-60.60s | %-6s' % [
+        '%-8s | %-4s %4s | %-50.50s | %-60.60s | %-6s' % [
           @id,
-          has_album? ? 'A' : '',
-          @album&.has_cover? ? 'C' : '',
           artist_key,
           original_release_year || '-',
           artist,
@@ -137,7 +130,6 @@ class MusicBox
           ['Released', release_year || '-'],
           ['Originally released', original_release_year || '-'],
           ['Discogs URI', @uri || '-'],
-          ['Album dir', @album&.dir || '-'],
           ['Tracks', nil, tracklist_to_info],
         ]
         MusicBox.info_to_s(info)
