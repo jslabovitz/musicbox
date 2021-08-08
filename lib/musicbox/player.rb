@@ -69,7 +69,14 @@ class MusicBox
       setup_mpv
       next_equalizer
       @dispatcher.set_timeout_handler(@checkpoint_timeout) { save_state }
-      restore_state unless @ignore_state
+      unless @ignore_state
+        begin
+          restore_state
+        rescue Error => e
+          show_error("Invalid state: #{path} not in albums")
+          reset_state
+        end
+      end
       show_status('ready')
       @dispatcher.run
     end
@@ -141,16 +148,7 @@ class MusicBox
       if state_file.exist?
         state = JSON.load(state_file.read)
         if state['playlist']
-          paths = state['playlist'].map do |path|
-            path = Path.new(path)
-            unless @album_for_track_path[path]
-              show_error("Invalid state: #{path} not in albums")
-              reset_state
-              return
-            end
-            path
-          end
-          play_tracks(paths,
+          play_tracks(state['playlist'].map { |p| track_for_path(p) },
             pos: state['playlist-pos'],
             time: state['time-pos'])
         end
@@ -163,7 +161,7 @@ class MusicBox
 
     def play_tracks(tracks, pos: nil, time: nil)
       @playlist_file.dirname.mkpath
-      @playlist_file.write(tracks.map { |t| t.respond_to?(:path) ? t.path : t }.join("\n"))
+      @playlist_file.write(tracks.map(&:path).join("\n"))
       @mpv.command('loadlist', @playlist_file.to_s)
       @future_playlist_pos = pos if pos && pos >= 0
       @future_time_pos = time if time && time > 0
@@ -171,10 +169,10 @@ class MusicBox
 
     def read_albums
       raise Error, "No albums to play" if @albums.nil? || @albums.empty?
-      @album_for_track_path = {}
+      @album_for_path = {}
       @albums.each do |album|
         album.tracks.each do |track|
-          @album_for_track_path[track.path] = album
+          @album_for_path[track.path] = album
         end
       end
     end
@@ -191,9 +189,15 @@ class MusicBox
       tracks.to_a
     end
 
+    def album_for_path(path)
+      path = Path.new(path)
+      @album_for_path[path] \
+        or raise Error, "Can't determine album for path: #{path}"
+    end
+
     def track_for_path(path)
       path = Path.new(path)
-      @album_for_track_path[path]&.tracks.find { |t| t.path == path } \
+      album_for_path(path).tracks.find { |t| t.path == path } \
         or raise Error, "Can't determine track for path #{path.to_s.inspect}"
     end
 
@@ -284,8 +288,7 @@ class MusicBox
 
     def play_album_for_current_track
       if @current_track
-        album = @album_for_track_path[@current_track.path] \
-          or raise Error, "Can't determine album for track file: #{track_path}"
+        album = album_for_path(@current_track.path)
         play_tracks(album.tracks)
       else
         show_status('no current track')

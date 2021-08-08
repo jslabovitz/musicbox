@@ -76,6 +76,7 @@ class MusicBox
       @config.set(:root_dir, value: root_dir)
       @config.set(:import_dir, value: root_dir / 'import')
       @config.set(:import_done_dir, value: root_dir / 'import-done')
+      @config.set(:albums_dir, value: root_dir / 'albums')
       @config.append_path(root_dir.to_s)
       @config.env_prefix = 'MUSICBOX'
       @config.autoload_env
@@ -86,7 +87,7 @@ class MusicBox
 
   def initialize
     @root_dir = Path.new(config.fetch(:root_dir))
-    @albums = Albums.new(root: @root_dir / 'albums')
+    @albums = Albums.new(root: config.fetch(:albums_dir))
     @prompt = TTY::Prompt.new
   end
 
