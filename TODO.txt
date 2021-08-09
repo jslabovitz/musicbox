@@ -2,8 +2,33 @@
 
 - store albums/tracks/artists in SQLite/Sequel
 
+- treat album dirs as assets
+  - new class: AlbumAssets
+  - takes directory as parameter
+  - loads all files in dir
+  - categorize files by type:
+    - track
+      - audio files with track-num tags
+    - bin/cue
+    - log
+    - extracted cover
+    - album artwork (as aux files)
+    - booklet
+    - lyrics
+    - etc
+  - imported directory is a new Assets obj
+
 - re-implement file-based Group
   - convert all Discogs structures
+
+- when extracting cover, write into 'extracted-cover.jpg'
+  - then copy to 'cover.jpg' if needed
+  - be able to revert to original embedded cover
+
+- research MusicBrainz
+  - get MBIDs from logs?
+  - store MBIDs in track/album files
+    https://musicbrainz.org/doc/MusicBrainz_Identifier
 
 - allow artist key to be user-defined
   - when importing/updating, prompt for artist
@@ -80,9 +105,6 @@
   - sample rate
   - channels
   - format/codec
-
-- save @cover_file in album info.json file?
-  - just read cover_file (as path) instead of deriving via glob
 
 - have player read default settings from config
   - audio-device, exclusive, EQ, etc.
