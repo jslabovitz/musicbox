@@ -123,6 +123,7 @@ class MusicBox
   end
 
   def make_database
+    Collection.setup
     @albums.items.each do |album|
       Collection.import_album(album)
     end
