@@ -2,34 +2,40 @@ class MusicBox
 
   class Collection
 
-    # DB = Sequel.sqlite('sqlite://database')
+    # DB = Sequel.sqlite('database.sqlite')
     DB = Sequel.sqlite
     if false
       DB.loggers << Logger.new($stderr)
       DB.sql_log_level = :info
     end
-    DB.create_table :artists do
-      primary_key :id
-      String      :key, null: false
-      String      :name, null: false, unique: true
+    unless DB.tables.include?(:artists)
+      DB.create_table :artists do
+        primary_key :id
+        String      :key, null: false
+        String      :name, null: false, unique: true
+      end
     end
-    DB.create_table :albums do
-      primary_key :id
-      foreign_key :artist_id, :artists, null: false
-      String      :title, null: false
-      String      :artist_name, null: false
-      Integer     :year
-      Integer     :release_id
-      String      :cover_file
+    unless DB.tables.include?(:albums)
+      DB.create_table :albums do
+        primary_key :id
+        foreign_key :artist_id, :artists, null: false
+        String      :title, null: false
+        String      :artist_name, null: false
+        Integer     :year
+        Integer     :release_id
+        String      :cover_file
+      end
     end
-    DB.create_table :tracks do
-      primary_key :id
-      foreign_key :album_id, :albums, null: false
-      String      :title, null: false
-      String      :artist_name
-      Integer     :track_num, null: false
-      Integer     :disc_num, null: false
-      String      :file, null: false
+    unless DB.tables.include?(:tracks)
+      DB.create_table :tracks do
+        primary_key :id
+        foreign_key :album_id, :albums, null: false
+        String      :title, null: false
+        String      :artist_name
+        Integer     :track_num, null: false
+        Integer     :disc_num, null: false
+        String      :file, null: false
+      end
     end
 
     def self.import_album(old_album)
