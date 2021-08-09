@@ -116,7 +116,7 @@ class MusicBox
   end
 
   def export(args, **params)
-    exporter = Exporter.new(params)
+    exporter = Exporter.new(**params)
     @albums.find(args).each do |album|
       exporter.export_album(album)
     end
