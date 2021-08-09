@@ -2,23 +2,22 @@ class MusicBox
 
   class Collection
 
-    # DB = Sequel.sqlite('database.sqlite')
-    DB = Sequel.sqlite
-
     def self.setup
+      # @db = Sequel.sqlite('database.sqlite')
+      @db = Sequel.sqlite
       if false
-        DB.loggers << Logger.new($stderr)
-        DB.sql_log_level = :info
+        @db.loggers << Logger.new($stderr)
+        @db.sql_log_level = :info
       end
-      unless DB.tables.include?(:artists)
-        DB.create_table :artists do
+      unless @db.tables.include?(:artists)
+        @db.create_table :artists do
           primary_key :id
           String      :key, null: false
           String      :name, null: false, unique: true
         end
       end
-      unless DB.tables.include?(:albums)
-        DB.create_table :albums do
+      unless @db.tables.include?(:albums)
+        @db.create_table :albums do
           primary_key :id
           foreign_key :artist_id, :artists, null: false
           String      :title, null: false
@@ -28,8 +27,8 @@ class MusicBox
           String      :cover_file
         end
       end
-      unless DB.tables.include?(:tracks)
-        DB.create_table :tracks do
+      unless @db.tables.include?(:tracks)
+        @db.create_table :tracks do
           primary_key :id
           foreign_key :album_id, :albums, null: false
           String      :title, null: false
