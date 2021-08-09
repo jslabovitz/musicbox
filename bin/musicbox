@@ -21,18 +21,16 @@ SimpleCommand.run do
     @musicbox.fix(args)
   end
 
-  command 'cover', prompt: false do |args|
-    @musicbox.cover(args,
-      prompt: @prompt)
+  command 'cover' do |args|
+    @musicbox.cover(args)
   end
 
   command 'import' do |args|
     @musicbox.import(args)
   end
 
-  command 'label', prompt: false do |args|
-    @musicbox.label(args,
-      prompt: @prompt)
+  command 'label' do |args|
+    @musicbox.label(args)
   end
 
   command 'dir' do |args|
@@ -41,10 +39,6 @@ SimpleCommand.run do
 
   command 'open' do |args|
     @musicbox.open(args)
-  end
-
-  command 'select-cover', force: false do |args|
-    @musicbox.select_cover(args, force: @force)
   end
 
   command 'orphaned' do
@@ -77,9 +71,8 @@ SimpleCommand.run do
     @musicbox.artist_keys
   end
 
-  command 'play', prompt: nil, device: nil, exclusive: nil, mpv_log_level: nil, eq: nil, ignore_state: nil do |args|
+  command 'play', device: nil, exclusive: nil, mpv_log_level: nil, eq: nil, ignore_state: nil do |args|
     @musicbox.play(args,
-      prompt: @prompt,
       audio_device: @device,
       audio_exclusive: @exclusive,
       mpv_log_level: @mpv_log_level,

@@ -25,8 +25,9 @@ class MusicBox
         @albums.save_item(@album)
         copy_files
         archive
-        @album.extract_cover
-        @album.select_cover(@release)   # also does update_tags
+        extract_cover
+        select_cover
+        @album.update_tags
         make_label if @prompt.yes?('Make label?')
         make_cover if @prompt.yes?('Make cover?')
       end
@@ -102,6 +103,49 @@ class MusicBox
       album_track
     end
 
+    def extract_cover
+      begin
+        run_command('mp4art',
+          '--extract',
+          '--art-index', 0,
+          '--overwrite',
+          '--quiet',
+          @album.tracks.first.path)
+      rescue RunCommandFailed => e
+        # ignore
+      end
+      # cover is in FILE.art[0].TYPE
+      files = dir.glob('*.art*.*').reject { |f| f.extname.downcase == '.gif' }
+      if files.length == 0
+        puts "#{@id}: no cover to extract"
+      elsif files.length > 1
+        raise Error, "#{@id}: multiple covers found"
+      else
+        file = files.first
+        cover_file = (file.dirname / 'extracted-cover').add_extension(file.extname)
+        cover_file.unlink if cover_file.exist?
+        file.rename(cover_file)
+      end
+    end
+
+    def select_cover
+      choices = [
+        @release.master&.images&.map(&:file),
+        @release.images&.map(&:file),
+        @album.dir / @album.cover_file,
+      ].flatten.compact.uniq.select(&:exist?)
+      if choices.empty?
+        puts "#{@album.id}: no covers exist"
+        return
+      end
+      choices.each { |f| run_command('open', f) }
+      choice = @prompt.select('Cover?', choices)
+      file = Path.new(choice)
+      cover_file = (dir / 'cover').add_extension(file.extname)
+      file.cp(cover_file) unless file == cover_file
+      @album.update(cover_file: cover_file.basename.to_s)
+    end
+
     def copy_files
       @copy_plan.each do |source_file, dest_file|
         source_file.cp(dest_file)
@@ -120,7 +164,7 @@ class MusicBox
     end
 
     def make_cover
-      CoverMaker.make_covers(@album.cover_file,
+      CoverMaker.make_covers(@album.dir / @album.cover_file,
         output_file: '/tmp/covers.pdf',
         open: true)
     end

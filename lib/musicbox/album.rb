@@ -141,60 +141,14 @@ class MusicBox
           run_command('mp4art',
             '--quiet',
             '--add',
-            cover_file,
+            cover_path,
             track.path)
         end
       end
     end
 
-    def select_cover(release)
-      choices = [
-        release.master&.images&.map(&:file),
-        release.images&.map(&:file),
-        cover_file,
-      ].flatten.compact.uniq.select(&:exist?)
-      if choices.empty?
-        puts "#{@id}: no covers exist"
-      else
-        choices.each { |f| run_command('open', f) }
-        choice = TTY::Prompt.new.select('Cover?', choices)
-        save_cover(choice)
-        update_tags
-      end
-    end
-
-    def save_cover(file)
-      cover_file = (dir / 'cover').add_extension(file.extname)
-      file.cp(cover_file) unless file == cover_file
-    end
-
-    def extract_cover
-      if has_cover?
-        puts "#{@id}: already has cover"
-        return
-      end
-      file = dir / @tracks.first.file
-      begin
-        run_command('mp4art',
-          '--extract',
-          '--art-index', 0,
-          '--overwrite',
-          '--quiet',
-          file)
-      rescue RunCommandFailed => e
-        # ignore
-      end
-      # cover is in FILE.art[0].TYPE
-      files = dir.glob('*.art*.*').reject { |f| f.extname.downcase == '.gif' }
-      if files.length == 0
-        puts "#{@id}: no cover to extract"
-      elsif files.length > 1
-        raise Error, "#{@id}: multiple covers found"
-      else
-        file = files.first
-        save_cover(file)
-        file.unlink
-      end
+    def to_h
+      %i[title artist artist_key year discs].map { |k| [k, send(k) ] }.to_h.compact
     end
 
     def as_json(*options)

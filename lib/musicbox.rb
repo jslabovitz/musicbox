@@ -4,15 +4,18 @@ require 'discogs-wrapper'
 require 'http'
 require 'io-dispatcher'
 require 'json'
+require 'logger'
 require 'mime-types'
 require 'mpv_client'
 require 'path'
 require 'prawn'
 require 'prawn/measurement_extensions'
 require 'run-command'
+require 'sequel'
 require 'set'
 require 'set_params'
 require 'sixarm_ruby_unaccent'
+require 'sqlite3'
 require 'tty-config'
 require 'tty-prompt'
 require 'yaml'
@@ -24,6 +27,8 @@ require 'musicbox/version'
 require 'musicbox/error'
 require 'musicbox/group'
 require 'musicbox/info_to_s'
+
+require 'musicbox/collection'
 
 require 'musicbox/discogs'
 require 'musicbox/discogs/artist'
@@ -87,8 +92,10 @@ class MusicBox
 
   def initialize
     @root_dir = Path.new(config.fetch(:root_dir))
-    @albums = Albums.new(root: config.fetch(:albums_dir))
+    @albums_dir = Path.new(config.fetch(:albums_dir))
+    @albums = Albums.new(root: @albums_dir)
     @prompt = TTY::Prompt.new
+    make_database
   end
 
   def inspect
@@ -115,30 +122,21 @@ class MusicBox
     end
   end
 
+  def make_database
+    @albums.items.each do |album|
+      Collection.import_album(album)
+    end
+  end
+
   def fix(args)
   end
 
-  def cover(args, prompt: false, output_file: '/tmp/cover.pdf')
-    cover_files = []
-    @albums.find(args, prompt: prompt).each do |album|
-      unless album.has_cover?
-        release = @discogs.releases[album.id] or raise Error, "No release for album ID #{album.id}"
-        album.select_cover(release)
-      end
-      cover_files << album.cover_file if album.has_cover?
-    end
+  def cover(args, output_file: '/tmp/cover.pdf')
+    albums = Collection::Album.search(args).with_covers
+    cover_files = albums.map { |a| @albums_dir / a.cover_file }
     CoverMaker.make_covers(cover_files,
       output_file: output_file,
       open: true)
-  end
-
-  def select_cover(args, prompt: false, force: false)
-    @albums.find(args, prompt: prompt).each do |album|
-      unless album.has_cover? && !force
-        release = @discogs.releases[album.id] or raise Error, "No release for album ID #{album.id}"
-        album.select_cover(release)
-      end
-    end
   end
 
   def import(args)
@@ -163,8 +161,8 @@ class MusicBox
     end
   end
 
-  def label(args, prompt: false, output_file: '/tmp/labels.pdf')
-    labels = @albums.find(args, prompt: prompt).map(&:to_label)
+  def label(args, output_file: '/tmp/labels.pdf')
+    labels = Collection::Album.search(args).map(&:to_label)
     LabelMaker.make_labels(labels,
       output_file: output_file,
       open: true)
@@ -216,15 +214,19 @@ class MusicBox
   end
 
   def show_albums(args, mode: :summary)
-    @albums.find(args).each do |album|
+    Collection::Album.search(args).each do |album|
       case mode
       when :cover
-        MusicBox.show_image(file: album.cover_file) if album.has_cover?
+        if album.has_cover?
+          MusicBox.show_image(file: @albums_dir / album.cover_file)
+        else
+          puts "[no cover file]"
+        end
       when :details
         puts album.details
         puts
       when :summary
-        puts album
+        puts album.summary
       end
     end
   end
@@ -244,7 +246,7 @@ class MusicBox
 
   def csv(args)
     print Album.csv_header
-    @albums.find(args).each do |album|
+    Collection::Album.search(args).each do |album|
       print album.to_csv
     end
   end
@@ -279,8 +281,8 @@ class MusicBox
     end
   end
 
-  def play(args, prompt: false, equalizer_name: nil, **params)
-    albums = @albums.find(args, prompt: prompt).compact
+  def play(args, equalizer_name: nil, **params)
+    albums = @albums.find(args).compact
     if equalizer_name
       equalizers = Equalizer.load_equalizers(
         dir: Path.new(config.fetch(:equalizers_dir)),
@@ -298,7 +300,7 @@ class MusicBox
   def select(args)
     ids = []
     loop do
-      albums = @albums.find(args, prompt: true) or break
+      albums = @albums.find(args) or break
       ids += albums.map(&:id)
       puts ids.join(' ')
     end
@@ -318,7 +320,7 @@ class MusicBox
 
   def update_info(args, force: false)
     @albums.find(args).each do |album|
-      release = @discogs.releases[album.id] or raise Error, "No release for album ID #{album.id}"
+      release = release_for_album(album)
       diffs = album.diff_info(release)
       unless diffs.empty?
         puts album
@@ -336,6 +338,11 @@ class MusicBox
 
   def orphaned_albums
     @albums.items.reject { |a| @discogs.releases[a.id] }
+  end
+
+  def release_for_album(album)
+    load_discogs
+    @discogs.releases[album.release_id] or raise Error, "No release for album ID #{album.release_id}"
   end
 
 end
