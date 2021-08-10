@@ -367,7 +367,7 @@ class MusicBox
             i + 1,
             track.title,
             album.title,
-            album.artist,
+            album.artist_name,
           ]
         end
       else
