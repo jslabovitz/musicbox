@@ -80,10 +80,6 @@ SimpleCommand.run do
       ignore_state: @ignore_state)
   end
 
-  command 'select' do |args|
-    @musicbox.select(args)
-  end
-
   command 'update' do |args|
     @musicbox.update
   end

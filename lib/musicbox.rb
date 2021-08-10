@@ -298,15 +298,6 @@ class MusicBox
     player.play
   end
 
-  def select(args)
-    ids = []
-    loop do
-      albums = @albums.find(args) or break
-      ids += albums.map(&:id)
-      puts ids.join(' ')
-    end
-  end
-
   def update
     load_discogs
     @discogs.update
