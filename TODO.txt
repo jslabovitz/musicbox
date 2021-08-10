@@ -1,6 +1,20 @@
 # TODO
 
-- store albums/tracks/artists in SQLite/Sequel
+- update Player for SQL
+
+- update Importer, update_tags, update_info for SQL
+
+- use file-based SQLite database, not memory
+
+- do automatic SQL dump if db has been modified
+
+- add SQL dump file to git repo
+
+- remove Albums group when database is reliable
+   - album.rb
+   - albums.rb
+   - track.rb
+   - $MUSICBOX/albums/*/info.json
 
 - treat album dirs as assets
   - new class: AlbumAssets
@@ -21,9 +35,10 @@
 - re-implement file-based Group
   - convert all Discogs structures
 
-- when extracting cover, write into 'extracted-cover.jpg'
-  - then copy to 'cover.jpg' if needed
-  - be able to revert to original embedded cover
+- reimplement 'select' command when SQL support is finished
+  - save permanently
+  - with optional name
+  - can be referred to in query
 
 - research MusicBrainz
   - get MBIDs from logs?
@@ -120,11 +135,6 @@
 - use curses or tty for full-screen player TTY mode?
 
 - sort #find results by relevance, not by artist/title
-
-- improve 'select' tool
-  - save to $MUSIC_ROOT/selection.json?
-  - optionally name
-  - can be referred to in query
 
 - when updating collection, don't simply delete previous collection
   - determine additions/removals/changes
