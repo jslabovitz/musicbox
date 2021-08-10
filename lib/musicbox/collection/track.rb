@@ -7,9 +7,9 @@ class MusicBox
       many_to_one :album
 
       def summary
-        '%-6s | %-6s | %02d-%02d | %-60.60s | %-60.60s' % [
+        '%-8s | %-8s | %02d-%02d | %-60.60s | %-60.60s' % [
           id,
-          album.id,
+          album.release_id,
           disc_num, track_num,
           title,
           artist_name || '-',

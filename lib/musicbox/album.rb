@@ -32,7 +32,7 @@ class MusicBox
     end
 
     def summary
-      '%-8s | %1s | %-4s | %-4s | %-50.50s | %-60.60s | %-6s' % [
+      '%-8s | %1s | %-4s | %-4s | %-50.50s | %-60.60s | %s' % [
         @id,
         has_cover? ? 'C' : '',
         @artist_key,

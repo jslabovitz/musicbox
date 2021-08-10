@@ -39,8 +39,8 @@ class MusicBox
       end
 
       def summary
-        '%-6s | %-4s | %-4s | %-60.50s | %-60.60s' % [
-          id,
+        '%-8s | %-4s | %-4s | %-60.50s | %-60.60s' % [
+          release_id,
           artist.key,
           year || '-',
           artist_name,
