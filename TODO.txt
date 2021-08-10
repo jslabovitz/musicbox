@@ -1,6 +1,10 @@
 # TODO
 
-- update Player for SQL
+- make Player more efficient in SQL usage
+  - move track/album->path conversions to Track/Album
+    - remove @album_for_path hash
+  - use Sequel shuffle function?
+  - ensure album-for-current track function still works
 
 - update Importer, update_tags, update_info for SQL
 
