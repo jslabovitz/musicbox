@@ -178,7 +178,7 @@ class MusicBox
     end
 
     def random_album
-      @albums.shuffle.first
+      @albums.to_a.shuffle.first
     end
 
     def random_tracks(length:)
@@ -288,8 +288,7 @@ class MusicBox
 
     def play_album_for_current_track
       if @current_track
-        album = album_for_path(@current_track.path)
-        play_tracks(album.tracks)
+        play_tracks(@current_track.album.tracks)
       else
         show_status('no current track')
       end
@@ -335,9 +334,10 @@ class MusicBox
 
     def show_current_track
       if (track = @current_track)
-        if track.album.has_cover?
+        album = track.album
+        if album.has_cover?
           MusicBox.show_image(
-            file: @current_track.album.cover_file,
+            file: album.cover_path,
             width: 'auto',
             height: 20,
             preserve_aspect_ratio: false)
@@ -345,11 +345,11 @@ class MusicBox
         end
         puts MusicBox.info_to_s(
           [
-            ['Disc', track.disc || '-'],
-            ['Track', [track.track, track.album.tracks.count].join('/')],
+            ['Disc', track.disc_num || '-'],
+            ['Track', [track.track_num, album.tracks.count].join('/')],
             ['Title', track.title],
-            ['Album', track.album.title],
-            ['Artist', [track.album.artist, track.artist].compact.uniq.join(' / ')],
+            ['Album', album.title],
+            ['Artist', [album.artist_name, track.artist_name].compact.uniq.join(' / ')],
           ]
         )
         puts
@@ -360,13 +360,14 @@ class MusicBox
       if @playlist
         @playlist.each_with_index do |entry, i|
           track = track_for_path(entry['filename']) or raise
+          album = track.album
           puts '%1s%1s %2d. %-40.40s | %-40.40s | %-40.40s' % [
             entry['current'] ? '=' : '',
             entry['playing'] ? '>' : '',
             i + 1,
             track.title,
-            track.album.title,
-            track.album.artist,
+            album.title,
+            album.artist,
           ]
         end
       else

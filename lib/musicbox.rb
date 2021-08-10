@@ -289,8 +289,7 @@ class MusicBox
   end
 
   def play(args, equalizer_name: nil, **params)
-    load_albums
-    albums = @albums.find(args).compact
+    albums = Collection::Album.search(args)
     if equalizer_name
       equalizers = Equalizer.load_equalizers(
         dir: Path.new(config.fetch(:equalizers_dir)),
