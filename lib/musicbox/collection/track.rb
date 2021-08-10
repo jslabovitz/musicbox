@@ -16,6 +16,10 @@ class MusicBox
         ]
       end
 
+      def path
+        album.dir / file
+      end
+
     end
 
   end

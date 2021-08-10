@@ -16,7 +16,7 @@ class MusicBox
       export_dir.mkpath unless export_dir.exist?
       threads = []
       album.tracks.each do |track|
-        src_file = album.file_path(track.file)
+        src_file = track.path
         dest_file = export_dir / track.file
         if @force || !dest_file.exist? || dest_file.mtime != src_file.mtime
           if @parallel
