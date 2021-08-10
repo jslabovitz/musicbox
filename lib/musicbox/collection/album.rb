@@ -48,12 +48,8 @@ class MusicBox
         ]
       end
 
-      def album_dir(root)
-        root / release_id.to_s
-      end
-
-      def cover_path(dir)
-        dir / cover_file
+      def file_path(*parts)
+        parts.first.join(release_id.to_s, *(parts[1..-1])).join
       end
 
       def has_cover?

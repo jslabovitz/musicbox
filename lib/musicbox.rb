@@ -134,7 +134,7 @@ class MusicBox
 
   def cover(args, output_file: '/tmp/cover.pdf')
     albums = Collection::Album.search(args).with_covers
-    cover_files = albums.map { |a| @albums_dir / a.cover_file }
+    cover_files = albums.map { |a| a.file_path(@albums_dir, a.cover_file) }
     CoverMaker.make_covers(cover_files,
       output_file: output_file,
       open: true)
@@ -170,14 +170,14 @@ class MusicBox
   end
 
   def dir(args)
-    @albums.find(args).each do |album|
-      puts "%-10s %s" % [album.id, album.dir]
+    Collection::Album.search(args).each do |album|
+      puts "%-10s %s" % [album.id, album.file_path(@albums_dir)]
     end
   end
 
   def open(args)
-    @albums.find(args).each do |album|
-      run_command('open', album.dir)
+    Collection::Album.search(args).each do |album|
+      run_command('open', album.file_path(@albums_dir))
     end
   end
 
@@ -219,7 +219,7 @@ class MusicBox
       case mode
       when :cover
         if album.has_cover?
-          MusicBox.show_image(file: @albums_dir / album.cover_file)
+          MusicBox.show_image(file: album.file_path(@albums_dir, album.cover_file))
         else
           puts "[no cover file]"
         end
