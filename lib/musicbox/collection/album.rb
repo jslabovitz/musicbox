@@ -1,6 +1,6 @@
 class MusicBox
 
-  class Collection
+  module Collection
 
     class Album < Sequel::Model
 
@@ -47,8 +47,16 @@ class MusicBox
         ]
       end
 
+      def dir
+        Collection.albums_dir / release_id.to_s
+      end
+
       def file_path(*parts)
-        parts.first.join(release_id.to_s, *(parts[1..-1])).join
+        dir.join(*parts)
+      end
+
+      def cover_path
+        cover_file ? file_path(cover_file) : nil
       end
 
       def has_cover?

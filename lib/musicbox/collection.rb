@@ -1,44 +1,53 @@
 class MusicBox
 
-  class Collection
+  module Collection
 
-    def self.setup
-      # @db = Sequel.sqlite('database.sqlite')
-      @db = Sequel.sqlite
+    def self.db
+      @db
+    end
+
+    def self.albums_dir
+      @albums_dir
+    end
+
+    def self.setup(root_dir:, albums_dir:)
+      @root_dir = root_dir
+      @albums_dir = albums_dir
+      db_file = @root_dir / 'database.sqlite'
+      db_exists = db_file.exist?
+      @db = Sequel.sqlite(db_file.to_s)
       if false
         @db.loggers << Logger.new($stderr)
         @db.sql_log_level = :info
       end
-      unless @db.tables.include?(:artists)
-        @db.create_table :artists do
-          primary_key :id
-          String      :key, null: false
-          String      :name, null: false, unique: true
-        end
-      end
-      unless @db.tables.include?(:albums)
-        @db.create_table :albums do
-          primary_key :id
-          foreign_key :artist_id, :artists, null: false
-          String      :title, null: false
-          String      :artist_name, null: false
-          Integer     :year
-          Integer     :release_id
-          String      :cover_file
-        end
-      end
-      unless @db.tables.include?(:tracks)
-        @db.create_table :tracks do
-          primary_key :id
-          foreign_key :album_id, :albums, null: false
-          String      :title, null: false
-          String      :artist_name
-          Integer     :track_num, null: false
-          Integer     :disc_num, null: false
-          String      :file, null: false
-        end
-      end
+      make_databases unless db_exists
       Path.new(__FILE__).dirname.glob('collection/*.rb').each { |p| require p.to_s }
+    end
+
+    def self.make_databases
+      @db.create_table :artists do
+        primary_key :id
+        String      :key, null: false
+        String      :name, null: false, unique: true
+      end
+      @db.create_table :albums do
+        primary_key :id
+        foreign_key :artist_id, :artists, null: false
+        String      :title, null: false
+        String      :artist_name, null: false
+        Integer     :year
+        Integer     :release_id
+        String      :cover_file
+      end
+      @db.create_table :tracks do
+        primary_key :id
+        foreign_key :album_id, :albums, null: false
+        String      :title, null: false
+        String      :artist_name
+        Integer     :track_num, null: false
+        Integer     :disc_num, null: false
+        String      :file, null: false
+      end
     end
 
     def self.import_album(old_album)

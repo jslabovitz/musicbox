@@ -93,7 +93,6 @@ class MusicBox
   def initialize
     @root_dir = Path.new(config.fetch(:root_dir))
     @albums_dir = Path.new(config.fetch(:albums_dir))
-    @albums = Albums.new(root: @albums_dir)
     @prompt = TTY::Prompt.new
     make_database
   end
@@ -106,6 +105,10 @@ class MusicBox
     self.class.config
   end
 
+  def load_albums
+    @albums = Albums.new(root: @albums_dir)
+  end
+
   def load_discogs
     @discogs ||= Discogs.new(
       root_dir: @root_dir / 'discogs',
@@ -116,16 +119,19 @@ class MusicBox
   end
 
   def export(args, **params)
-    exporter = Exporter.new(src_dir: @albums_dir, **params)
+    exporter = Exporter.new(**params)
     Collection::Album.search(args).each do |album|
       exporter.export_album(album)
     end
   end
 
   def make_database
-    Collection.setup
-    @albums.items.each do |album|
-      Collection.import_album(album)
+    Collection.setup(root_dir: @root_dir, albums_dir: @albums_dir)
+    if Collection::Album.empty?
+      load_albums
+      @albums.items.each do |album|
+        Collection.import_album(album)
+      end
     end
   end
 
@@ -134,13 +140,13 @@ class MusicBox
 
   def cover(args, output_file: '/tmp/cover.pdf')
     albums = Collection::Album.search(args).with_covers
-    cover_files = albums.map { |a| a.file_path(@albums_dir, a.cover_file) }
-    CoverMaker.make_covers(cover_files,
+    CoverMaker.make_covers(albums.map(&:cover_path),
       output_file: output_file,
       open: true)
   end
 
   def import(args)
+    load_albums
     load_discogs
     if args.empty?
       import_dir = Path.new(config.fetch(:import_dir))
@@ -171,13 +177,13 @@ class MusicBox
 
   def dir(args)
     Collection::Album.search(args).each do |album|
-      puts "%-10s %s" % [album.id, album.file_path(@albums_dir)]
+      puts "%-10s %s" % [album.id, album.dir]
     end
   end
 
   def open(args)
     Collection::Album.search(args).each do |album|
-      run_command('open', album.file_path(@albums_dir))
+      run_command('open', album.dir)
     end
   end
 
@@ -219,7 +225,7 @@ class MusicBox
       case mode
       when :cover
         if album.has_cover?
-          MusicBox.show_image(file: album.file_path(@albums_dir, album.cover_file))
+          MusicBox.show_image(file: album.cover_path)
         else
           puts "[no cover file]"
         end
@@ -283,6 +289,7 @@ class MusicBox
   end
 
   def play(args, equalizer_name: nil, **params)
+    load_albums
     albums = @albums.find(args).compact
     if equalizer_name
       equalizers = Equalizer.load_equalizers(
@@ -304,6 +311,7 @@ class MusicBox
   end
 
   def update_tags(args, force: false)
+    load_albums
     @albums.find(args).each do |album|
       puts album
       album.update_tags(force: force)
@@ -311,6 +319,7 @@ class MusicBox
   end
 
   def update_info(args, force: false)
+    load_albums
     @albums.find(args).each do |album|
       release = release_for_album(album)
       diffs = album.diff_info(release)
@@ -329,6 +338,7 @@ class MusicBox
   end
 
   def orphaned_albums
+    load_albums
     @albums.items.reject { |a| @discogs.releases[a.id] }
   end
 

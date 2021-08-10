@@ -2,9 +2,7 @@ class MusicBox
 
   class Exporter
 
-    def initialize(src_dir:, dest_dir:, compress: false, force: false, parallel: false)
-      raise Error, "Must specify source directory" unless src_dir
-      @src_dir = Path.new(src_dir).expand_path
+    def initialize(dest_dir:, compress: false, force: false, parallel: false)
       raise Error, "Must specify destination directory" unless dest_dir
       @dest_dir = Path.new(dest_dir).expand_path
       @compress = compress
@@ -18,7 +16,7 @@ class MusicBox
       export_dir.mkpath unless export_dir.exist?
       threads = []
       album.tracks.each do |track|
-        src_file = album.file_path(@src_dir, track.file)
+        src_file = album.file_path(track.file)
         dest_file = export_dir / track.file
         if @force || !dest_file.exist? || dest_file.mtime != src_file.mtime
           if @parallel

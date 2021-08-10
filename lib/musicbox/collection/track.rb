@@ -1,6 +1,6 @@
 class MusicBox
 
-  class Collection
+  module Collection
 
     class Track < Sequel::Model
 
