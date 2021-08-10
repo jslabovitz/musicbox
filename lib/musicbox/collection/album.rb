@@ -14,8 +14,7 @@ class MusicBox
           args.each do |selector|
             dataset = case selector
             when /^[\d,]+$/
-              ids = selector.split(',').map(&:to_i)
-              dataset.where(id: ids)
+              dataset.where(release_id: selector.split(',').map(&:to_i))
             else
               raise Error, "Unknown selector: #{selector}"
             end
