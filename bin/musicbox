@@ -11,7 +11,7 @@ SimpleCommand.run do
 
   command 'export', dir: nil, compress: false, force: false, parallel: true do |args|
     @musicbox.export(args,
-      dir: @dir,
+      dest_dir: @dir,
       compress: @compress,
       force: @force,
       parallel: @parallel)

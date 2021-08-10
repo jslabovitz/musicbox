@@ -2,49 +2,51 @@ class MusicBox
 
   class Exporter
 
-    def initialize(dir:, compress: false, force: false, parallel: false)
-      @dir = Path.new(dir).expand_path
+    def initialize(src_dir:, dest_dir:, compress: false, force: false, parallel: false)
+      raise Error, "Must specify source directory" unless src_dir
+      @src_dir = Path.new(src_dir).expand_path
+      raise Error, "Must specify destination directory" unless dest_dir
+      @dest_dir = Path.new(dest_dir).expand_path
       @compress = compress
       @force = force
       @parallel = parallel
     end
 
     def export_album(album)
-      raise Error, "Must specify destination directory" unless @dir
-      name = '%s - %s (%s)' % [album.artist, album.title, album.year]
-      export_dir = @dir / name
+      name = '%s - %s (%s)' % [album.artist_name, album.title, album.year]
+      export_dir = @dest_dir / name
       export_dir.mkpath unless export_dir.exist?
       threads = []
       album.tracks.each do |track|
-        src_file = track.path
-        dst_file = export_dir / src_file.basename
-        if @force || !dst_file.exist? || dst_file.mtime != src_file.mtime
+        src_file = album.file_path(@src_dir, track.file)
+        dest_file = export_dir / track.file
+        if @force || !dest_file.exist? || dest_file.mtime != src_file.mtime
           if @parallel
             threads << Thread.new do
-              export_track(src_file, dst_file)
+              export_track(src_file, dest_file)
             end
           else
-            export_track(src_file, dst_file)
+            export_track(src_file, dest_file)
           end
         end
       end
       threads.map(&:join)
     end
 
-    def export_track(src_file, dst_file)
+    def export_track(src_file, dest_file)
       if @compress
         warn "compressing #{src_file}"
-        compress_track(src_file, dst_file)
+        compress_track(src_file, dest_file)
       else
         warn "copying #{src_file}"
-        src_file.cp(dst_file)
+        src_file.cp(dest_file)
       end
     end
 
-    def compress_track(src_file, dst_file)
+    def compress_track(src_file, dest_file)
       begin
         tags = Tags.load(src_file)
-        caf_file = dst_file.replace_extension('.caf')
+        caf_file = dest_file.replace_extension('.caf')
         run_command('afconvert',
           src_file,
           caf_file,
@@ -59,11 +61,11 @@ class MusicBox
           '--bitrate', 256000,
           '--quality', 127,
           '--strategy', 2,
-          dst_file)
-        tags.save(dst_file, force: true)
-        dst_file.utime(src_file.atime, src_file.mtime)
+          dest_file)
+        tags.save(dest_file, force: true)
+        dest_file.utime(src_file.atime, src_file.mtime)
       rescue => e
-        dst_file.unlink if dst_file.exist?
+        dest_file.unlink if dest_file.exist?
         raise e
       ensure
         caf_file.unlink if caf_file.exist?
