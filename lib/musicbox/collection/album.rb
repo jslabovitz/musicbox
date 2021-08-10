@@ -23,11 +23,11 @@ class MusicBox
         end
 
         def with_covers
-          where { !cover_file.nil? }
+          exclude(cover_file: nil)
         end
 
         def without_covers
-          where { cover_file.nil? }
+          where(cover_file: nil)
         end
 
         def all_albums_released_in_year(year)
