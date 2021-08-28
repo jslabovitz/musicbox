@@ -126,7 +126,7 @@ class MusicBox
         state['playlist'] = playlist.map { |e| e['filename'] }
         if (pos = @mpv.get_property('playlist-pos')) && pos >= 0
           state['playlist-pos'] = pos
-          state['time-pos'] = @mpv.get_property('time-pos')
+          state['time-pos'] = @mpv.get_property('time-pos') rescue nil
         end
       end
       @state_file.dirname.mkpath unless @state_file.dirname.exist?
@@ -201,22 +201,35 @@ class MusicBox
     #
 
     def playlist_changed(value)
+# ;;puts "PROPERTY: #{__method__} => #{value.inspect}"
       @playlist = value
+      @current_track = @current_pos = nil
+      @playlist.each_with_index do |entry, i|
+        if entry['current']
+          @current_track = Collection::Track.from_path(entry['filename'])
+          @current_pos = i
+          break
+        end
+      end
+      save_state
       show_playlist
     end
 
     def playlist_pos_changed(value)
+# ;;puts "PROPERTY: #{__method__} => #{value.inspect}"
       if value >= 0
         entry = @mpv.get_property('playlist')[value] or raise
         @current_track = Collection::Track.from_path(entry['filename'])
         @current_pos = value
-        show_current_track
       else
         @current_track = @current_pos = nil
       end
+      save_state
+      show_current_track
     end
 
     def pause_changed(value)
+# ;;puts "PROPERTY: #{__method__} => #{value.inspect}"
       @play_state = value ? :paused : :playing
       show_play_state
     end
