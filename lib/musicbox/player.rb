@@ -57,7 +57,7 @@ class MusicBox
     end
 
     def play
-      read_albums
+      raise Error, "No albums to play" unless @albums && !@albums.empty?
       @dispatcher = IO::Dispatcher.new
       setup_interface
       setup_mpv
@@ -137,7 +137,7 @@ class MusicBox
       if state_file.exist?
         state = JSON.load(state_file.read)
         if state['playlist']
-          play_tracks(state['playlist'].map { |p| track_for_path(p) },
+          play_tracks(state['playlist'].map { |p| Collection::Track.from_path(p) },
             pos: state['playlist-pos'],
             time: state['time-pos'])
         end
@@ -156,16 +156,6 @@ class MusicBox
       @future_time_pos = time if time && time > 0
     end
 
-    def read_albums
-      raise Error, "No albums to play" if @albums.nil? || @albums.empty?
-      @album_for_path = {}
-      @albums.each do |album|
-        album.tracks.each do |track|
-          @album_for_path[track.path] = album
-        end
-      end
-    end
-
     def random_album
       @albums.to_a.shuffle.first
     end
@@ -176,18 +166,6 @@ class MusicBox
         tracks << random_album.tracks.shuffle.first
       end
       tracks.to_a
-    end
-
-    def album_for_path(path)
-      path = Path.new(path)
-      @album_for_path[path] \
-        or raise Error, "Can't determine album for path: #{path}"
-    end
-
-    def track_for_path(path)
-      path = Path.new(path)
-      album_for_path(path).tracks.find { |t| t.path == path } \
-        or raise Error, "Can't determine track for path #{path.to_s.inspect}"
     end
 
     def set_equalizer(equalizer)
@@ -230,7 +208,7 @@ class MusicBox
     def playlist_pos_changed(value)
       if value >= 0
         entry = @mpv.get_property('playlist')[value] or raise
-        @current_track = track_for_path(entry['filename'])
+        @current_track = Collection::Track.from_path(entry['filename'])
         @current_pos = value
         show_current_track
       else
@@ -348,7 +326,7 @@ class MusicBox
     def show_playlist
       if @playlist
         @playlist.each_with_index do |entry, i|
-          track = track_for_path(entry['filename']) or raise
+          track = Collection::Track.from_path(entry['filename']) or raise
           album = track.album
           puts '%1s%1s %2d. %-40.40s | %-40.40s | %-40.40s' % [
             entry['current'] ? '=' : '',
