@@ -1,6 +1,7 @@
 # TODO
 
-- Player: use Sequel shuffle function?
+- resolve confusion between album ID and album release ID
+  - use release ID as primary key, instead of arbitrary sequence?
 
 - update Importer, update_tags, update_info for SQL
 
