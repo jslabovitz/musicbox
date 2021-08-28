@@ -20,12 +20,6 @@ class MusicBox
       '?' => :show_keymap,
     }
 
-    PropertyHandlers = {
-      'playlist' => :playlist_changed,
-      'playlist-pos' => :playlist_pos_changed,
-      'pause' => :pause_changed,
-    }
-
     attr_accessor :albums
     attr_accessor :audio_device
     attr_accessor :audio_exclusive
@@ -96,14 +90,9 @@ class MusicBox
       @mpv.command('request_log_messages', @mpv_log_level) if @mpv_log_level
       @mpv.register_event('start-file') { |e| start_file(e) }
       @mpv.register_event('playback-restart') { |e| playback_restart(e) }
-      PropertyHandlers.keys.each do |name|
-        @mpv.observe_property(name) do |name, value|
-# ;;puts "PROPERTY: #{name} => #{value.inspect}"
-          if (meth = PropertyHandlers[name])
-            method(meth).call(value)
-          end
-        end
-      end
+      @mpv.observe_property('playlist') { |n, v| playlist_changed(v) }
+      @mpv.observe_property('playlist-pos') { |n, v| playlist_pos_changed(v) }
+      @mpv.observe_property('pause') { |n, v| pause_changed(v) }
     end
 
     def shutdown_mpv
