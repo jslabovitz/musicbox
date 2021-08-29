@@ -319,8 +319,9 @@ class MusicBox
 
   def update_info(args, force: false)
     load_albums
+    load_discogs
     @albums.find(args).each do |album|
-      release = release_for_album(album)
+      release = @discogs.releases[album.release_id] or raise Error, "No release for album ID #{album.release_id}"
       diffs = album.diff_info(release)
       unless diffs.empty?
         puts album
@@ -339,11 +340,6 @@ class MusicBox
   def orphaned_albums
     load_albums
     @albums.items.reject { |a| @discogs.releases[a.id] }
-  end
-
-  def release_for_album(album)
-    load_discogs
-    @discogs.releases[album.release_id] or raise Error, "No release for album ID #{album.release_id}"
   end
 
 end
