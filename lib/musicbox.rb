@@ -338,8 +338,7 @@ class MusicBox
   end
 
   def orphaned_albums
-    load_albums
-    @albums.items.reject { |a| @discogs.releases[a.id] }
+    Collection::Album.reject { |a| @discogs.releases[a.release_id] }
   end
 
 end
