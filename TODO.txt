@@ -1,20 +1,14 @@
 # TODO
 
-- resolve confusion between album ID and album release ID
-  - use release ID as primary key, instead of arbitrary sequence?
+- make importing work again
 
-- update Importer, update_tags, update_info for SQL
+- make update-info work again
 
-- do automatic SQL dump if db has been modified
-    sqlite3 DB.sqlite .dump > DB.sql
+- when importing, rename possible 'cover.{jpg,png}' to 'original-cover...'
 
-- add SQL dump file to git repo
+- move Exporter logic into MusicBox, Album, Track.
 
-- remove Albums group when database is reliable
-   - album.rb
-   - albums.rb
-   - track.rb
-   - $MUSICBOX/albums/*/info.json
+- combine Group & Item together into one class
 
 - don't save actual filename in Track
   - save type/ext (m4a) as separate field
@@ -22,26 +16,10 @@
   - write fixup to rename current files to re-constructed names
     - backup catalog first!
 
-- treat album dirs as assets
-  - new class: AlbumAssets
-  - takes directory as parameter
-  - loads all files in dir
-  - categorize files by type:
-    - track
-      - audio files with track-num tags
-    - bin/cue
-    - log
-    - extracted cover
-    - album artwork (as aux files)
-    - booklet
-    - lyrics
-    - etc
-  - imported directory is a new Assets obj
-
 - re-implement file-based Group
   - convert all Discogs structures
 
-- reimplement 'select' command when SQL support is finished
+- reimplement 'select' command
   - save permanently
   - with optional name
   - can be referred to in query

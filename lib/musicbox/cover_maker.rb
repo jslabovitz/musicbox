@@ -17,6 +17,7 @@ class MusicBox
       size = 4.75.in
       top = 10.in
       cover_files.flatten.each_with_index do |cover_file, i|
+        raise Error, "Cover file #{cover_file.to_s.inspect} does not exist" unless cover_file.exist?
         @pdf.start_new_page if i > 0
         @pdf.fill do
           @pdf.rectangle [0, top],

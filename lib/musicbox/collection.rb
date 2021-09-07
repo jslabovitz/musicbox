@@ -1,54 +1,22 @@
 class MusicBox
 
-  module Collection
+  class Collection
 
-    def self.db
-      @db
+    attr_accessor :root_dir
+    attr_accessor :albums
+    attr_accessor :artists
+
+    include SetParams
+
+    def initialize(params={})
+      set(params)
+      raise Error, "root_dir not specified" unless @root_dir
+      raise Error, "root_dir #{@root_dir.to_s.inspect} doesn't exist" unless @root_dir.exist?
+      @albums = Albums.new(root: @root_dir / 'albums')
+      @artists = Artists.new(root: @root_dir / 'artists')
     end
 
-    def self.albums_dir
-      @albums_dir
-    end
-
-    def self.setup(root_dir:, albums_dir:)
-      @root_dir = root_dir
-      @albums_dir = albums_dir
-      db_file = @root_dir / 'database.sqlite'
-      db_exists = db_file.exist?
-      @db = Sequel.sqlite(db_file.to_s)
-      if false
-        @db.loggers << Logger.new($stderr)
-        @db.sql_log_level = :info
-      end
-      make_databases unless db_exists
-      Path.new(__FILE__).dirname.glob('collection/*.rb').each { |p| require p.to_s }
-    end
-
-    def self.make_databases
-      @db.create_table :artists do
-        primary_key :id
-        String      :key, null: false
-        String      :name, null: false, unique: true
-      end
-      @db.create_table :albums do
-        primary_key :id
-        foreign_key :artist_id, :artists, null: false
-        String      :title, null: false
-        String      :artist_name, null: false
-        Integer     :year
-        Integer     :release_id
-        String      :cover_file
-      end
-      @db.create_table :tracks do
-        primary_key :id
-        foreign_key :album_id, :albums, null: false
-        String      :title, null: false
-        String      :artist_name
-        Integer     :track_num, null: false
-        Integer     :disc_num, null: false
-        String      :file, null: false
-      end
-    end
+    #FIXME: dup code?
 
     def self.import_album(old_album)
       # ;;puts old_album.summary
@@ -66,7 +34,7 @@ class MusicBox
         artist_name: artist_name,
         year: old_album.year,
         release_id: old_album.id,
-        cover_file: cover_file ? cover_file.to_s : nil)
+        cover_file: cover_file&.to_s)
       # ;;pp(album: album)
       old_album.tracks.each do |old_track|
         track = album.add_track(

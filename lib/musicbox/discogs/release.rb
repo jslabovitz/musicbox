@@ -149,7 +149,7 @@ class MusicBox
         tracks = []
         tracklist.each do |track|
           tracks << track
-          tracks += tracklist_flattened(track.sub_tracks) if track.type == 'index'
+          tracks += make_tracklist_flattened(track.sub_tracks) if track.type == 'index'
         end
         tracks
       end

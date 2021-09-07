@@ -57,7 +57,6 @@ class MusicBox
     end
 
     def play
-      raise Error, "No albums to play" unless @albums && !@albums.empty?
       @dispatcher = IO::Dispatcher.new
       setup_interface
       setup_mpv
@@ -137,7 +136,7 @@ class MusicBox
       if state_file.exist?
         state = JSON.load(state_file.read)
         if state['playlist']
-          play_tracks(state['playlist'].map { |p| Collection::Track.from_path(p) },
+          play_tracks(state['playlist'].map { |p| @albums.track_from_path(p) },
             pos: state['playlist-pos'],
             time: state['time-pos'])
         end
@@ -154,18 +153,6 @@ class MusicBox
       @mpv.command('loadlist', @playlist_file.to_s)
       @future_playlist_pos = pos if pos && pos >= 0
       @future_time_pos = time if time && time > 0
-    end
-
-    def random_album
-      @albums.to_a.shuffle.first
-    end
-
-    def random_tracks(length:)
-      tracks = Set.new
-      while tracks.length < length
-        tracks << random_album.tracks.shuffle.first
-      end
-      tracks.to_a
     end
 
     def set_equalizer(equalizer)
@@ -206,7 +193,7 @@ class MusicBox
       @current_track = @current_pos = nil
       @playlist.each_with_index do |entry, i|
         if entry['current']
-          @current_track = Collection::Track.from_path(entry['filename'])
+          @current_track = @albums.track_from_path(entry['filename'])
           @current_pos = i
           break
         end
@@ -219,7 +206,7 @@ class MusicBox
 # ;;puts "PROPERTY: #{__method__} => #{value.inspect}"
       if value >= 0
         entry = @mpv.get_property('playlist')[value] or raise
-        @current_track = Collection::Track.from_path(entry['filename'])
+        @current_track = @albums.track_from_path(entry['filename'])
         @current_pos = value
       else
         @current_track = @current_pos = nil
@@ -259,11 +246,11 @@ class MusicBox
     end
 
     def play_random_album
-      play_tracks(random_album.tracks)
+      play_tracks(@albums.random_album.tracks)
     end
 
     def play_random_tracks
-      play_tracks(random_tracks(length: 10))
+      play_tracks(@albums.random_tracks(length: 10))
     end
 
     def play_album_for_current_track
@@ -317,7 +304,7 @@ class MusicBox
         album = track.album
         if album.has_cover?
           MusicBox.show_image(
-            file: album.cover_path,
+            file: album.cover_file,
             width: 'auto',
             height: 20,
             preserve_aspect_ratio: false)
@@ -339,7 +326,7 @@ class MusicBox
     def show_playlist
       if @playlist
         @playlist.each_with_index do |entry, i|
-          track = Collection::Track.from_path(entry['filename']) or raise
+          track = @albums.track_from_path(entry['filename'])
           album = track.album
           puts '%1s%1s %2d. %-40.40s | %-40.40s | %-40.40s' % [
             entry['current'] ? '=' : '',

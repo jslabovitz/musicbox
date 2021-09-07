@@ -1,10 +1,11 @@
 class MusicBox
 
-  module Collection
+  class Collection
 
-    class Artist < Sequel::Model
+    class Artist < Group::Item
 
-      one_to_many :albums
+      attr_accessor :id
+      attr_accessor :name
 
     end
 

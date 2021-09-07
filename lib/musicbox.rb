@@ -11,11 +11,9 @@ require 'path'
 require 'prawn'
 require 'prawn/measurement_extensions'
 require 'run-command'
-require 'sequel'
 require 'set'
 require 'set_params'
 require 'sixarm_ruby_unaccent'
-require 'sqlite3'
 require 'tty-config'
 require 'tty-prompt'
 require 'yaml'
@@ -29,6 +27,11 @@ require 'musicbox/group'
 require 'musicbox/info_to_s'
 
 require 'musicbox/collection'
+require 'musicbox/collection/album'
+require 'musicbox/collection/albums'
+require 'musicbox/collection/artist'
+require 'musicbox/collection/artists'
+require 'musicbox/collection/track'
 
 require 'musicbox/discogs'
 require 'musicbox/discogs/artist'
@@ -47,9 +50,6 @@ require 'musicbox/exporter'
 require 'musicbox/importer'
 require 'musicbox/label_maker'
 require 'musicbox/player'
-require 'musicbox/album'
-require 'musicbox/track'
-require 'musicbox/albums'
 require 'musicbox/tags'
 
 class MusicBox
@@ -77,12 +77,9 @@ class MusicBox
   def self.config
     unless @config
       @config = TTY::Config.new
-      root_dir = Path.new(ENV['MUSICBOX_ROOT'] || '~/Music/MusicBox')
-      @config.set(:root_dir, value: root_dir)
-      @config.set(:import_dir, value: root_dir / 'import')
-      @config.set(:import_done_dir, value: root_dir / 'import-done')
-      @config.set(:albums_dir, value: root_dir / 'albums')
-      @config.append_path(root_dir.to_s)
+      root_dir = ENV['MUSICBOX_ROOT'] || '~/Music/MusicBox'
+      @config.append_path(root_dir)
+      @config.set(:root_dir, value: Path.new(root_dir).expand_path)
       @config.env_prefix = 'MUSICBOX'
       @config.autoload_env
       @config.read
@@ -91,10 +88,13 @@ class MusicBox
   end
 
   def initialize
-    @root_dir = Path.new(config.fetch(:root_dir))
-    @albums_dir = Path.new(config.fetch(:albums_dir))
+    @root_dir = config.fetch(:root_dir)
+    @import_dir = @root_dir / 'import'
+    @import_done_dir = @root_dir / 'import-done'
+    @collection_dir = @root_dir / 'collection'
+    @discogs_dir = @root_dir / 'discogs'
+    @collection = Collection.new(root_dir: @collection_dir)
     @prompt = TTY::Prompt.new
-    make_database
   end
 
   def inspect
@@ -105,13 +105,9 @@ class MusicBox
     self.class.config
   end
 
-  def load_albums
-    @albums = Albums.new(root: @albums_dir)
-  end
-
   def load_discogs
     @discogs ||= Discogs.new(
-      root_dir: @root_dir / 'discogs',
+      root_dir: @discogs_dir,
       user: config.fetch(:discogs, :user),
       token: config.fetch(:discogs, :token),
       ignore_folder_id: config.fetch(:discogs, :ignore_folder_id),
@@ -120,18 +116,8 @@ class MusicBox
 
   def export(args, **params)
     exporter = Exporter.new(**params)
-    Collection::Album.search(args).each do |album|
+    @collection.albums.find(args).each do |album|
       exporter.export_album(album)
-    end
-  end
-
-  def make_database
-    Collection.setup(root_dir: @root_dir, albums_dir: @albums_dir)
-    if Collection::Album.empty?
-      load_albums
-      @albums.items.each do |album|
-        Collection.import_album(album)
-      end
     end
   end
 
@@ -139,8 +125,9 @@ class MusicBox
   end
 
   def cover(args, output_file: '/tmp/cover.pdf')
-    albums = Collection::Album.search(args).with_covers
-    CoverMaker.make_covers(albums.map(&:cover_path),
+    albums = @collection.albums.find(args).select(&:has_cover?)
+    raise Error, "No matching albums" if albums.empty?
+    CoverMaker.make_covers(albums.map(&:cover_file),
       output_file: output_file,
       open: true)
   end
@@ -149,9 +136,8 @@ class MusicBox
     load_albums
     load_discogs
     if args.empty?
-      import_dir = Path.new(config.fetch(:import_dir))
-      return unless import_dir.exist?
-      dirs = import_dir.children.select(&:dir?).sort_by { |d| d.to_s.downcase }
+      return unless @import_dir.exist?
+      dirs = @import_dir.children.select(&:dir?).sort_by { |d| d.to_s.downcase }
     else
       dirs = args.map { |p| Path.new(p) }
     end
@@ -161,7 +147,7 @@ class MusicBox
           discogs: @discogs,
           albums: @albums,
           source_dir: dir,
-          archive_dir: Path.new(config.fetch(:import_done_dir)))
+          archive_dir: @import_done_dir)
       rescue Error => e
         warn "Error: #{e}"
       end
@@ -169,20 +155,20 @@ class MusicBox
   end
 
   def label(args, output_file: '/tmp/labels.pdf')
-    labels = Collection::Album.search(args).map(&:to_label)
+    labels = @collection.albums.find(args).map(&:to_label)
     LabelMaker.make_labels(labels,
       output_file: output_file,
       open: true)
   end
 
   def dir(args)
-    Collection::Album.search(args).each do |album|
+    @collection.albums.find(args).each do |album|
       puts "%-10s %s" % [album.id, album.dir]
     end
   end
 
   def open(args)
-    Collection::Album.search(args).each do |album|
+    @collection.albums.find(args).each do |album|
       run_command('open', album.dir)
     end
   end
@@ -221,11 +207,11 @@ class MusicBox
   end
 
   def show_albums(args, mode: :summary)
-    Collection::Album.search(args).each do |album|
+    @collection.albums.find(args).each do |album|
       case mode
       when :cover
         if album.has_cover?
-          MusicBox.show_image(file: album.cover_path)
+          MusicBox.show_image(file: album.cover_file)
         else
           puts "[no cover file]"
         end
@@ -252,8 +238,8 @@ class MusicBox
   end
 
   def csv(args)
-    print Album.csv_header
-    Collection::Album.search(args).each do |album|
+    print Collection::Album.csv_header
+    @collection.albums.find(args).each do |album|
       print album.to_csv
     end
   end
@@ -289,7 +275,6 @@ class MusicBox
   end
 
   def play(args, equalizer_name: nil, **params)
-    albums = Collection::Album.search(args)
     if equalizer_name
       equalizers = Equalizer.load_equalizers(
         dir: Path.new(config.fetch(:equalizers_dir)),
@@ -298,7 +283,7 @@ class MusicBox
       equalizers = nil
     end
     player = MusicBox::Player.new(
-      albums: albums,
+      albums: @collection.albums,
       equalizers: equalizers,
       **params)
     player.play
@@ -317,28 +302,53 @@ class MusicBox
     end
   end
 
-  def update_info(args, force: false)
-    load_albums
+  def update_from_release(args, force: false)
     load_discogs
-    @albums.find(args).each do |album|
+    @collection.albums.find(args).each do |album|
       release = @discogs.releases[album.release_id] or raise Error, "No release for album ID #{album.release_id}"
-      diffs = album.diff_info(release)
-      unless diffs.empty?
-        puts album
-        diffs.each do |key, values|
-          puts "\t" + '%s: %p != %p' % [key, *values]
-        end
-        puts
-        if force || @prompt.yes?('Update?')
-          album.update_info(release)
-          album.update_tags
-        end
-      end
+      album.update_from_release(release, force: force)
     end
   end
 
   def orphaned_albums
-    Collection::Album.reject { |a| @discogs.releases[a.release_id] }
+    @collection.albums.items.reject { |a| @discogs.releases[a.id] }
+  end
+
+  def add_albums(args)
+    load_discogs
+    @discogs.releases.find(args).each do |release|
+      add_album_for_release(release)
+    end
+  end
+
+  def add_album_for_release(release)
+#     artist_key = release.artist_key
+#     artist_name = release.artist.to_s
+# ;;pp(id: release.id, artist_key: artist_key, artist_name: artist_name)
+#     unless (artist = Collection::Artist[artist_key])
+#       artist = Collection::Artist.new(name: artist_name)
+#       artist.id = artist_key
+#       artist.save
+#     end
+#     album = Collection::Album.for_release_id(release.id)
+#     raise Error, "Album already exists with release ID #{release.id}" if album
+#     album = Collection::Album.new(
+#       release_id: release.id,
+#       title: release.title,
+#       artist: artist,
+#       artist_name: artist_name,
+#       year: release.original_release_year,
+#       discs: release.format_quantity)
+#     album.save
+#     release.tracklist_flattened.each do |release_track|
+#       track = Collection::Track.new(
+#         title: release_track.title,
+#         artist_name: release_track.artist || artist_name,
+#         position: release_track.position,
+#         album: album)
+#       track.save
+#     end
+#     ;;show_albums([album.id.to_s], mode: :details)
   end
 
 end
