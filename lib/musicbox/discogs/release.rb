@@ -46,7 +46,7 @@ class MusicBox
       attr_accessor :master    # linked on load
 
       def artists=(artists)
-        @artists = artists.map { |a| Artist.new(a) }
+        @artists = ArtistList.new(artists.map { |a| Artist.new(a) })
       end
 
       def extraartists=(artists)
@@ -90,7 +90,7 @@ class MusicBox
       end
 
       def artist
-        Artist.join(@artists)
+        @artists.to_s
       end
 
       def artist_key
@@ -124,7 +124,7 @@ class MusicBox
         info = [
           ['ID', @id],
           ['Master ID', @master_id || '-'],
-          ['Artist', Artist.join(@artists)],
+          ['Artist', @artists],
           ['Title', @title],
           ['Formats', Format.to_s(@formats)],
           ['Released', release_year || '-'],
@@ -163,7 +163,7 @@ class MusicBox
             [
               !track.position.to_s.empty? ? ('%*s:' % [max_position_length, track.position]) : nil,
               track.title || '-',
-              track.artists ? "(#{Artist.join(track.artists)})" : nil,
+              track.artists ? "(#{track.artists})" : nil,
               !track.duration.to_s.empty? ? "[#{track.duration}]" : nil,
             ].compact.join(' '),
             track.sub_tracks ? tracklist_to_info(track.sub_tracks) : nil,

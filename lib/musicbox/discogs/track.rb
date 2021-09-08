@@ -19,11 +19,11 @@ class MusicBox
       end
 
       def artists=(artists)
-        @artists = artists.map { |a| Artist.new(a) }
+        @artists = ArtistList.new(artists.map { |a| Artist.new(a) })
       end
 
       def extraartists=(artists)
-        @extraartists = artists.map { |a| Artist.new(a) }
+        @extraartists = ArtistList.new(artists.map { |a| Artist.new(a) })
       end
 
       def sub_tracks=(sub_tracks)
@@ -31,7 +31,7 @@ class MusicBox
       end
 
       def artist
-        @artists ? Artist.join(@artists) : nil
+        @artists&.to_s
       end
 
     end

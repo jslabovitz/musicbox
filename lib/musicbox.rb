@@ -35,6 +35,7 @@ require 'musicbox/collection/track'
 
 require 'musicbox/discogs'
 require 'musicbox/discogs/artist'
+require 'musicbox/discogs/artist_list'
 require 'musicbox/discogs/basic_information'
 require 'musicbox/discogs/format'
 require 'musicbox/discogs/image'
