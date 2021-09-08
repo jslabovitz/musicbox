@@ -35,6 +35,17 @@ class MusicBox
         ]
       end
 
+      def details
+        info = [
+          ['ID', @id],
+          ['Artist', @artist_name],
+          ['Title', @title],
+          ['Released', @year || '-'],
+          ['Tracks', nil, @tracks.map(&:to_info)],
+        ]
+        MusicBox.info_to_s(info)
+      end
+
       def cover_file
         @cover_file ||= dir.glob('cover.{jpg,png}').first
       end

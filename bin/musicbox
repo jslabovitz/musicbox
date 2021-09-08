@@ -49,9 +49,11 @@ SimpleCommand.run do
     @musicbox.orphaned
   end
 
-  command 'show-albums', cover: false do |args|
+  command 'show-albums', cover: false, details: false do |args|
     if @cover
       mode = :cover
+    elsif @details
+      mode = :details
     else
       mode = :summary
     end
