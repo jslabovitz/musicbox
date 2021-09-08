@@ -1,5 +1,7 @@
 # TODO
 
+- create Artist data
+
 - make importing work again
 
 - make update-info work again
