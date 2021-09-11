@@ -25,6 +25,17 @@ class MusicBox
         @tracks = tracks.map { |t| Track.new(t.merge(album: self)) }
       end
 
+      def to_h
+        super.merge(
+          title: @title,
+          artist: @artist_name,
+          artist_key: @artist_key,
+          year: @year,
+          discs: @discs,
+          tracks: @tracks.map(&:to_h),
+        )
+      end
+
       def summary
         '%-8s | %-4s | %-4s | %-60.50s | %-60.60s' % [
           @id,
@@ -119,25 +130,6 @@ class MusicBox
         file
       end
 
-      def select_cover
-        choices = [
-          @release.master&.images&.map(&:file),
-          @release.images&.map(&:file),
-          cover_file,
-        ].flatten.compact.uniq.select(&:exist?)
-        if choices.empty?
-          puts "#{id}: no covers exist"
-          return
-        end
-        choices.each { |f| run_command('open', f) }
-        choice = Path.new(@prompt.select('Cover?', choices))
-        file = (dir / 'cover').add_extension(choice_path.extname)
-        unless choice == file
-          choice.cp(file)
-          save
-        end
-      end
-
       def make_label
         LabelMaker.make_labels(to_label,
           output_file: '/tmp/labels.pdf',
@@ -170,36 +162,15 @@ class MusicBox
               set(k => vs.first)
             end
             save
-            update_tags(force: force)
+            update_tags
           end
         end
       end
 
-      def update_tags(force: false)
-        changed_tracks = []
+      def update_tags
         @tracks.each do |track|
           track.update_tags
-          changed_tracks << track if track.tags.changed?
-        end
-        unless changed_tracks.empty?
-          puts
-          puts "#{@title} [#{dir}]"
-          changed_tracks.each do |track|
-            puts "\t" + track.file.to_s
-            track.tags.changes.each do |key, change|
-              puts "\t\t%s: %p => %p" % [key, *change]
-            end
-          end
-          if force || TTY::Prompt.new.yes?('Update track files?')
-            changed_tracks.each do |track|
-              track.save_tags
-            end
-          end
-        end
-        if has_cover?
-          @tracks.each do |track|
-            track.update_cover(cover_file)
-          end
+          track.update_cover(cover_file) if has_cover?
         end
       end
 

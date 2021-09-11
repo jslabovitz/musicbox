@@ -2,8 +2,6 @@
 
 - create Artist data
 
-- make importing work again
-
 - make update-info work again
 
 - when importing, rename possible 'cover.{jpg,png}' to 'original-cover...'

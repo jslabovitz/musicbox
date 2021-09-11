@@ -146,14 +146,18 @@ class MusicBox
         @json_file.dirname
       end
 
+      def to_h
+        {
+          id: @id,
+        }
+      end
+
       def to_json(*options)
         as_json(*options).to_json(*options)
       end
 
       def as_json(*options)
-        {
-          id: @id,
-        }
+        to_h.compact
       end
 
       def fields(keys)

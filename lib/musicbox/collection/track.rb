@@ -20,10 +20,10 @@ class MusicBox
       def to_h
         {
           title: @title,
-          artist: @artist_name,
+          artist: (@artist_name != @album.artist_name) ? @artist_name : nil,
           track: @track_num,
           disc: @disc_num,
-          file: @file,
+          file: @file.to_s,
         }.compact
       end
 
@@ -45,7 +45,7 @@ class MusicBox
           run_command('mp4art',
             '--quiet',
             '--remove',
-            @path)
+            path)
         rescue RunCommandFailed => e
           # ignore
         end
@@ -53,20 +53,12 @@ class MusicBox
           '--quiet',
           '--add',
           cover_path,
-          @path)
-      end
-
-      def load_tags
-        @tags ||= Tags.load(path)
-      end
-
-      def save_tags
-        @tags.save(path)
+          path)
       end
 
       def update_tags
-        load_tags
-        @tags.update(
+        tags = Tags.load(path)
+        tags.update(
           {
             title: @title,
             album: @album.title,
@@ -79,6 +71,7 @@ class MusicBox
             year: @album.year,
           }.reject { |k, v| v.to_s.empty? }
         )
+        tags.save(path)
       end
 
     end

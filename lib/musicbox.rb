@@ -134,8 +134,11 @@ class MusicBox
   end
 
   def import(args)
-    load_albums
     load_discogs
+    importer = Importer.new(
+      discogs: @discogs,
+      collection: @collection,
+      archive_dir: @import_done_dir)
     if args.empty?
       return unless @import_dir.exist?
       dirs = @import_dir.children.select(&:dir?).sort_by { |d| d.to_s.downcase }
@@ -143,12 +146,10 @@ class MusicBox
       dirs = args.map { |p| Path.new(p) }
     end
     dirs.each do |dir|
+      release = @discogs.releases.find(dir.basename.to_s, prompt: true, multiple: false).first
+      print release.details
       begin
-        Importer.import(
-          discogs: @discogs,
-          albums: @albums,
-          source_dir: dir,
-          archive_dir: @import_done_dir)
+        importer.import(source_dir: dir, release: release)
       rescue Error => e
         warn "Error: #{e}"
       end
