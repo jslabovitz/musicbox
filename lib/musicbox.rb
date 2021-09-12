@@ -296,10 +296,10 @@ class MusicBox
     @discogs.update
   end
 
-  def update_tags(args, force: false)
+  def update_tags(args)
     @collection.albums.find(args).each do |album|
       puts album
-      album.update_tags(force: force)
+      album.update_tags
     end
   end
 
