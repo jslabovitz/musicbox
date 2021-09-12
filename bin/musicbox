@@ -9,10 +9,6 @@ SimpleCommand.run do
     @musicbox = MusicBox.new
   end
 
-  command 'add' do |args|
-    @musicbox.add_albums(args)
-  end
-
   command 'export', dir: nil, compress: false, force: false, parallel: true do |args|
     @musicbox.export(args,
       dest_dir: @dir,

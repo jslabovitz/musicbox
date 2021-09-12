@@ -315,41 +315,4 @@ class MusicBox
     @collection.albums.items.reject { |a| @discogs.releases[a.id] }
   end
 
-  def add_albums(args)
-    load_discogs
-    @discogs.releases.find(args).each do |release|
-      add_album_for_release(release)
-    end
-  end
-
-  def add_album_for_release(release)
-#     artist_key = release.artist_key
-#     artist_name = release.artist.to_s
-# ;;pp(id: release.id, artist_key: artist_key, artist_name: artist_name)
-#     unless (artist = Collection::Artist[artist_key])
-#       artist = Collection::Artist.new(name: artist_name)
-#       artist.id = artist_key
-#       artist.save
-#     end
-#     album = Collection::Album.for_release_id(release.id)
-#     raise Error, "Album already exists with release ID #{release.id}" if album
-#     album = Collection::Album.new(
-#       release_id: release.id,
-#       title: release.title,
-#       artist: artist,
-#       artist_name: artist_name,
-#       year: release.original_release_year,
-#       discs: release.format_quantity)
-#     album.save
-#     release.tracklist_flattened.each do |release_track|
-#       track = Collection::Track.new(
-#         title: release_track.title,
-#         artist_name: release_track.artist || artist_name,
-#         position: release_track.position,
-#         album: album)
-#       track.save
-#     end
-#     ;;show_albums([album.id.to_s], mode: :details)
-  end
-
 end
