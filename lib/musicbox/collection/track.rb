@@ -28,11 +28,10 @@ class MusicBox
       end
 
       def to_info
-        pos = [
-          @disc_num ? ('%1d' % @disc_num) : nil,
-          '%02d' % @track_num,
-        ].compact.join('-')
-        [pos, @title]
+        [
+          @disc_num ? ('%1d-%02d' % [@disc_num, @track_num]) : ('%2d' % @track_num),
+          @title,
+        ]
       end
 
       def path
