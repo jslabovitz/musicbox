@@ -246,7 +246,7 @@ class MusicBox
     end
   end
 
-  def artist_keys
+  def show_artists
     load_discogs
     artists = (@discogs.releases.items + @discogs.masters.items).map(&:artists).flatten
     # for some reason #uniq doesn't do the job

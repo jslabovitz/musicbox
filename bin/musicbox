@@ -69,12 +69,12 @@ SimpleCommand.run do
     @musicbox.show_releases(args, mode: mode)
   end
 
-  command 'csv' do |args|
-    @musicbox.csv(args)
+  command 'show-artists' do
+    @musicbox.show_artists
   end
 
-  command 'artist-keys' do
-    @musicbox.artist_keys
+  command 'csv' do |args|
+    @musicbox.csv(args)
   end
 
   command 'play', device: nil, exclusive: nil, mpv_log_level: nil, eq: nil, ignore_state: nil do |args|
