@@ -297,8 +297,7 @@ class MusicBox
   end
 
   def update_tags(args, force: false)
-    load_albums
-    @albums.find(args).each do |album|
+    @collection.albums.find(args).each do |album|
       puts album
       album.update_tags(force: force)
     end
