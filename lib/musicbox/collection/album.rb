@@ -11,14 +11,6 @@ class MusicBox
       attr_accessor :discs
       attr_accessor :tracks
 
-      InfoKeyMap = {
-        :title => :title,
-        :artist => :artist_name,
-        :artist_key => :artist_key,
-        :original_release_year => :year,
-        :format_quantity => :discs,
-      }
-
       alias_method :artist=, :artist_name=
 
       def tracks=(tracks)
@@ -140,31 +132,6 @@ class MusicBox
         CoverMaker.make_covers(cover_file,
           output_file: '/tmp/covers.pdf',
           open: true)
-      end
-
-      def update_from_release(release, force: false)
-        diffs = {}
-        InfoKeyMap.each do |release_key, album_key|
-          release_value = @release.send(release_key)
-          album_value = send(album_key)
-          if album_value && release_value != album_value
-            diffs[album_key] = [release_value, album_value]
-          end
-        end
-        unless diffs.empty?
-          puts summary
-          diffs.each do |key, values|
-            puts "\t" + '%s: %p != %p' % [key, *values]
-          end
-          puts
-          if force || TTY::Prompt.new.yes?('Update?')
-            diffs.each do |k, vs|
-              set(k => vs.first)
-            end
-            save
-            update_tags
-          end
-        end
       end
 
       def update_tags

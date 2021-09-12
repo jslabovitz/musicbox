@@ -86,10 +86,6 @@ SimpleCommand.run do
     @musicbox.update
   end
 
-  command 'update-from-release', force: false do |args|
-    @musicbox.update_from_release(args, force: @force)
-  end
-
   command 'update-tags' do |args|
     @musicbox.update_tags(args)
   end

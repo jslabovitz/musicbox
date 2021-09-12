@@ -303,14 +303,6 @@ class MusicBox
     end
   end
 
-  def update_from_release(args, force: false)
-    load_discogs
-    @collection.albums.find(args).each do |album|
-      release = @discogs.releases[album.release_id] or raise Error, "No release for album ID #{album.release_id}"
-      album.update_from_release(release, force: force)
-    end
-  end
-
   def orphaned_albums
     @collection.albums.items.reject { |a| @discogs.releases[a.id] }
   end
