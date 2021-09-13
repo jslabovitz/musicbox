@@ -64,7 +64,6 @@ require 'musicbox/discogs/track'
 
 require 'musicbox/cover_maker'
 require 'musicbox/equalizer'
-require 'musicbox/exporter'
 require 'musicbox/importer'
 require 'musicbox/label_maker'
 require 'musicbox/player'
@@ -73,7 +72,12 @@ require 'musicbox/tags'
 class MusicBox
 
   attr_accessor :discogs
-  attr_accessor :albums
+  attr_accessor :collection
+  attr_accessor :import_dir
+  attr_accessor :import_done_dir
+  attr_accessor :collection_dir
+  attr_accessor :discogs_dir
+  attr_accessor :equalizers_dir
 
   def self.show_image(file:, width: nil, height: nil, preserve_aspect_ratio: nil)
     # see https://iterm2.com/documentation-images.html
@@ -112,6 +116,7 @@ class MusicBox
     @collection_dir = @root_dir / 'collection'
     @discogs_dir = @root_dir / 'discogs'
     @collection = Collection.new(root_dir: @collection_dir)
+    @equalizers_dir = Path.new(config.fetch(:equalizers_dir))
     @prompt = TTY::Prompt.new
   end
 
@@ -132,64 +137,12 @@ class MusicBox
     )
   end
 
-  def export(args, **params)
-    exporter = Exporter.new(**params)
-    @collection.albums.find(args).each do |album|
-      exporter.export_album(album)
-    end
-  end
-
-  def fix(args)
-  end
-
-  def cover(args, output_file: '/tmp/cover.pdf')
-    albums = @collection.albums.find(args).select(&:has_cover?)
-    raise Error, "No matching albums" if albums.empty?
-    CoverMaker.make_covers(albums.map(&:cover_file),
-      output_file: output_file,
-      open: true)
-  end
-
-  def import(args)
+  def make_importer
     load_discogs
-    importer = Importer.new(
+    Importer.new(
       discogs: @discogs,
       collection: @collection,
       archive_dir: @import_done_dir)
-    if args.empty?
-      return unless @import_dir.exist?
-      dirs = @import_dir.children.select(&:dir?).sort_by { |d| d.to_s.downcase }
-    else
-      dirs = args.map { |p| Path.new(p) }
-    end
-    dirs.each do |dir|
-      release = @discogs.releases.find(dir.basename.to_s, prompt: true, multiple: false).first
-      print release.details
-      begin
-        importer.import(source_dir: dir, release: release)
-      rescue Error => e
-        warn "Error: #{e}"
-      end
-    end
-  end
-
-  def label(args, output_file: '/tmp/labels.pdf')
-    labels = @collection.albums.find(args).map(&:to_label)
-    LabelMaker.make_labels(labels,
-      output_file: output_file,
-      open: true)
-  end
-
-  def dir(args)
-    @collection.albums.find(args).each do |album|
-      puts "%-10s %s" % [album.id, album.dir]
-    end
-  end
-
-  def open(args)
-    @collection.albums.find(args).each do |album|
-      run_command('open', album.dir)
-    end
   end
 
   def orphaned
@@ -225,42 +178,13 @@ class MusicBox
     end
   end
 
-  def show_albums(args, mode: :summary)
-    @collection.albums.find(args).each do |album|
-      case mode
-      when :cover
-        if album.has_cover?
-          MusicBox.show_image(file: album.cover_file)
-        else
-          puts "[no cover file]"
-        end
-      when :details
-        puts album.details
-        puts
-      when :summary
-        puts album.summary
-      end
-    end
-  end
-
-  def show_releases(args, mode: :summary)
+  def find_releases(args)
     load_discogs
-    @discogs.releases.find(args).each do |release|
-      case mode
-      when :details
-        puts release.details
-        puts
-      when :summary
-        puts release
-      end
-    end
+    @discogs.releases.find(args)
   end
 
-  def csv(args)
-    print Collection::Album.csv_header
-    @collection.albums.find(args).each do |album|
-      print album.to_csv
-    end
+  def find_albums(args)
+    @collection.albums.find(args)
   end
 
   def show_artists
@@ -293,34 +217,13 @@ class MusicBox
     end
   end
 
-  def play(args, equalizer_name: nil, **params)
-    if equalizer_name
-      equalizers = Equalizer.load_equalizers(
-        dir: Path.new(config.fetch(:equalizers_dir)),
-        name: equalizer_name)
-    else
-      equalizers = nil
-    end
-    player = MusicBox::Player.new(
-      albums: @collection.albums,
-      equalizers: equalizers,
-      **params)
-    player.play
-  end
-
-  def update
+  def update_discogs
     load_discogs
     @discogs.update
   end
 
-  def update_tags(args)
-    @collection.albums.find(args).each do |album|
-      puts album
-      album.update_tags
-    end
-  end
-
   def orphaned_albums
+    load_discogs
     @collection.albums.items.reject { |a| @discogs.releases[a.id] }
   end
 

@@ -7,12 +7,14 @@ class MusicBox
       option :details, default: false
 
       def run(args)
-        if @details
-          mode = :details
-        else
-          mode = :summary
+        $musicbox.find_releases(args).each do |release|
+          if @details
+            puts release.details
+            puts
+          else
+            puts release
+          end
         end
-        $musicbox.show_releases(args, mode: mode)
       end
 
     end

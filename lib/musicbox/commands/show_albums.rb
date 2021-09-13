@@ -8,14 +8,20 @@ class MusicBox
       option :details, default: false
 
       def run(args)
-        if @cover
-          mode = :cover
-        elsif @details
-          mode = :details
-        else
-          mode = :summary
+        $musicbox.find_albums(args).each do |album|
+          if @cover
+            if album.has_cover?
+              MusicBox.show_image(file: album.cover_file)
+            else
+              puts "[no cover file]"
+            end
+          elsif @details
+            puts album.details
+            puts
+          else
+            puts album.summary
+          end
         end
-        $musicbox.show_albums(args, mode: mode)
       end
 
     end

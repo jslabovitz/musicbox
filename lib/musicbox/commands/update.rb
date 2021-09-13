@@ -5,7 +5,7 @@ class MusicBox
     class Update < SimpleCommand::Command
 
       def run(args)
-        $musicbox.update
+        $musicbox.update_discogs
       end
 
     end

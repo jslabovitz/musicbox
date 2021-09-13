@@ -4,17 +4,21 @@ class MusicBox
 
     class Export < SimpleCommand::Command
 
-      option :dir
+      option :dest_dir
       option :compress, default: false
       option :force, default: false
       option :parallel, default: true
 
       def run(args)
-        $musicbox.export(args,
-          dest_dir: @dir,
-          compress: @compress,
-          force: @force,
-          parallel: @parallel)
+        raise Error, "Must specify destination directory" unless @dest_dir
+        @dest_dir = Path.new(@dest_dir).expand_path
+        $musicbox.find_albums(args).each do |album|
+          album.export(
+            dest_dir: @dest_dir / album.description,
+            compress: @compress,
+            force: @force,
+            parallel: @parallel)
+        end
       end
 
     end

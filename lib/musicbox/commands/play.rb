@@ -11,12 +11,21 @@ class MusicBox
       option :ignore_state
 
       def run(args)
-        $musicbox.play(args,
+        if @eq
+          equalizers = Equalizer.load_equalizers(
+            dir: $musicbox.equalizers_dir,
+            name: @eq)
+        else
+          equalizers = nil
+        end
+        player = Player.new(
+          albums: $musicbox.collection.albums,
+          equalizers: equalizers,
           audio_device: @device,
           audio_exclusive: @exclusive,
           mpv_log_level: @mpv_log_level,
-          equalizer_name: @eq,
           ignore_state: @ignore_state)
+        player.play
       end
 
     end

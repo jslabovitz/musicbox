@@ -73,6 +73,48 @@ class MusicBox
         tags.save(path)
       end
 
+      def export(dest_dir:, force: false, compress: false)
+        dest_file = dest_dir / @file
+        if force || !dest_file.exist? || dest_file.mtime != path.mtime
+          if compress
+            warn "compressing #{path}"
+            compress(dest_file)
+          else
+            warn "copying #{path}"
+            path.cp(dest_file)
+          end
+        end
+      end
+
+      def compress(dest_file)
+        begin
+          tags = Tags.load(path)
+          caf_file = dest_file.replace_extension('.caf')
+          run_command('afconvert',
+            path,
+            caf_file,
+            '--data', 0,
+            '--file', 'caff',
+            '--soundcheck-generate')
+          run_command('afconvert',
+            caf_file,
+            '--data', 'aac',
+            '--file', 'm4af',
+            '--soundcheck-read',
+            '--bitrate', 256000,
+            '--quality', 127,
+            '--strategy', 2,
+            dest_file)
+          tags.save(dest_file, force: true)
+          dest_file.utime(path.atime, path.mtime)
+        rescue => e
+          dest_file.unlink if dest_file.exist?
+          raise e
+        ensure
+          caf_file.unlink if caf_file.exist?
+        end
+      end
+
     end
 
   end

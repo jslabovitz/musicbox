@@ -49,6 +49,10 @@ class MusicBox
         MusicBox.info_to_s(info)
       end
 
+      def description
+        '%s - %s (%s)' % [@artist_name, @title, @year]
+      end
+
       def cover_file
         @cover_file ||= dir.glob('cover.{jpg,png}').first
       end
@@ -139,6 +143,21 @@ class MusicBox
           track.update_tags
           track.update_cover(cover_file) if has_cover?
         end
+      end
+
+      def export(dest_dir:, compress: false, force: false, parallel: true)
+        dest_dir.mkpath unless dest_dir.exist?
+        threads = []
+        @tracks.each do |track|
+          if parallel
+            threads << Thread.new do
+              track.export(dest_dir: dest_dir, force: force, compress: compress)
+            end
+          else
+            track.export(dest_dir: dest_dir, force: force, compress: compress)
+          end
+        end
+        threads.map(&:join)
       end
 
     end
