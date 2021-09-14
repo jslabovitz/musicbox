@@ -1,12 +1,22 @@
 # TODO
 
 - create Artist data
+  + allow artist key to be user-defined
+  - when importing/updating, prompt for artist
+    - new
+    - personal name
+  - save in group database
+  - allow for modification as needed
+  - allow override of primary artist
+    - eg, to file release under main artist instead of artist-group of collaboration
+  - do artist sort/rename using artist ID
+    - instead of CanonicalArtists/PersonalNames hash maps
+  - ensure artist key is unique
+    - doesn't represent multiple artists
 
 - make update-info work again
 
 - when importing, rename possible 'cover.{jpg,png}' to 'original-cover...'
-
-- move Exporter logic into MusicBox, Album, Track.
 
 - combine Group & Item together into one class
 
@@ -15,6 +25,8 @@
   - construct filename from disc/track/title/type
   - write fixup to rename current files to re-constructed names
     - backup catalog first!
+
+- see if taglib-ruby will substitute for ffprobe/mp4tags/mp4art/etc.
 
 - re-implement file-based Group
   - convert all Discogs structures
@@ -29,31 +41,9 @@
   - store MBIDs in track/album files
     https://musicbrainz.org/doc/MusicBrainz_Identifier
 
-- allow artist key to be user-defined
-  - when importing/updating, prompt for artist
-    - new
-    - personal name
-  - save in group database
-  - allow for modification as needed
-  - allow override of primary artist
-    - eg, to file release under main artist instead of artist-group of collaboration
-  - do artist sort/rename using artist ID
-    - instead of CanonicalArtists/PersonalNames hash maps
-  - ensure artist key is unique
-    - doesn't represent multiple artists
-
 - when selecting cover, show cover images & info in iTerm
   - instead of shelling out to Preview
   - show resolution, file size, file name
-
-- move Equalizer to separate AutoEQ gem
-  - handles lookup in AutoEQ results
-  - knows about precedences
-  - has methods to make equalizer specifications for ffmpeg/afilter, etc.
-  - try convolution equalizers
-      https://github.com/jaakkopasanen/AutoEq#convolution-equalizers
-      https://ffmpeg.org/ffmpeg-filters.html#toc-headphone
-      https://ffmpeg.org/ffmpeg-filters.html#firequalizer
 
 - experiment with volume up/down keys
   - in exclusive mode
@@ -62,21 +52,9 @@
 - describe player modes in README
   - 3-function player: play random album, play random tracks (typical shuffle mode), or play the album for the current track
 
-- see if taglib-ruby will substitute for ffprobe/mp4tags/mp4art/etc.
-
 - integrate/expand ripping HOWTO
 
 - consider using `cover_image` from collection item instead of `images` from release
-
-- create better way of making sub-commands
-  - as easy as shell script
-  - no class or methods needed
-  - one command -> one file
-  - auto-loaded from commands/ directory
-  - no need to modify bin/musicbox or lib/musicbox.rb
-  - predefined variables:
-    - $catalog (based on --root)
-    - $prompt
 
 - improve covers:
   - make 2-up
@@ -111,10 +89,6 @@
     - so can have one for headphones, and another for speakers
     - add --profile=X flag to specify profile
     - or specify multiple configs?
-
-- build player that works with BlueSound
-  - same logic, but asks BluOS to pull music from shared library on Mac
-  - see ~/bin/bluos
 
 - use curses or tty for full-screen player TTY mode?
 
