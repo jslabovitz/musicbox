@@ -35,7 +35,7 @@ class MusicBox
       @items[id]
     end
 
-    def find(*selectors, prompt: false, multiple: true)
+    def find(*selectors)
       ;;puts "searching #{self.class}"
       selectors = [selectors].compact.flatten
       if selectors.empty?
@@ -62,23 +62,9 @@ class MusicBox
             selected += search(selector)
           end
         end
+        selected.uniq!
       end
-      selected.uniq.sort!
-      if prompt
-        choices = selected.map { |i| [i.to_s, i.id] }.to_h
-        if multiple
-          ids = TTY::Prompt.new.multi_select('Item?', filter: true, per_page: 50, quiet: true) do |menu|
-            choices.each do |name, value|
-              menu.choice name, value
-            end
-          end
-          selected = ids.map { |id| self[id] }
-        else
-          id = TTY::Prompt.new.select('Item?', choices, filter: true, per_page: 50, quiet: true)
-          selected = [self[id]] if id
-        end
-      end
-      selected
+      selected.sort
     end
 
     def search(query)

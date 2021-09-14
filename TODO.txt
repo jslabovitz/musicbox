@@ -1,7 +1,5 @@
 # TODO
 
-- remove `prompt` and `multiple` from Group::find, and move logic into `import`, which is the only place it's used
-
 - create Artist data
 
 - make update-info work again
