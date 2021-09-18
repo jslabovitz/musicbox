@@ -86,7 +86,7 @@ class MusicBox
       ]
       album_track = Collection::Track.new(
         title: release_track.title,
-        artist: release_track.artist || release.artist,
+        artist_name: release_track.artist || release.artist,
         track_num: tags[:track],
         disc_num: disc || tags[:disc],
         file: Path.new(name).add_extension(file.extname),

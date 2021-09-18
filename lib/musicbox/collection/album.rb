@@ -11,8 +11,6 @@ class MusicBox
       attr_accessor :discs
       attr_accessor :tracks
 
-      alias_method :artist=, :artist_name=
-
       def tracks=(tracks)
         @tracks = tracks.map { |t| Track.new(t.merge(album: self)) }
       end
@@ -20,7 +18,7 @@ class MusicBox
       def to_h
         super.merge(
           title: @title,
-          artist: @artist_name,
+          artist_name: @artist_name,
           artist_key: @artist_key,
           year: @year,
           discs: @discs,

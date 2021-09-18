@@ -13,16 +13,12 @@ class MusicBox
 
       include SetParams
 
-      alias_method :artist=, :artist_name=
-      alias_method :track=, :track_num=
-      alias_method :disc=, :disc_num=
-
       def to_h
         {
           title: @title,
-          artist: (@artist_name != @album.artist_name) ? @artist_name : nil,
-          track: @track_num,
-          disc: @disc_num,
+          artist_name: (@artist_name != @album.artist_name) ? @artist_name : nil,
+          track_num: @track_num,
+          disc_num: @disc_num,
           file: @file.to_s,
         }.compact
       end
