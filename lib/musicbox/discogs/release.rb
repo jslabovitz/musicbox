@@ -2,7 +2,7 @@ class MusicBox
 
   class Discogs
 
-    class Release < Group::Item
+    class Release < Simple::Group::Item
 
       attr_accessor :artists
       attr_accessor :artists_sort

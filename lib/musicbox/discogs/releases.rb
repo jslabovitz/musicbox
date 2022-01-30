@@ -2,7 +2,7 @@ class MusicBox
 
   class Discogs
 
-    class Releases < Group
+    class Releases < Simple::Group
 
       def self.item_class
         Release

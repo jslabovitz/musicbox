@@ -2,7 +2,7 @@ class MusicBox
 
   class Collection
 
-    class Albums < Group
+    class Albums < Simple::Group
 
       def self.item_class
         Album

@@ -2,7 +2,7 @@ class MusicBox
 
   class Discogs
 
-    class CollectionItem < Group::Item
+    class CollectionItem < Simple::Group::Item
 
       attr_accessor :basic_information
       attr_accessor :date_added

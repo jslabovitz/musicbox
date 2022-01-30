@@ -2,7 +2,7 @@ class MusicBox
 
   class Collection
 
-    class Album < Group::Item
+    class Album < Simple::Group::Item
 
       attr_accessor :title
       attr_accessor :artist_name
