@@ -4,8 +4,8 @@ class MusicBox
 
     class ShowAlbums < SimpleCommand::Command
 
-      option :cover, default: false
-      option :details, default: false
+      attr_accessor :cover
+      attr_accessor :details
 
       def run(args)
         $musicbox.find_albums(args).each do |album|

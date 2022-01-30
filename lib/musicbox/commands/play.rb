@@ -4,11 +4,11 @@ class MusicBox
 
     class Play < SimpleCommand::Command
 
-      option :device
-      option :exclusive
-      option :mpv_log_level
-      option :eq
-      option :ignore_state
+      attr_accessor :device
+      attr_accessor :exclusive
+      attr_accessor :mpv_log_level
+      attr_accessor :eq
+      attr_accessor :ignore_state
 
       def run(args)
         if @eq

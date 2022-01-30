@@ -4,7 +4,7 @@ class MusicBox
 
     class ShowReleases < SimpleCommand::Command
 
-      option :details, default: false
+      attr_accessor :details
 
       def run(args)
         $musicbox.find_releases(args).each do |release|

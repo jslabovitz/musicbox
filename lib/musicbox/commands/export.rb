@@ -4,10 +4,16 @@ class MusicBox
 
     class Export < SimpleCommand::Command
 
-      option :dest_dir
-      option :compress, default: false
-      option :force, default: false
-      option :parallel, default: true
+      attr_accessor :dest_dir
+      attr_accessor :compress
+      attr_accessor :force
+      attr_accessor :parallel
+
+      def self.defaults
+        {
+          parallel: true,
+        }
+      end
 
       def run(args)
         raise Error, "Must specify destination directory" unless @dest_dir

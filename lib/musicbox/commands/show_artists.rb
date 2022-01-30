@@ -4,6 +4,8 @@ class MusicBox
 
     class ShowArtists < SimpleCommand::Command
 
+      attr_accessor :personal
+
       def run(args)
         $musicbox.show_artists
       end

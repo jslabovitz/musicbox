@@ -4,4 +4,21 @@ require 'musicbox'
 
 $musicbox = MusicBox.new
 
-SimpleCommand.run
+SimpleCommand::Commander.new(
+  'cover' => MusicBox::Commands::Cover,
+  'csv' => MusicBox::Commands::Csv,
+  'dir' => MusicBox::Commands::Dir,
+  'export' => MusicBox::Commands::Export,
+  'fix' => MusicBox::Commands::Fix,
+  'import' => MusicBox::Commands::Import,
+  'label' => MusicBox::Commands::Label,
+  'open' => MusicBox::Commands::Open,
+  'orphaned' => MusicBox::Commands::Orphaned,
+  'play' => MusicBox::Commands::Play,
+  'save-albums' => MusicBox::Commands::SaveAlbums,
+  'show-albums' => MusicBox::Commands::ShowAlbums,
+  'show-artists' => MusicBox::Commands::ShowArtists,
+  'show-releases' => MusicBox::Commands::ShowReleases,
+  'update' => MusicBox::Commands::Update,
+  'update-tags' => MusicBox::Commands::UpdateTags,
+).run(ARGV)

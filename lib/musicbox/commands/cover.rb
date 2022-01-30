@@ -4,7 +4,13 @@ class MusicBox
 
     class Cover < SimpleCommand::Command
 
-      option :output_file, default: '/tmp/cover.pdf'
+      attr_accessor :output_file
+
+      def self.defaults
+        {
+          output_file: '/tmp/cover.pdf',
+        }
+      end
 
       def run(args)
         albums = $musicbox.find_albums(args).select(&:has_cover?)
