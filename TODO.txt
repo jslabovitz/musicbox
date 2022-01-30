@@ -1,5 +1,9 @@
 # TODO
 
+- fix 'show-artists' command
+
+- make 'update-tags' work again?
+
 - create Artist data
   + allow artist key to be user-defined
   - when importing/updating, prompt for artist
@@ -14,11 +18,11 @@
   - ensure artist key is unique
     - doesn't represent multiple artists
 
-- make update-info work again
+- add play history
+  - choose random tracks/albums that haven't been played recently
+  - or that *have* been played recently (new releases)
 
 - when importing, rename possible 'cover.{jpg,png}' to 'original-cover...'
-
-- combine Group & Item together into one class
 
 - don't save actual filename in Track
   - save type/ext (m4a) as separate field
