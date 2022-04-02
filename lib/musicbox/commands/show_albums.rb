@@ -16,7 +16,7 @@ class MusicBox
               puts "[no cover file]"
             end
           elsif @details
-            puts album.details
+            album.print
             puts
           else
             puts album.summary

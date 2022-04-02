@@ -30,12 +30,13 @@ Gem::Specification.new do |s|
   s.add_dependency 'run-command', '~> 0.4'
   s.add_dependency 'set_params', '~> 0.1'
   s.add_dependency 'simple-command', '~> 0.4'
+  s.add_dependency 'simple-printer', '~> 0.1'
   s.add_dependency 'sixarm_ruby_unaccent', '~> 1.2'
   s.add_dependency 'tty-config', '~> 0.5'
   s.add_dependency 'tty-prompt', '~> 0.23'
 
-  s.add_development_dependency 'bundler', '~> 2.2'
-  s.add_development_dependency 'minitest', '~> 5.14'
+  s.add_development_dependency 'bundler', '~> 2.3'
+  s.add_development_dependency 'minitest', '~> 5.15'
   s.add_development_dependency 'minitest-power_assert', '~> 0.3'
   s.add_development_dependency 'rake', '~> 13.0'
 end

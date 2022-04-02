@@ -9,7 +9,7 @@ class MusicBox
       def run(args)
         $musicbox.find_releases(args).each do |release|
           if @details
-            puts release.details
+            release.print
             puts
           else
             puts release

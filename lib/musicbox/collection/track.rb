@@ -12,6 +12,7 @@ class MusicBox
       attr_accessor :album
 
       include SetParams
+      include Simple::Printer::Printable
 
       def to_h
         {
@@ -23,10 +24,13 @@ class MusicBox
         }.compact
       end
 
-      def to_info
+      def printable
         [
-          @disc_num ? ('%1d-%02d' % [@disc_num, @track_num]) : ('%2d' % @track_num),
-          @title,
+          [
+            :num,
+            @disc_num ? ('%1d-%02d' % [@disc_num, @track_num]) : ('%2d' % @track_num),
+            @title,
+          ],
         ]
       end
 

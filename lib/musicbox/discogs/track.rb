@@ -13,9 +13,10 @@ class MusicBox
       attr_accessor :sub_tracks
 
       include SetParams
+      include Simple::Printer::Printable
 
       def type_=(type)
-        self.type = type
+        @type = type
       end
 
       def artists=(artists)
@@ -27,11 +28,28 @@ class MusicBox
       end
 
       def sub_tracks=(sub_tracks)
-        @sub_tracks = sub_tracks.map { |t| Track.new(t) }
+        @sub_tracks = TrackList.new(sub_tracks.map { |t| Track.new(t) })
       end
 
       def artist
         @artists&.to_s
+      end
+
+      def to_s
+        [
+          @title || '-',
+          @artists ? "(#{@artists})" : nil,
+          !@duration ? "[#{@duration}]" : nil,
+        ].compact.join(' ')
+      end
+
+      def printable
+        [
+          Simple::Printer::Field.new(
+            label: [@type, @position].reject { |s| s.to_s.empty? }.join(' '),
+            value: to_s,
+            children: @sub_tracks),
+        ]
       end
 
     end

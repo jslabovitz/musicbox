@@ -17,7 +17,7 @@ class MusicBox
           puts "Finding: #{query.inspect}"
           releases = $musicbox.find_releases(query)
           release = TTY::Prompt.new.select('Item?', releases, filter: true, per_page: 25, quiet: true)
-          print release.details
+          release.print
           begin
             importer.import(source_dir: dir, release: release)
           rescue Error => e

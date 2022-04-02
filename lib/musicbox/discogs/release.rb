@@ -4,6 +4,8 @@ class MusicBox
 
     class Release < Simple::Group::Item
 
+      include Simple::Printer::Printable
+
       attr_accessor :artists
       attr_accessor :artists_sort
       attr_accessor :blocked_from_sale
@@ -70,7 +72,7 @@ class MusicBox
       end
 
       def tracklist=(tracklist)
-        @tracklist = tracklist.map { |t| Track.new(t) }
+        @tracklist = TrackList.new(tracklist.map { |t| Track.new(t) })
       end
 
       def release_year
@@ -86,7 +88,7 @@ class MusicBox
       end
 
       def odd_positions?
-        tracklist_flattened.find { |t| t.position !~ /^\d+$/ }
+        @tracklist.flatten.find { |t| t.position !~ /^\d+$/ }
       end
 
       def artist
@@ -105,6 +107,10 @@ class MusicBox
         [artist_key, original_release_year || 0, @title]
       end
 
+      def inspect
+        "\#<#{self.class}:#{'0x%x' % object_id}>"
+      end
+
       def to_s
         summary
       end
@@ -120,55 +126,23 @@ class MusicBox
         ]
       end
 
-      def details
-        info = [
-          ['ID', @id],
-          ['Master ID', @master_id || '-'],
-          ['Artist', @artists],
-          ['Title', @title],
-          ['Formats', Format.to_s(@formats)],
-          ['Released', release_year || '-'],
-          ['Originally released', original_release_year || '-'],
-          ['Discogs URI', @uri || '-'],
-          ['Tracks', nil, tracklist_to_info],
+      def printable
+        [
+          [:id, 'ID', @id],
+          [:master_id, 'Master ID', @master_id || '-'],
+          [:artists, 'Artist', @artists.to_s],
+          :title,
+          [:formats, 'Formats', Format.to_s(@formats)],
+          [:release_year, 'Released', release_year || '-'],
+          [:original_release_year, 'Originally released', original_release_year || '-'],
+          [:uri, 'Discogs URI', @uri || '-'],
+          [:tracklist, 'Tracks'],
         ]
-        MusicBox.info_to_s(info)
       end
 
       def find_track_for_title(title)
         normalized_title = title.normalize
-        tracklist_flattened.find { |t| t.title.normalize == normalized_title }
-      end
-
-      def tracklist_flattened
-        @tracklist_flattened ||= make_tracklist_flattened
-      end
-
-      def make_tracklist_flattened(tracklist=nil)
-        tracklist ||= @tracklist
-        tracks = []
-        tracklist.each do |track|
-          tracks << track
-          tracks += make_tracklist_flattened(track.sub_tracks) if track.type == 'index'
-        end
-        tracks
-      end
-
-      def tracklist_to_info(tracklist=nil)
-        tracklist ||= @tracklist
-        max_position_length = tracklist.select(&:position).map { |t| t.position.to_s.length }.max
-        tracklist.map do |track|
-          [
-            track.type,
-            [
-              !track.position.to_s.empty? ? ('%*s:' % [max_position_length, track.position]) : nil,
-              track.title || '-',
-              track.artists ? "(#{track.artists})" : nil,
-              !track.duration.to_s.empty? ? "[#{track.duration}]" : nil,
-            ].compact.join(' '),
-            track.sub_tracks ? tracklist_to_info(track.sub_tracks) : nil,
-          ]
-        end
+        @tracklist.flatten.find { |t| t.title.normalize == normalized_title }
       end
 
       def link_images(images_dir)

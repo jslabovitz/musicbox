@@ -310,14 +310,12 @@ class MusicBox
             preserve_aspect_ratio: false)
           puts
         end
-        puts MusicBox.info_to_s(
-          [
-            ['Disc', track.disc_num || '-'],
-            ['Track', [track.track_num, album.tracks.count].join('/')],
-            ['Title', track.title],
-            ['Album', album.title],
-            ['Artist', [album.artist_name, track.artist_name].compact.uniq.join(' / ')],
-          ]
+        Simple::Printer.print(
+          ['Disc', track.disc_num || '-'],
+          ['Track', [track.track_num, album.tracks.count].join('/')],
+          ['Title', track.title],
+          ['Album', album.title],
+          ['Artist', [album.artist_name, track.artist_name].compact.uniq.join(' / ')],
         )
         puts
       end

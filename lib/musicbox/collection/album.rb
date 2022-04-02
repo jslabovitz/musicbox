@@ -11,6 +11,8 @@ class MusicBox
       attr_accessor :discs
       attr_accessor :tracks
 
+      include Simple::Printer::Printable
+
       def tracks=(tracks)
         @tracks = tracks.map { |t| Track.new(t.merge(album: self)) }
       end
@@ -36,15 +38,14 @@ class MusicBox
         ]
       end
 
-      def details
-        info = [
-          ['ID', @id],
-          ['Artist', @artist_name],
-          ['Title', @title],
-          ['Released', @year || '-'],
-          ['Tracks', nil, @tracks.map(&:to_info)],
+      def printable
+        [
+          [:id, 'ID'],
+          [:artist_name, 'Artist'],
+          :title,
+          [:year, 'Released', @year || '-'],
+          [:tracks, @tracks],
         ]
-        MusicBox.info_to_s(info)
       end
 
       def description
