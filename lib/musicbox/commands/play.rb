@@ -19,7 +19,7 @@ class MusicBox
           equalizers = nil
         end
         player = Player.new(
-          albums: $musicbox.collection.albums,
+          albums: $musicbox.find_albums(args),
           equalizers: equalizers,
           audio_device: @device,
           audio_exclusive: @exclusive,

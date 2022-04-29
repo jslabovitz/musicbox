@@ -46,6 +46,12 @@ class MusicBox
           ignore_state: false,
         }.merge(params.compact)
       )
+      @track_paths = {}
+      @albums.each do |album|
+        album.tracks.each do |track|
+          @track_paths[track.path.to_s] = track
+        end
+      end
     end
 
     def state_file=(file)
@@ -136,7 +142,7 @@ class MusicBox
       if state_file.exist?
         state = JSON.load(state_file.read)
         if state['playlist']
-          play_tracks(state['playlist'].map { |p| @albums.track_from_path(p) },
+          play_tracks(state['playlist'].map { |p| @track_paths[p] },
             pos: state['playlist-pos'],
             time: state['time-pos'])
         end
@@ -193,7 +199,7 @@ class MusicBox
       @current_track = @current_pos = nil
       @playlist.each_with_index do |entry, i|
         if entry['current']
-          @current_track = @albums.track_from_path(entry['filename'])
+          @current_track = @track_paths[entry['filename']]
           @current_pos = i
           break
         end
@@ -206,7 +212,7 @@ class MusicBox
 # ;;puts "PROPERTY: #{__method__} => #{value.inspect}"
       if value >= 0
         entry = @mpv.get_property('playlist')[value] or raise
-        @current_track = @albums.track_from_path(entry['filename'])
+        @current_track = @track_paths[entry['filename']]
         @current_pos = value
       else
         @current_track = @current_pos = nil
@@ -246,11 +252,15 @@ class MusicBox
     end
 
     def play_random_album
-      play_tracks(@albums.random_album.tracks)
+      play_tracks(@albums.sample.tracks)
     end
 
     def play_random_tracks
-      play_tracks(@albums.random_tracks(length: 10))
+      tracks = Set.new
+      while tracks.length < 10
+        tracks << @albums.sample.tracks.sample
+      end
+      play_tracks(tracks.to_a)
     end
 
     def play_album_for_current_track
@@ -324,7 +334,7 @@ class MusicBox
     def show_playlist
       if @playlist
         @playlist.each_with_index do |entry, i|
-          track = @albums.track_from_path(entry['filename'])
+          track = @track_paths[entry['filename']]
           album = track.album
           puts '%1s%1s %2d. %-40.40s | %-40.40s | %-40.40s' % [
             entry['current'] ? '=' : '',
