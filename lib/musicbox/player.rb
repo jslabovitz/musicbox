@@ -72,7 +72,7 @@ class MusicBox
         begin
           restore_state
         rescue Error => e
-          show_error("Invalid state: #{path} not in albums")
+          show_error('Invalid state')
           reset_state
         end
       end
