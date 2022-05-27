@@ -54,8 +54,9 @@ class MusicBox
         release.master = @masters[release.master_id] if release.master_id
         release.link_images(@images_dir)
         release.master&.link_images(@images_dir)
-        collection_item = @collection[release.id] or raise
-        collection_item.release = release
+        if (collection_item = @collection[release.id])
+          collection_item.release = release
+        end
       end
     end
 
