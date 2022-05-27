@@ -107,7 +107,7 @@ class MusicBox
         album.cover_file,
       ].flatten.compact.uniq.select(&:exist?)
       if choices.empty?
-        puts "#{id}: no covers exist"
+        warn "no covers exist"
         return
       end
       choices.each { |f| run_command('open', f) }
