@@ -187,6 +187,10 @@ class MusicBox
         @mpv.set_property('time-pos', @future_time_pos)
         @future_time_pos = nil
       end
+      run_command('noti',
+        '--title', 'MusicBox',
+        '--message', current_track_info,
+      )
     end
 
     #
@@ -307,6 +311,16 @@ class MusicBox
       @mpv.command('stop')
       reset_state
       @play_state = :stopped
+    end
+
+    def current_track_info
+      track = @current_track or return ''
+      album = track.album
+      '%s: %s: %s' % [
+        [album.artist_name, track.artist_name].compact.uniq.join(' / '),
+        track.title,
+        album.title,
+      ]
     end
 
     def show_current_track
