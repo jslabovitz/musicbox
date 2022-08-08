@@ -19,9 +19,9 @@ Gem::Specification.new do |s|
   s.require_path  = 'lib'
 
   s.add_dependency 'discogs-wrapper', '~> 2.5'
-  s.add_dependency 'http', '~> 5.0'
+  s.add_dependency 'http', '~> 5.1'
   s.add_dependency 'io-dispatcher', '~> 0.3'
-  s.add_dependency 'json', '~> 2.2'
+  s.add_dependency 'json', '~> 2.6'
   s.add_dependency 'matrix'   # for prawn
   s.add_dependency 'mime-types', '~> 3.4'
   s.add_dependency 'mpv_client', '~> 0.2'
@@ -30,9 +30,10 @@ Gem::Specification.new do |s|
   s.add_dependency 'run-command', '~> 0.4'
   s.add_dependency 'set_params', '~> 0.2'
   s.add_dependency 'simple-command', '~> 0.4'
+  s.add_dependency 'simple-group', '~> 0.2'
   s.add_dependency 'simple-printer', '~> 0.1'
   s.add_dependency 'sixarm_ruby_unaccent', '~> 1.2'
-  s.add_dependency 'tty-config', '~> 0.5'
+  s.add_dependency 'tty-config', '~> 0.6'
   s.add_dependency 'tty-prompt', '~> 0.23'
 
   s.add_development_dependency 'bundler', '~> 2.3'
