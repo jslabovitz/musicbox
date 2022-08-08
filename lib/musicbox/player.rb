@@ -194,10 +194,7 @@ class MusicBox
         @mpv.set_property('time-pos', @future_time_pos)
         @future_time_pos = nil
       end
-      run_command('noti',
-        '--title', 'MusicBox',
-        '--message', current_track_info,
-      )
+      display_notification
     end
 
     #
@@ -328,14 +325,17 @@ class MusicBox
       @play_state = :stopped
     end
 
-    def current_track_info
-      track = @current_track or return ''
-      album = track.album
-      '%s: %s: %s' % [
-        [album.artist_name, track.artist_name].compact.uniq.join(' / '),
-        track.title,
-        album.title,
-      ]
+    def display_notification
+      if (track = @current_track) && (album = track.album)
+        title = 'MusicBox'
+        subtitle = [track.artist_name || album.artist_name, album.title].join(': ')
+        message = track.title
+        run_command('osascript',
+          input: <<~END
+            display notification "#{message}" with title "#{title}" subtitle "#{subtitle}"
+          END
+        )
+      end
     end
 
     def show_current_track
