@@ -79,6 +79,7 @@ class MusicBox
   attr_accessor :import_done_dir
   attr_accessor :collection_dir
   attr_accessor :discogs_dir
+  attr_accessor :refs_dir
   attr_accessor :equalizers_dir
 
   def self.show_image(file:, width: nil, height: nil, preserve_aspect_ratio: nil)
@@ -117,7 +118,8 @@ class MusicBox
     @import_done_dir = @root_dir / 'import-done'
     @collection_dir = @root_dir / 'collection'
     @discogs_dir = @root_dir / 'discogs'
-    @collection = Collection.new(root_dir: @collection_dir)
+    @refs_dir = @root_dir / 'refs'
+    @collection = Collection.new(root_dir: @collection_dir, refs_dir: @refs_dir)
     @equalizers_dir = Path.new(config.fetch(:equalizers_dir))
     @prompt = TTY::Prompt.new
   end
