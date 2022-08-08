@@ -137,9 +137,12 @@ class MusicBox
       if state_file.exist?
         state = JSON.load(state_file.read)
         if state['playlist']
-          play_tracks(state['playlist'].map { |p| @track_paths[p] },
-            pos: state['playlist-pos'],
-            time: state['time-pos'])
+          tracks = state['playlist'].map { |p| @track_paths[p] }.compact
+          unless tracks.empty?
+            play_tracks(tracks,
+              pos: state['playlist-pos'],
+              time: state['time-pos'])
+          end
         end
       end
     end
@@ -161,6 +164,15 @@ class MusicBox
       if equalizer
         equalizer.enabled = @equalizer_enabled
         @mpv.command('af', 'set', equalizer.to_af)
+      end
+    end
+
+    def build_track_paths
+      @track_paths = {}
+      @albums.each do |album|
+        album.tracks.each do |track|
+          @track_paths[track.path.to_s] = track
+        end
       end
     end
 
@@ -251,15 +263,23 @@ class MusicBox
     end
 
     def play_random_album
-      play_tracks(@albums.sample.tracks)
+      if @albums.empty?
+        show_status('no albums to play')
+      else
+        play_tracks(@albums.sample.tracks)
+      end
     end
 
     def play_random_tracks
-      tracks = Set.new
-      while tracks.length < 10
-        tracks << @albums.sample.tracks.sample
+      if @albums.empty?
+        show_status('no albums to play')
+      else
+        tracks = Set.new
+        while tracks.length < 10
+          tracks << @albums.sample.tracks.sample
+        end
+        play_tracks(tracks.to_a)
       end
-      play_tracks(tracks.to_a)
     end
 
     def play_album_for_current_track
