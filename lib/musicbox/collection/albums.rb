@@ -12,6 +12,10 @@ class MusicBox
         @search_fields ||= [:title, :artist_name]
       end
 
+      def self.convert_id(id)
+        id.to_i
+      end
+
     end
 
   end
