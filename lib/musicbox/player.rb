@@ -46,12 +46,7 @@ class MusicBox
           ignore_state: false,
         }.merge(params.compact)
       )
-      @track_paths = {}
-      @albums.each do |album|
-        album.tracks.each do |track|
-          @track_paths[track.path.to_s] = track
-        end
-      end
+      build_track_paths
     end
 
     def state_file=(file)
