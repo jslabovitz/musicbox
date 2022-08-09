@@ -1,17 +1,10 @@
 # TODO
 
-- retire Discogs methods
-  - Release
-    - #artist_key
-    - #sort_tuple
-  - BasicInformation
-    - #artist_key
-  - Artist
-    - #canonical_name
-    - #key
-
 - rename 'artist_key' to 'artist_id'
   - in code & JSON files
+
+- move code in 'import' command into Importer
+  - 
 
 - use artist.id instead of artist_id
 
