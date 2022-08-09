@@ -1,22 +1,28 @@
 # TODO
 
-- fix 'show-artists' command
+- retire Discogs methods
+  - Release
+    - #artist_key
+    - #sort_tuple
+  - BasicInformation
+    - #artist_key
+  - Artist
+    - #canonical_name
+    - #key
+
+- rename 'artist_key' to 'artist_id'
+  - in code & JSON files
+
+- use artist.id instead of artist_id
 
 - make 'update-tags' work again?
 
-- create Artist data
-  + allow artist key to be user-defined
-  - when importing/updating, prompt for artist
-    - new
-    - personal name
-  - save in group database
+- when importing/updating, prompt for artist info if new
+  - personal name
   - allow for modification as needed
+  - allow artist key to be user-defined
   - allow override of primary artist
     - eg, to file release under main artist instead of artist-group of collaboration
-  - do artist sort/rename using artist ID
-    - instead of CanonicalArtists/PersonalNames hash maps
-  - ensure artist key is unique
-    - doesn't represent multiple artists
 
 - add play history
   - choose random tracks/albums that haven't been played recently
@@ -35,11 +41,6 @@
 - re-implement file-based Group
   - convert all Discogs structures
 
-- reimplement 'select' command
-  - save permanently
-  - with optional name
-  - can be referred to in query
-
 - research MusicBrainz
   - get MBIDs from logs?
   - store MBIDs in track/album files
@@ -51,7 +52,7 @@
 
 - experiment with volume up/down keys
   - in exclusive mode
-  - does it work with Musicstreamer?
+  - does it work with DAC?
 
 - describe player modes in README
   - 3-function player: play random album, play random tracks (typical shuffle mode), or play the album for the current track
