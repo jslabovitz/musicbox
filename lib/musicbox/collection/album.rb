@@ -40,7 +40,7 @@ class MusicBox
       def summary
         '%-8s | %-4s | %-4s | %-60.60s | %-60.60s' % [
           @id,
-          @artist_key,
+          @artist.id,
           @year || '-',
           @artist_name,
           @title,
