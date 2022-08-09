@@ -15,6 +15,13 @@ class MusicBox
       raise Error, "root_dir #{@root_dir.to_s.inspect} doesn't exist" unless @root_dir.exist?
       @albums = Albums.new(root: @root_dir / 'albums', refs_dir: @refs_dir)
       @artists = Artists.new(root: @root_dir / 'artists')
+      link_artists
+    end
+
+    def link_artists
+      @albums.items.each do |album|
+        album.artist = @artists[album.artist_key] or raise "#{album.id}: Can't find artist for key #{album.artist_key.inspect}"
+      end
     end
 
   end

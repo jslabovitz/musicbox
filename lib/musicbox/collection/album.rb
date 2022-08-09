@@ -7,6 +7,7 @@ class MusicBox
       attr_accessor :title
       attr_accessor :artist_name
       attr_accessor :artist_key
+      attr_accessor :artist       # linked on load
       attr_accessor :year
       attr_accessor :discs
       attr_accessor :tracks

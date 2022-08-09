@@ -191,33 +191,46 @@ class MusicBox
     @collection.albums.find(args)
   end
 
-  def show_artists
+  def find_artists(args)
+    @collection.artists.find(args)
+  end
+
+  def discogs_artists
     load_discogs
-    artists = (@discogs.releases.items + @discogs.masters.items).map(&:artists).flatten
-    # for some reason #uniq doesn't do the job
-    artists = artists.map { |a| [a.id, a] }.to_h.values.sort
-    keys = {}
-    names = {}
-    non_personal_names = Set.new
-    artists.each do |artist|
-      name, key = artist.name, artist.key
-      non_personal_names << name if name == artist.canonical_name
-      (keys[key] ||= Set.new) << name
-      if names[name] && names[name] != key
-        raise Error, "Name #{name.inspect} maps to different key #{key.inspect}"
+    (@discogs.releases.items + @discogs.masters.items).
+      map(&:artists).
+      flatten.
+      # for some reason #uniq doesn't do the job
+      map { |a| [a.id, a] }.to_h.values.
+      sort
+  end
+
+  def update_artists
+    discogs_artists.each do |discogs_artist|
+      discogs_name = discogs_artist.name
+      name = MusicBox.config.fetch(:canonical_names)[discogs_name] || discogs_name
+      name.sub!(/\s\(\d+\)/, '')  # handle 'Nico (3)'
+      if MusicBox.config.fetch(:personal_names).include?(name)
+        elems = name.split(/\s+/)
+        name = [elems[-1], elems[0..-2].join(' ')].join(', ')
+        personal = true
+      else
+        personal = false
       end
-      names[name] = key
-    end
-    puts "Non-personal names:"
-    non_personal_names.sort.each { |n| puts "\t" + n }
-    puts "Keys:"
-    keys.sort.each do |key, names|
-      puts "\t" + key
-      names.each { |n| puts "\t\t" + n }
-    end
-    puts "Artists:"
-    artists.each do |artist|
-      puts artist.summary
+      id = Collection::Artist.make_id(name)
+      unless (artist = @collection.artists[id])
+        artist = Collection::Artist.new(
+          id: id,
+          name: name,
+          personal: personal)
+        ;;warn "adding new artist: #{artist}"
+        @collection.artists.save_item(artist)
+      end
+      unless discogs_name == name || artist.aliases.include?(discogs_artist)
+        ;;warn "adding alias #{discogs_name.inspect} to artist #{artist.inspect}"
+        artist.aliases << discogs_name
+        @collection.artists.save_item(artist)
+      end
     end
   end
 
