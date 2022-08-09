@@ -72,7 +72,7 @@ class MusicBox
       def to_label
         {
           artist_name: @artist_name,
-          artist_key: @artist_key,
+          artist_id: @artist_key,
           title: @title,
           year: @year,
           id: @id,
