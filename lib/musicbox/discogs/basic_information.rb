@@ -32,10 +32,6 @@ class MusicBox
         @artists.to_s
       end
 
-      def artist_key
-        @artists.first.key
-      end
-
     end
 
   end

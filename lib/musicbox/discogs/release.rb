@@ -95,18 +95,6 @@ class MusicBox
         @artists.to_s
       end
 
-      def artist_key
-        @artists.first.key
-      end
-
-      def <=>(other)
-        sort_tuple <=> other.sort_tuple
-      end
-
-      def sort_tuple
-        [artist_key, original_release_year || 0, @title]
-      end
-
       def inspect
         "\#<#{self.class}:#{'0x%x' % object_id}>"
       end
@@ -116,9 +104,8 @@ class MusicBox
       end
 
       def summary
-        '%-8s | %-4s %4s | %-50.50s | %-50.50s | %-6s' % [
+        '%-8s | %4s | %-50.50s | %-50.50s | %-6s' % [
           @id,
-          artist_key,
           original_release_year || '-',
           artist,
           @title,
