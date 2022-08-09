@@ -29,6 +29,14 @@ class MusicBox
         )
       end
 
+      def <=>(other)
+        sort_tuple <=> other.sort_tuple
+      end
+
+      def sort_tuple
+        [@artist.id, @year || 0, @title]
+      end
+
       def summary
         '%-8s | %-4s | %-4s | %-60.60s | %-60.60s' % [
           @id,

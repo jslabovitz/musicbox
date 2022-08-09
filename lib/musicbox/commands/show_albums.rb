@@ -8,7 +8,7 @@ class MusicBox
       attr_accessor :details
 
       def run(args)
-        $musicbox.find_albums(args).each do |album|
+        $musicbox.find_albums(args).sort.each do |album|
           if @cover
             if album.has_cover?
               MusicBox.show_image(file: album.cover_file)
