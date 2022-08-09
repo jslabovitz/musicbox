@@ -1,5 +1,8 @@
 # TODO
 
+- fix 'sync-musicbox-to-streamer'
+  - ensure doesn't write over local $MUSICBOX_ROOT!
+
 - make 'update-tags' work again?
 
 - when importing/updating, prompt for artist info if new
