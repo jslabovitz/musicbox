@@ -2,9 +2,13 @@ class MusicBox
 
   class LabelMaker
 
-    def self.make_labels(*labels, output_file:, open: false)
+    def self.make_labels(album, **params)
+      make_labels([album], **params)
+    end
+
+    def self.make_labels(albums, output_file:, open: false)
       label_maker = new
-      label_maker.make_labels(labels)
+      label_maker.make_labels(albums)
       label_maker.write(output_file)
       run_command('open', output_file) if open
     end
@@ -17,26 +21,10 @@ class MusicBox
       @pdf.font_size(12)
     end
 
-    def make_labels(*labels)
-      labels.flatten.sort_by { |l| l.values_at(:artist_id, :year) }.each_with_index do |label, i|
+    def make_labels(albums)
+      albums.sort.each_with_index do |album, i|
         @pdf.start_new_page if i > 0
-        @pdf.bounding_box([0, 1.in], width: 2.5.in, height: 1.in) do
-          # ;;@pdf.transparent(0.5) { @pdf.stroke_bounds }
-          @pdf.text_box <<~END, inline_format: true
-            <b>#{label[:artist_name]}</b>
-            <i>#{label[:title]}</i>
-          END
-        end
-        @pdf.bounding_box([2.7.in, 1.in], width: 0.8.in, height: 1.in) do
-          # ;;@pdf.transparent(0.5) { @pdf.stroke_bounds }
-          @pdf.text_box <<~END, align: :right, inline_format: true
-            <b>#{label[:artist_id]}
-            #{label[:year]}</b>
-
-
-            #{label[:id]}
-          END
-        end
+        album.make_label(@pdf)
       end
     end
 

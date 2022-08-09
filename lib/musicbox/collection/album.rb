@@ -69,14 +69,24 @@ class MusicBox
         cover_file != nil
       end
 
-      def to_label
-        {
-          artist_name: @artist_name,
-          artist_id: @artist_id,
-          title: @title,
-          year: @year,
-          id: @id,
-        }
+      def make_label(pdf)
+        pdf.bounding_box([0, 1.in], width: 2.5.in, height: 1.in) do
+          # ;;pdf.transparent(0.5) { pdf.stroke_bounds }
+          pdf.text_box <<~END, inline_format: true
+            <b>#{@artist_name}</b>
+            <i>#{@title}</i>
+          END
+        end
+        pdf.bounding_box([2.7.in, 1.in], width: 0.8.in, height: 1.in) do
+          # ;;pdf.transparent(0.5) { pdf.stroke_bounds }
+          pdf.text_box <<~END, align: :right, inline_format: true
+            <b>#{@artist_id}
+            #{@year}</b>
+
+
+            #{@id}
+          END
+        end
       end
 
       def self.csv_header
@@ -132,12 +142,6 @@ class MusicBox
         file.unlink if file.exist?
         art_path.rename(file)
         file
-      end
-
-      def make_label
-        LabelMaker.make_labels(to_label,
-          output_file: '/tmp/labels.pdf',
-          open: true)
       end
 
       def make_cover

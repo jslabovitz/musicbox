@@ -32,7 +32,7 @@ class MusicBox
       album.extract_cover
       select_cover(album: album, release: release)
       album.update_tags
-      @prompt.yes?('Make label?') && album.make_label
+      @prompt.yes?('Make label?') && LabelMaker.make_label(album)
       @prompt.yes?('Make cover?') && album.make_cover
     end
 

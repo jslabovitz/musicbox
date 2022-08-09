@@ -1,11 +1,5 @@
 # TODO
 
-- rewrite LabelMaker
-  - add Label class
-  - add #sort
-  - change 'id' to 'album_id'
-  - change 'year' to 'album_year'
-
 - make 'update-tags' work again?
 
 - when importing/updating, prompt for artist info if new
