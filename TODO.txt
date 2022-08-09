@@ -1,16 +1,17 @@
 # TODO
 
-- rename 'artist_key' to 'artist_id'
-  - in code & JSON files
-
-- use artist.id instead of artist_id
+- rewrite LabelMaker
+  - add Label class
+  - add #sort
+  - change 'id' to 'album_id'
+  - change 'year' to 'album_year'
 
 - make 'update-tags' work again?
 
 - when importing/updating, prompt for artist info if new
   - personal name
   - allow for modification as needed
-  - allow artist key to be user-defined
+  - allow artist ID to be user-defined
   - allow override of primary artist
     - eg, to file release under main artist instead of artist-group of collaboration
 
