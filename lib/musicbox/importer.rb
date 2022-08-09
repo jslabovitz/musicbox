@@ -47,7 +47,7 @@ class MusicBox
           id: release.id,
           title: release.title,
           artist_name: release.artist,
-          artist_key: release.artist_key,
+          artist_id: Collection::Artist.make_id(release.artist),
           year: release.original_release_year,
           discs: discs > 1 ? discs : nil,
           json_file: @collection.albums.json_file_for_id(release.id))

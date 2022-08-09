@@ -20,7 +20,7 @@ class MusicBox
 
     def link_artists
       @albums.items.each do |album|
-        album.artist = @artists[album.artist_key] or raise "#{album.id}: Can't find artist for key #{album.artist_key.inspect}"
+        album.artist = @artists[album.artist_id] or raise "#{album.id}: Can't find artist ID #{album.artist_id.inspect}"
       end
     end
 

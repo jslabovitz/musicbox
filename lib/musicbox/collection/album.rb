@@ -6,7 +6,7 @@ class MusicBox
 
       attr_accessor :title
       attr_accessor :artist_name
-      attr_accessor :artist_key
+      attr_accessor :artist_id
       attr_accessor :artist       # linked on load
       attr_accessor :year
       attr_accessor :discs
@@ -22,7 +22,7 @@ class MusicBox
         super.merge(
           title: @title,
           artist_name: @artist_name,
-          artist_key: @artist_key,
+          artist_id: @artist_id,
           year: @year,
           discs: @discs,
           tracks: @tracks.map(&:to_h),
@@ -72,7 +72,7 @@ class MusicBox
       def to_label
         {
           artist_name: @artist_name,
-          artist_id: @artist_key,
+          artist_id: @artist_id,
           title: @title,
           year: @year,
           id: @id,
