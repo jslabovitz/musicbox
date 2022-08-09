@@ -13,13 +13,8 @@ class MusicBox
           dirs = args.map { |p| Path.new(p) }
         end
         dirs.each do |dir|
-          query = dir.basename.to_s
-          puts "Finding: #{query.inspect}"
-          releases = $musicbox.find_releases(query)
-          release = TTY::Prompt.new.select('Item?', releases, filter: true, per_page: 25, quiet: true)
-          release.print
           begin
-            importer.import(source_dir: dir, release: release)
+            importer.import_dir(dir)
           rescue Error => e
             warn "Error: #{e}"
           end

@@ -13,23 +13,27 @@ class MusicBox
       @prompt = TTY::Prompt.new
     end
 
-    def import(source_dir:, release:)
-      puts; puts "Importing from #{source_dir}"
+    def import_dir(dir)
+      raise Error, "Directory #{dir.to_s.inspect} does not exist" unless dir.exist?
+      query = dir.basename.to_s
+      puts "Finding: #{query.inspect}"
+      releases = $musicbox.find_releases(query)
+      release = @prompt.select('Item?', releases, filter: true, per_page: 25, quiet: true)
+      release.print
       album, disc = make_album(release: release)
-      copy_plan = make_tracks(album: album, disc: disc, release: release, source_dir: source_dir)
-      if @prompt.yes?('Add?')
-        @collection.albums.save_item(album)
-        copy_plan.each do |source_file, dest_file|
-          source_file.cp(dest_file)
-        end
-        @archive_dir.mkpath unless @archive_dir.exist?
-        source_dir.rename(@archive_dir / source_dir.basename)
-        album.extract_cover
-        select_cover(album: album, release: release)
-        album.update_tags
-        @prompt.yes?('Make label?') && album.make_label
-        @prompt.yes?('Make cover?') && album.make_cover
+      copy_plan = make_tracks(album: album, disc: disc, release: release, dir: dir)
+      return unless @prompt.yes?('Add?')
+      @collection.albums.save_item(album)
+      copy_plan.each do |source_file, dest_file|
+        source_file.cp(dest_file)
       end
+      @archive_dir.mkpath unless @archive_dir.exist?
+      dir.rename(@archive_dir / dir.basename)
+      album.extract_cover
+      select_cover(album: album, release: release)
+      album.update_tags
+      @prompt.yes?('Make label?') && album.make_label
+      @prompt.yes?('Make cover?') && album.make_cover
     end
 
     def make_album(release:)

@@ -3,9 +3,6 @@
 - rename 'artist_key' to 'artist_id'
   - in code & JSON files
 
-- move code in 'import' command into Importer
-  - 
-
 - use artist.id instead of artist_id
 
 - make 'update-tags' work again?
