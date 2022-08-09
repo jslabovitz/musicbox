@@ -43,7 +43,7 @@ class MusicBox
     def orphaned_image_files
       all_files = [@releases, @masters].map do |group|
         group.items.select(&:images).map do |release|
-          release.images.map { |image| image.file.basename.to_s }
+          release.images.map { |image| image.file&.basename.to_s }
         end
       end.flatten.compact
       @images_dir.children.map(&:basename).map(&:to_s) - all_files
