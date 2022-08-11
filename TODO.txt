@@ -1,5 +1,14 @@
 # TODO
 
+- experiment with https://listenbrainz.org
+
+- make server mode for player
+  - listens on HTTP port?
+  - at least random album/tracks, next/previous, pause/stop/play
+  - some gateways to Oppo
+    - volume up/down
+    - source (select HDMI 1)
+
 - fix 'sync-musicbox-to-streamer'
   - ensure doesn't write over local $MUSICBOX_ROOT!
 
