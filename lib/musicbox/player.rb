@@ -160,11 +160,9 @@ class MusicBox
     end
 
     def set_equalizer(equalizer)
+      equalizer&.enabled = @equalizer_enabled
       show_equalizer(equalizer || 'none')
-      if equalizer
-        equalizer.enabled = @equalizer_enabled
-        @mpv.command('af', 'set', equalizer.to_af)
-      end
+      @mpv.command('af', 'set', equalizer.to_af) if equalizer
     end
 
     def build_track_paths
