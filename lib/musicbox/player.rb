@@ -46,6 +46,7 @@ class MusicBox
           ignore_state: false,
         }.merge(params.compact)
       )
+      @equalizer_enabled = !@equalizers.empty?
       build_track_paths
     end
 
@@ -159,10 +160,9 @@ class MusicBox
       @future_time_pos = time if time && time > 0
     end
 
-    def set_equalizer(equalizer)
-      equalizer&.enabled = @equalizer_enabled
-      show_equalizer(equalizer || 'none')
-      @mpv.command('af', 'set', equalizer.to_af) if equalizer
+    def set_equalizer
+      show_equalizer
+      @mpv.command('af', 'set', @current_equalizer.to_af(@equalizer_enabled)) if @current_equalizer
     end
 
     def build_track_paths
@@ -378,8 +378,11 @@ class MusicBox
       puts
     end
 
-    def show_equalizer(equalizer)
-      puts "EQUALIZER: #{equalizer}"
+    def show_equalizer
+      puts "EQUALIZER: %s <%s>" % [
+        @current_equalizer&.name || 'none',
+        @equalizer_enabled ? 'enabled' : 'disabled',
+      ]
     end
 
     def show_play_state
@@ -410,18 +413,14 @@ class MusicBox
 
     def toggle_equalizer
       @equalizer_enabled = !@equalizer_enabled
-      set_equalizer(@current_equalizer)
+      set_equalizer
     end
 
     def next_equalizer
       if @equalizers
-        equalizer = @current_equalizer
-        equalizer &&= @equalizers[@equalizers.index(equalizer) + 1]
-        equalizer ||= @equalizers.first
-        if equalizer != @current_equalizer
-          @current_equalizer = equalizer
-          set_equalizer(@current_equalizer)
-        end
+        @current_equalizer &&= @equalizers[@equalizers.index(@current_equalizer) + 1]
+        @current_equalizer ||= @equalizers.first
+        set_equalizer
       end
     end
 

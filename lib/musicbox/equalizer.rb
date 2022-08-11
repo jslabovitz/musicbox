@@ -8,7 +8,6 @@ class MusicBox
     attr_accessor :name
     attr_accessor :volume_filter
     attr_accessor :equalizer_filters
-    attr_accessor :enabled
 
     include SetParams
 
@@ -21,7 +20,6 @@ class MusicBox
 
     def initialize(params={})
       @equalizer_filters = []
-      @enabled = true
       set(params)
     end
 
@@ -43,15 +41,8 @@ class MusicBox
       @name <=> other.name
     end
 
-    def to_af
-      [@volume_filter, @enabled ? @equalizer_filters : nil].flatten.compact.map(&:to_af).join(',')
-    end
-
-    def to_s
-      '%s <%s>' % [
-        @name,
-        @enabled ? 'enabled' : 'disabled',
-      ]
+    def to_af(enabled)
+      [@volume_filter, enabled ? @equalizer_filters : nil].flatten.compact.map(&:to_af).join(',')
     end
 
     class VolumeFilter < Struct.new(:volume)
