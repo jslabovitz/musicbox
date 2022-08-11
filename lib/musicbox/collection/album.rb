@@ -172,6 +172,13 @@ class MusicBox
         threads.map(&:join)
       end
 
+      def check
+        # warn "#{@id}: cover file doesn't exist: #{cover_file}" unless cover_file.exist?
+        @tracks.each do |track|
+          warn "#{@id}: track file doesn't exist: #{track.path}" unless track.path&.exist?
+        end
+      end
+
     end
 
   end
