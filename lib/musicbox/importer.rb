@@ -20,7 +20,8 @@ class MusicBox
       releases = $musicbox.find_releases(query)
       release = @prompt.select('Item?', releases, filter: true, per_page: 25, quiet: true)
       release.print
-      album, disc = make_album(release: release)
+      artist = make_artist(release: release)
+      album, disc = make_album(release: release, artist: artist)
       copy_plan = make_tracks(album: album, disc: disc, release: release, dir: dir)
       return unless @prompt.yes?('Add?')
       @collection.albums.save_item(album)
@@ -36,7 +37,35 @@ class MusicBox
       @prompt.yes?('Make cover?') && album.make_cover
     end
 
-    def make_album(release:)
+    def make_artist(release:)
+      discogs_name = release.artist.name
+      name = MusicBox.config.fetch(:canonical_names)[discogs_name] || discogs_name
+      name.sub!(/\s\(\d+\)/, '')  # handle 'Nico (3)'
+      if MusicBox.config.fetch(:personal_names).include?(name)
+        elems = name.split(/\s+/)
+        name = [elems[-1], elems[0..-2].join(' ')].join(', ')
+        personal = true
+      else
+        personal = false
+      end
+      id = Collection::Artist.make_id(name)
+      unless (artist = @collection.artists[id])
+        artist = Collection::Artist.new(
+          id: id,
+          name: name,
+          personal: personal)
+        ;;warn "adding new artist: #{artist}"
+        @collection.artists.save_item(artist)
+      end
+      unless discogs_name == name || artist.aliases.include?(discogs_artist)
+        ;;warn "adding alias #{discogs_name.inspect} to artist #{artist.inspect}"
+        artist.aliases << discogs_name
+        @collection.artists.save_item(artist)
+      end
+      artist
+    end
+
+    def make_album(release:, artist:)
       album = @collection.albums[release.id]
       discs = release.format_quantity || 1
       if album
@@ -47,7 +76,7 @@ class MusicBox
           id: release.id,
           title: release.title,
           artist_name: release.artist,
-          artist_id: Collection::Artist.make_id(release.artist),
+          artist_id: artist.id,
           year: release.original_release_year,
           discs: discs > 1 ? discs : nil,
           json_file: @collection.albums.json_file_for_id(release.id))
