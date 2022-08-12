@@ -109,7 +109,7 @@ class MusicBox
       release_track = tags[:title] ? release.find_track_for_title(tags[:title]) : nil
       unless release_track
         puts "Can't find release track with title #{tags[:title].inspect}"
-        choices = release.tracklist.all_tracks.map { |t| [t.title, t] }.to_h
+        choices = release.tracklist.all_tracks.to_h { |t| [t.title, t] }
         release_track = @prompt.select('Track?', choices, per_page: 50)
       end
       name = '%s%02d - %s' % [
