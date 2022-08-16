@@ -94,6 +94,7 @@ class MusicBox
       @mpv.observe_property('playlist') { |n, v| playlist_changed(v) }
       @mpv.observe_property('playlist-pos') { |n, v| playlist_pos_changed(v) }
       @mpv.observe_property('pause') { |n, v| pause_changed(v) }
+      @mpv.observe_property('volume') { |n, v| volume_changed(v) }
     end
 
     def shutdown_mpv
@@ -110,15 +111,7 @@ class MusicBox
       @stty_old_params = `stty -g`.chomp
       at_exit { system('stty', @stty_old_params) }
       system('stty', 'cbreak', '-echo')
-      @dispatcher.add_io_handler(input: STDIN) do |io|
-        key = io.sysread(1)
-        if (command = Keymap[key])
-          show_status(command_description(command))
-          send(command)
-        else
-          show_error("unknown key: %p" % key)
-        end
-      end
+      @dispatcher.add_io_handler(input: STDIN) { |io| handle_key(io.sysread(1)) }
     end
 
     def save_state
@@ -231,6 +224,11 @@ class MusicBox
 # ;;puts "PROPERTY: #{__method__} => #{value.inspect}"
       @play_state = value ? :paused : :playing
       show_play_state
+    end
+
+    def volume_changed(value)
+# ;;puts "PROPERTY: #{__method__} => #{value.inspect}"
+      puts "VOLUME: #{value}"
     end
 
     #
@@ -425,6 +423,34 @@ class MusicBox
     end
 
     private
+
+    def handle_key(key)
+      case @key_state
+      when nil
+        if key == "\e"
+          @key_state = :esc
+        elsif (command = Keymap[key])
+          show_status(command_description(command))
+          send(command)
+        else
+          show_error("unknown key: %p" % key)
+        end
+      when :esc
+        @key_state = :left_bracket
+      when :left_bracket
+        case key
+        when 'A'  # up
+          @mpv.command('add', 'volume', 5)
+        when 'B'  # down
+          @mpv.command('add', 'volume', -5)
+        else
+          show_error("unknown escape key: %p" % key)
+        end
+        @key_state = nil
+      else
+        raise Error, "Unknown state: #{@key_state.inspect}"
+      end
+    end
 
     def key_description(key)
       case key

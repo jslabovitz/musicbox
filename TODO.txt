@@ -47,10 +47,6 @@
   - instead of shelling out to Preview
   - show resolution, file size, file name
 
-- experiment with volume up/down keys
-  - in exclusive mode
-  - does it work with DAC?
-
 - describe player modes in README
   - 3-function player: play random album, play random tracks (typical shuffle mode), or play the album for the current track
 
