@@ -46,7 +46,7 @@ class MusicBox
           ignore_state: false,
         }.merge(params.compact)
       )
-      @equalizer_enabled = !@equalizers.empty?
+      @equalizer_enabled = @equalizers && !@equalizers.empty?
       build_track_paths
     end
 
