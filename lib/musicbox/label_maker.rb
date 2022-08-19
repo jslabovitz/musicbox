@@ -2,7 +2,7 @@ class MusicBox
 
   class LabelMaker
 
-    def self.make_labels(album, **params)
+    def self.make_label(album, **params)
       make_labels([album], **params)
     end
 

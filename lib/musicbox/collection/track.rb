@@ -45,7 +45,7 @@ class MusicBox
             '--quiet',
             '--remove',
             path)
-        rescue RunCommandFailed => e
+        rescue RunCommandFailed => _
           # ignore
         end
         run_command('mp4art',

@@ -6,7 +6,7 @@ class MusicBox
 
       attr_accessor :descriptions
       attr_accessor :name
-      attr_accessor :qty
+      attr_reader   :qty
       attr_accessor :text
 
       include SetParams

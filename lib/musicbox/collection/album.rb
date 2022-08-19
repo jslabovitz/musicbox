@@ -10,7 +10,7 @@ class MusicBox
       attr_accessor :artist       # linked on load
       attr_accessor :year
       attr_accessor :discs
-      attr_accessor :tracks
+      attr_reader   :tracks
 
       include Simple::Printer::Printable
 
@@ -127,7 +127,7 @@ class MusicBox
             '--overwrite',
             '--quiet',
             @tracks.first.path)
-        rescue RunCommandFailed => e
+        rescue RunCommandFailed => _
           # ignore
         end
         # cover is in FILE.art[0].TYPE

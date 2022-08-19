@@ -5,11 +5,11 @@ class MusicBox
     class Image
 
       attr_accessor :type
-      attr_accessor :uri
-      attr_accessor :uri150
+      attr_reader   :uri
+      attr_reader   :uri150
       attr_accessor :width
       attr_accessor :height
-      attr_accessor :file  # synthetic
+      attr_reader   :file  # synthetic
 
       include SetParams
 

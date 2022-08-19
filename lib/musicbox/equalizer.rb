@@ -25,7 +25,7 @@ class MusicBox
 
     def load(file)
       file.readlines.map { |l| l.sub(/#.*/, '') }.map(&:strip).reject(&:empty?).each do |line|
-        key, value = line.split(/:\s+/, 1)
+        key, _ = line.split(/:\s+/, 1)
         case key
         when /^Preamp: ([-.\d]+) dB$/
           @volume_filter = VolumeFilter.new($1.to_f)

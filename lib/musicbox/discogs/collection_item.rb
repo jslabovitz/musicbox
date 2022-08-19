@@ -4,8 +4,8 @@ class MusicBox
 
     class CollectionItem < Simple::Group::Item
 
-      attr_accessor :basic_information
-      attr_accessor :date_added
+      attr_reader   :basic_information
+      attr_reader   :date_added
       attr_accessor :folder_id
       attr_accessor :instance_id
       attr_accessor :notes

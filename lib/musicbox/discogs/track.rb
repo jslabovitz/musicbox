@@ -8,9 +8,9 @@ class MusicBox
       attr_accessor :position
       attr_accessor :title
       attr_accessor :duration
-      attr_accessor :extraartists
-      attr_accessor :artists
-      attr_accessor :sub_tracks
+      attr_reader   :extraartists
+      attr_reader   :artists
+      attr_reader   :sub_tracks
 
       include SetParams
       include Simple::Printer::Printable

@@ -12,9 +12,9 @@ class MusicBox
       attr_accessor :cover_image
       attr_accessor :title
       attr_accessor :year
-      attr_accessor :formats
+      attr_reader   :formats
       attr_accessor :labels
-      attr_accessor :artists
+      attr_reader   :artists
       attr_accessor :genres
       attr_accessor :styles
 

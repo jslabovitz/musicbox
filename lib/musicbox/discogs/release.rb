@@ -6,22 +6,22 @@ class MusicBox
 
       include Simple::Printer::Printable
 
-      attr_accessor :artists
+      attr_reader   :artists
       attr_accessor :artists_sort
       attr_accessor :blocked_from_sale
       attr_accessor :community
       attr_accessor :companies
       attr_accessor :country
       attr_accessor :data_quality
-      attr_accessor :date_added
-      attr_accessor :date_changed
+      attr_reader   :date_added
+      attr_reader   :date_changed
       attr_accessor :estimated_weight
-      attr_accessor :extraartists
+      attr_reader   :extraartists
       attr_accessor :format_quantity
-      attr_accessor :formats
+      attr_reader   :formats
       attr_accessor :genres
       attr_accessor :identifiers
-      attr_accessor :images
+      attr_reader   :images
       attr_accessor :labels
       attr_accessor :lowest_price
       attr_accessor :main_release
@@ -39,7 +39,7 @@ class MusicBox
       attr_accessor :status
       attr_accessor :styles
       attr_accessor :thumb
-      attr_accessor :tracklist
+      attr_reader   :tracklist
       attr_accessor :title
       attr_accessor :uri
       attr_accessor :versions_url
