@@ -1,0 +1,66 @@
+{
+  "id": "test",
+  "tracks": [
+    {
+      "album": "Straight Outta Marysville",
+      "album_artist": "Cindy Lee Berryhill",
+      "artist": "Cindy Lee Berryhill",
+      "cover": "/Users/johnl/Music/beets/catalog/Cindy Lee Berryhill/Straight Outta Marysville/cover.jpg",
+      "mb_albumid": "87507361-30f2-41f2-bce9-e27c840ebf5d",
+      "mb_trackid": "33652768-333b-4ca9-a89b-fa174428db69",
+      "path": "/Users/johnl/Music/beets/catalog/Cindy Lee Berryhill/Straight Outta Marysville/03 Diane.m4a",
+      "title": "Diane",
+      "track_num": 3,
+      "track_count": 14
+    },
+    {
+      "album": "The Kick Inside",
+      "album_artist": "Kate Bush",
+      "artist": "Kate Bush",
+      "cover": "/Users/johnl/Music/beets/catalog/Kate Bush/The Kick Inside/cover.jpg",
+      "mb_albumid": "aa4b2092-0805-4cde-8a5f-1f0e3cae3aa8",
+      "mb_trackid": "fa3574fe-1d6e-4419-994a-471caa1aeb9d",
+      "path": "/Users/johnl/Music/beets/catalog/Kate Bush/The Kick Inside/13 The Kick Inside.m4a",
+      "title": "The Kick Inside",
+      "track_num": 13,
+      "track_count": 13
+    },
+    {
+      "album": "Taking Tiger Mountain (by Strategy)",
+      "album_artist": "Brian Eno",
+      "artist": "Brian Eno",
+      "cover": "/Users/johnl/Music/beets/catalog/Brian Eno/Taking Tiger Mountain (by Strategy)/cover.jpg",
+      "mb_albumid": "008aeb60-7eb1-46d0-aa9c-41d6f7831d25",
+      "mb_trackid": "1818d65a-6914-456c-8169-182855e57f0c",
+      "path": "/Users/johnl/Music/beets/catalog/Brian Eno/Taking Tiger Mountain (by Strategy)/04 Mother Whale Eyeless.m4a",
+      "title": "Mother Whale Eyeless",
+      "track_num": 4,
+      "track_count": 10
+    },
+    {
+      "album": "Club Meds",
+      "album_artist": "Dan Mangan",
+      "artist": "Dan Mangan",
+      "cover": "/Users/johnl/Music/beets/catalog/Dan Mangan/Club Meds/cover.jpg",
+      "mb_albumid": "0ebae938-ff08-46f0-86d6-b14ca8628929",
+      "mb_trackid": "3ae1e964-ebdd-4c1d-a0c8-f3428dc31d5c",
+      "path": "/Users/johnl/Music/beets/catalog/Dan Mangan/Club Meds/01 Offred.m4a",
+      "title": "Offred",
+      "track_num": 1,
+      "track_count": 11
+    },
+    {
+      "album": "Red (Taylor’s version)",
+      "album_artist": "Taylor Swift",
+      "artist": "Taylor Swift",
+      "cover": "/Users/johnl/Music/beets/catalog/Taylor Swift/Red (Taylor’s version)/cover.jpeg",
+      "mb_albumid": "a9415f2c-f756-41e2-bb11-1a5f4ca3b221",
+      "mb_trackid": "7f989758-df3e-4bc5-bda7-1558d9de03e4",
+      "path": "/Users/johnl/Music/beets/catalog/Taylor Swift/Red (Taylor’s version)/05 All Too Well (Taylor’s version).m4a",
+      "title": "All Too Well (Taylor’s version)",
+      "track_num": 5,
+      "track_count": 30
+    }
+  ],
+  "pos": 0
+}
