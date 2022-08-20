@@ -5,6 +5,7 @@ require 'musicbox'
 $musicbox = MusicBox.new
 
 SimpleCommand::Commander.new(
+  'beet-import' => MusicBox::Commands::BeetImport,
   'check' => MusicBox::Commands::Check,
   'cover' => MusicBox::Commands::Cover,
   'csv' => MusicBox::Commands::Csv,

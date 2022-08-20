@@ -34,6 +34,7 @@ require 'musicbox/collection/artist'
 require 'musicbox/collection/artists'
 require 'musicbox/collection/track'
 
+require 'musicbox/commands/beet_import'
 require 'musicbox/commands/check'
 require 'musicbox/commands/cover'
 require 'musicbox/commands/csv'
