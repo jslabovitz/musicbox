@@ -84,6 +84,8 @@ class MusicBox
   attr_accessor :equalizers_dir
 
   def self.show_image(file:, width: nil, height: nil, preserve_aspect_ratio: nil)
+    file = Path.new(file)
+    raise Error, "Cover image file #{file.to_s.inspect} doesn't exist" unless file.exist?
     # see https://iterm2.com/documentation-images.html
     data = Base64.strict_encode64(file.read)
     args = {
