@@ -1,5 +1,36 @@
 # TODO
 
+- reimplement playlist restoration & checkpointing
+
+- implement add/remove from [default] playlist
+
+- volume
+  + reset to 100 (or base) after each song?
+  + change increment to ±10
+  + +shift (or opt) does by ±1
+
+- re-import
+  + Adrienne Lenker: Abysskiss?
+
+- add bandcamp for searching?
+
+- experiment with replacing most functionality with 'beet', except:
+  - artist ID (needed?)
+  - making album covers/labels
+  - mirroring/searching Discogs collection (for first part of import)
+  - import
+    + beet replaygain -a <id>
+    + beet write <id>
+  - move to separate gems:
+    - cover/label-makers
+      + remove 'prawn' dependency from player, etc.
+    - player
+    - discogs sync
+
+- experiment with AURA
+    https://beets.readthedocs.io/en/stable/plugins/aura.html
+    https://auraspec.readthedocs.io/en/latest/
+
 - experiment with https://listenbrainz.org
 
 - make server mode for player
