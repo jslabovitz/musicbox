@@ -72,6 +72,8 @@ require 'musicbox/equalizer'
 require 'musicbox/importer'
 require 'musicbox/label_maker'
 require 'musicbox/player'
+require 'musicbox/playlist'
+require 'musicbox/playlists'
 require 'musicbox/tags'
 
 class MusicBox
@@ -84,6 +86,7 @@ class MusicBox
   attr_accessor :discogs_dir
   attr_accessor :refs_dir
   attr_accessor :equalizers_dir
+  attr_accessor :playlists_dir
 
   def self.show_image(file:, width: nil, height: nil, preserve_aspect_ratio: nil)
     file = Path.new(file)
@@ -124,6 +127,7 @@ class MusicBox
     @collection_dir = @root_dir / 'collection'
     @discogs_dir = @root_dir / 'discogs'
     @refs_dir = @root_dir / 'refs'
+    @playlists_dir = @root_dir / 'playlists'
     @collection = Collection.new(root_dir: @collection_dir, refs_dir: @refs_dir)
     @equalizers_dir = Path.new(config.fetch(:equalizers_dir))
     @prompt = TTY::Prompt.new
