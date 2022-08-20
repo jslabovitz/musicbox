@@ -65,6 +65,7 @@ require 'musicbox/discogs/releases'
 require 'musicbox/discogs/track'
 require 'musicbox/discogs/track_list'
 
+require 'musicbox/beets'
 require 'musicbox/cover_maker'
 require 'musicbox/equalizer'
 require 'musicbox/importer'
