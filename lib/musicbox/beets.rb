@@ -63,7 +63,7 @@ class MusicBox
     end
 
     def self.run_beet(sub_command, *args, **params)
-      interactive = params.delete[:interactive]
+      interactive = params.delete(:interactive)
       run_command(
         'beet',
         sub_command,
