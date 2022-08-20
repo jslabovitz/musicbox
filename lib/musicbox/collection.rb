@@ -18,6 +18,10 @@ class MusicBox
       link_artists
     end
 
+    def inspect
+      "<#{self.class}>"
+    end
+
     def link_artists
       @albums.items.each do |album|
         album.artist = @artists[album.artist_id] or raise "#{album.id}: Can't find artist ID #{album.artist_id.inspect}"
