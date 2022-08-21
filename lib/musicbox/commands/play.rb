@@ -33,7 +33,7 @@ class MusicBox
 
         if @eq
           @equalizers = Equalizer.load_equalizers(dir: $musicbox.equalizers_dir, name: @eq)
-          @equalizer_enabled = true
+          @equalizer_enabled = !@equalizers.empty?
         else
           @equalizers = []
         end
@@ -137,6 +137,45 @@ class MusicBox
         @player.start(@playlist.paths)
       end
 
+      def show_track_notification(track)
+        message = track.title
+        subtitle = [track.artist, track.title].join(': ')
+        script = <<~END
+          display notification "#{message}" with title "MusicBox" subtitle "#{subtitle}"
+        END
+        run_command('osascript', input: script)
+      end
+
+      def show_track_info(track)
+        system('clear')
+        if track.cover
+          MusicBox.show_image(
+            file: track.cover,
+            width: 'auto',
+            height: 20,
+            preserve_aspect_ratio: false)
+          puts
+        end
+        Simple::Printer.print(
+          ['Track', [track.track_num, track.track_count].join('/')],
+          ['Title', track.title],
+          ['Album', track.album],
+          ['Artist', track.artist],
+        )
+        puts
+        show_playlist
+      end
+
+      def set_equalizer
+        if @equalizer
+          @player.set_audio_filter(@equalizer.to_af(@equalizer_enabled))
+          puts "equalizer: %s <%s>" % [
+            @equalizer&.name || 'none',
+            @equalizer_enabled ? 'enabled' : 'disabled',
+          ]
+        end
+      end
+
       #
       # command callbacks
       #
@@ -174,21 +213,17 @@ class MusicBox
       end
 
       def toggle_equalizer
-        @equalizer_enabled = !@equalizer_enabled
-        set_equalizer
+        if @equalizer
+          @equalizer_enabled = !@equalizer_enabled
+          set_equalizer
+        end
       end
 
       def next_equalizer
         if @equalizers
           @equalizer &&= @equalizers[@equalizers.index(@equalizer) + 1]
           @equalizer ||= @equalizers.first
-          if @equalizer
-            @player.set_audio_filter(@player.set_equalizer(@equalizer))
-            puts "equalizer: %s <%s>" % [
-              @equalizer&.name || 'none',
-              @equalizer_enabled ? 'enabled' : 'disabled',
-            ]
-          end
+          set_equalizer
         end
       end
 
@@ -224,38 +259,12 @@ class MusicBox
       end
 
       def track_did_change
-        track = @playlist.current_track
-        unless track
+        if (track = @playlist.current_track)
+          show_track_notification(track)
+          show_track_info(track)
+        else
           puts 'no current track playing'
-          return
         end
-        message = track.title
-        subtitle = [track.artist, track.title].join(': ')
-        script = <<~END
-          display notification "#{message}" with title "MusicBox" subtitle "#{subtitle}"
-        END
-        run_command('osascript', input: script)
-        system('clear')
-        if track.cover
-          MusicBox.show_image(
-            file: track.cover,
-            width: 'auto',
-            height: 20,
-            preserve_aspect_ratio: false)
-          puts
-        end
-        Simple::Printer.print(
-          ['Track', [track.track_num, track.track_count].join('/')],
-          ['Title', track.title],
-          ['Album', track.album],
-          ['Artist', track.artist],
-        )
-        puts
-        show_playlist
-      end
-
-      def checkpoint
-        @playlist&.save
       end
 
     end
