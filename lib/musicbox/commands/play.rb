@@ -138,8 +138,8 @@ class MusicBox
       end
 
       def show_track_notification(track)
-        message = track.title
-        subtitle = [track.artist, track.title].join(': ')
+        subtitle = track.artist
+        message = "%s (%s)" % [track.title, track.album]
         script = <<~END
           display notification "#{message}" with title "MusicBox" subtitle "#{subtitle}"
         END
