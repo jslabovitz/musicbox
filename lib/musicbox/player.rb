@@ -11,7 +11,6 @@ class MusicBox
     attr_accessor :volume
     attr_accessor :replay_gain
     attr_accessor :dispatcher
-    attr_accessor :delegate
 
     include SetParams
 
@@ -112,6 +111,26 @@ class MusicBox
       @mpv.command('af', 'set', filter)
     end
 
+    def on_state_change(&block)
+      @state_change_cb = block
+    end
+
+    def on_volume_change(&block)
+      @volume_change_cb = block
+    end
+
+    def on_playlist_pos_change(&block)
+      @playlist_pos_change_cb = block
+    end
+
+    def on_time_pos_change(&block)
+      @time_pos_change_cb = block
+    end
+
+    def on_track_change(&block)
+      @on_track_change_cb = block
+    end
+
     private
 
     def current_track
@@ -127,7 +146,7 @@ class MusicBox
     end
 
     def set_state(state)
-      @delegate&.state_did_change(state)
+      @state_change_cb&.call(state)
     end
 
     #
@@ -149,7 +168,7 @@ class MusicBox
         @future_playlist_pos = nil
       else
         @playlist_pos = @mpv.get_property('playlist-pos')
-        @delegate&.playlist_pos_did_change(@playlist_pos)
+        @playlist_pos_change_cb&.call(@playlist_pos)
       end
     end
 
@@ -160,7 +179,7 @@ class MusicBox
         @future_time_pos = nil
       else
         @time_pos = @mpv.get_property('time-pos')
-        @delegate&.time_pos_did_change(@time_pos)
+        @time_pos_change_cb&.call(@time_pos)
       end
     end
 
@@ -171,13 +190,13 @@ class MusicBox
     def playlist_pos_did_change(value)
 # ;;warn "PROPERTY: #{__method__} => #{value.inspect}"
       @playlist_pos = (value >= 0) ? value : nil
-      @delegate&.playlist_pos_did_change(@playlist_pos)
+      @playlist_pos_change_cb&.call(@playlist_pos)
     end
 
     def time_pos_did_change(value)
 # ;;warn "PROPERTY: #{__method__} => #{value.inspect}"
       @time_pos = value
-      @delegate&.time_pos_did_change(@time_pos)
+      @time_pos_change_cb&.call(@time_pos)
     end
 
     def pause_did_change(value)
@@ -187,7 +206,7 @@ class MusicBox
 
     def volume_did_change(value)
 # ;;warn "PROPERTY: #{__method__} => #{value.inspect}"
-      @delegate&.volume_did_change(value)
+      @volume_change_cb&.call(value)
     end
 
   end

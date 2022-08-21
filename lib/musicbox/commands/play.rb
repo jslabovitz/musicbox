@@ -55,12 +55,29 @@ class MusicBox
           audio_exclusive: @audio_exclusive,
           mpv_log_level: @mpv_log_level,
           ignore_state: @ignore_state,
-          dispatcher: @dispatcher,
-          delegate: self)
-        # @dispatcher.set_timeout_handler(10) do
-        #   update_playlist
-        #   @playlist&.save
-        # end
+          dispatcher: @dispatcher)
+        @player.on_state_change do |state|
+          puts "STATE: #{state}"
+        end
+        @player.on_volume_change do |value|
+          puts "VOLUME: #{value}"
+        end
+        @player.on_playlist_pos_change do |value|
+          if @playlist
+            @playlist.pos = value
+            @playlist.save
+            show_track_change(@playlist.current_track)
+          end
+        end
+        @player.on_time_pos_change do |value|
+          if @playlist
+            @playlist.time_pos = value
+            # @playlist.save if @playlist.age > 10
+          end
+        end
+        @player.on_track_change do |track|
+          show_track_change(track)
+        end
         next_equalizer
         @dispatcher.run
       end
@@ -135,6 +152,15 @@ class MusicBox
         @playlists << @playlist
         @playlist.save
         @player.start(@playlist.paths)
+      end
+
+      def show_track_change(track)
+        if track
+          show_track_notification(track)
+          show_track_info(track)
+        else
+          puts 'no current track playing'
+        end
       end
 
       def show_track_notification(track)
@@ -229,42 +255,6 @@ class MusicBox
 
       def quit
         Kernel.exit(0)
-      end
-
-      #
-      # delegate methods
-      #
-
-      def state_did_change(state)
-        puts "STATE: #{state}"
-      end
-
-      def playlist_pos_did_change(value)
-        if @playlist
-          @playlist.pos = value
-          @playlist.save
-          track_did_change
-        end
-      end
-
-      def time_pos_did_change(value)
-        if @playlist
-          @playlist.time_pos = value
-          # @playlist.save if @playlist.age > 10
-        end
-      end
-
-      def volume_did_change(value)
-        puts "VOLUME: #{value}"
-      end
-
-      def track_did_change
-        if (track = @playlist.current_track)
-          show_track_notification(track)
-          show_track_info(track)
-        else
-          puts 'no current track playing'
-        end
       end
 
     end
