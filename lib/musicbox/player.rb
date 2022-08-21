@@ -127,10 +127,6 @@ class MusicBox
       @time_pos_change_cb = block
     end
 
-    def on_track_change(&block)
-      @on_track_change_cb = block
-    end
-
     private
 
     def current_track

@@ -75,9 +75,6 @@ class MusicBox
             # @playlist.save if @playlist.age > 10
           end
         end
-        @player.on_track_change do |track|
-          show_track_change(track)
-        end
         next_equalizer
         @dispatcher.run
       end
