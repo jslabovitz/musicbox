@@ -57,10 +57,10 @@ class MusicBox
           ignore_state: @ignore_state,
           dispatcher: @dispatcher,
           delegate: self)
-        @dispatcher.set_timeout_handler(10) do
-          # update_playlist
-          # @delegate&.checkpoint
-        end
+        # @dispatcher.set_timeout_handler(10) do
+        #   update_playlist
+        #   @playlist&.save
+        # end
         next_equalizer
         @dispatcher.run
       end
