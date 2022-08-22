@@ -39,6 +39,7 @@ class MusicBox
       @mpv.register_event('playback-restart') { |e| handle_playback_restart(e) }
       @mpv.observe_property('playlist-pos') { |n, v| playlist_pos_did_change(v) }
       @mpv.observe_property('time-pos') { |n, v| time_pos_did_change(v) }
+      @mpv.observe_property('percent-pos') { |n, v| percent_pos_did_change(v) }
       @mpv.observe_property('pause') { |n, v| pause_did_change(v) }
       @mpv.observe_property('volume') { |n, v| volume_did_change(v) }
       set_state(:ready)
@@ -127,6 +128,10 @@ class MusicBox
       @time_pos_change_cb = block
     end
 
+    def on_percent_pos_change(&block)
+      @percent_pos_change_cb = block
+    end
+
     private
 
     def current_track
@@ -186,6 +191,11 @@ class MusicBox
     def time_pos_did_change(value)
 # ;;warn "PROPERTY: #{__method__} => #{value.inspect}"
       @time_pos_change_cb&.call(value)
+    end
+
+    def percent_pos_did_change(value)
+# ;;warn "PROPERTY: #{__method__} => #{value.inspect}"
+      @percent_pos_change_cb&.call(value)
     end
 
     def pause_did_change(value)
