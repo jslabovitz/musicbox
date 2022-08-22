@@ -56,7 +56,7 @@ class MusicBox
 
     def start(playlist, playlist_pos: nil, time_pos: nil)
       @playlist = playlist
-      @playlist_pos = @time_pos = nil
+      @playlist_pos = nil
       playlist_path = Path.new('/tmp/mpv.playlist.m3u8')
       playlist_path.write(@playlist.join("\n"))
       @future_playlist_pos = (playlist_pos && playlist_pos >= 0) ? playlist_pos : nil
@@ -174,8 +174,7 @@ class MusicBox
         @mpv.set_property('time-pos', @future_time_pos)
         @future_time_pos = nil
       else
-        @time_pos = @mpv.get_property('time-pos')
-        @time_pos_change_cb&.call(@time_pos)
+        @time_pos_change_cb&.call(@mpv.get_property('time-pos'))
       end
     end
 
@@ -191,8 +190,7 @@ class MusicBox
 
     def time_pos_did_change(value)
 # ;;warn "PROPERTY: #{__method__} => #{value.inspect}"
-      @time_pos = value
-      @time_pos_change_cb&.call(@time_pos)
+      @time_pos_change_cb&.call(value)
     end
 
     def pause_did_change(value)
