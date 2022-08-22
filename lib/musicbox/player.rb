@@ -162,9 +162,6 @@ class MusicBox
       if @future_playlist_pos
         @mpv.set_property('playlist-pos', @future_playlist_pos)
         @future_playlist_pos = nil
-      else
-        @playlist_pos = @mpv.get_property('playlist-pos')
-        @playlist_pos_change_cb&.call(@playlist_pos)
       end
     end
 
@@ -173,8 +170,6 @@ class MusicBox
       if @future_time_pos
         @mpv.set_property('time-pos', @future_time_pos)
         @future_time_pos = nil
-      else
-        @time_pos_change_cb&.call(@mpv.get_property('time-pos'))
       end
     end
 
