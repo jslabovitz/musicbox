@@ -1,5 +1,14 @@
 # TODO
 
+- experiment with https://listenbrainz.org
+  - if song is played >50%, then submit to LB
+  - get recommendations
+    - play recommendations as playlist
+    - allow rating for recommendations
+      + https://listenbrainz.readthedocs.io/en/latest/users/api/recommendation.html
+      + rating values that can be submitted corresponding to a recommendation:
+          ['like', 'love', 'dislike', 'hate', 'bad_recommendation']
+
 - reimplement playlist restoration & checkpointing
 
 - implement add/remove from [default] playlist
@@ -11,6 +20,7 @@
 
 - re-import
   + Adrienne Lenker: Abysskiss?
+  + others -- diff old albums dir?
 
 - add bandcamp for searching?
 
@@ -19,7 +29,7 @@
   - making album covers/labels
   - mirroring/searching Discogs collection (for first part of import)
   - import
-    + beet replaygain -a <id>
+    + beet replaygain -a [<id>]
     + beet write <id>
   - move to separate gems:
     - cover/label-makers
@@ -30,8 +40,6 @@
 - experiment with AURA
     https://beets.readthedocs.io/en/stable/plugins/aura.html
     https://auraspec.readthedocs.io/en/latest/
-
-- experiment with https://listenbrainz.org
 
 - make server mode for player
   - listens on HTTP port?
