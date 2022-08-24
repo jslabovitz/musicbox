@@ -11,8 +11,13 @@ class MusicBox
       :albumartist => :album_artist,
       :artpath => :cover,
       :path => nil,
-      :mb_trackid => nil,
+      :mb_albumartistid => nil,
       :mb_albumid => nil,
+      :mb_artistid => nil,
+      :mb_releasegroupid => nil,
+      :mb_releasetrackid => nil,
+      :mb_trackid => nil,
+      :mb_workid => nil,
     }
 
     def self.import(dir)
