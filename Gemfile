@@ -4,6 +4,7 @@ gemspec
 
 gem 'bundler'
 gem 'discogs-wrapper'
+gem 'faraday'
 gem 'http'
 gem 'io-dispatcher'
 gem 'json'
