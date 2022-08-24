@@ -20,7 +20,27 @@ class MusicBox
     end
 
     def recommendations
-      request(:get, "/1/cf/recommendation/user/#{@user}/recording", artist_type: :similar)
+      # type:
+      #   top: top artists listened to by the user
+      #   similar: artists similar to top artists listened to by the user
+      #   raw: based on the training data fed to the CF model
+      result = request(:get, "/1/cf/recommendation/user/#{@user}/recording", artist_type: 'similar')
+# ;;pp(recordings: recordings)
+      mbids = result.payload.mbids.map(&:recording_mbid)
+# ;;pp(mbids: mbids)
+      result = request(:get, "/1/metadata/recording/", recording_mbids: mbids.join(','), inc: 'artist')
+# ;;pp(result: result)
+      result.to_h do |id, info|
+        artist = info.artist.artists.first
+        [
+          info.artist.name,
+          HashStruct.new(
+            type: artist.type.downcase,
+            area: artist.area,
+            begin_year: artist.begin_year,
+            streaming_url: artist.rels[:'free streaming'] || artist.rels[:streaming])
+        ]
+      end
     end
 
     private
@@ -50,7 +70,7 @@ class MusicBox
       if json.empty?
         nil
       else
-        JSON.parse(json, symbolize_names: true)
+        HashStruct.new(JSON.parse(json, symbolize_names: true))
       end
     end
 
