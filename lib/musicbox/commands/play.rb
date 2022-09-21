@@ -213,8 +213,12 @@ class MusicBox
 
       def save_listen(track)
         ;;puts "submitting listen: %s" % [track.artist, track.album, track.title].join(' - ')
-        @listen_brainz.submit_listen(make_submission(track))
-        track.saved_listen = true
+        begin
+          @listen_brainz.submit_listen(make_submission(track))
+          track.saved_listen = true
+        rescue ListenBrainz::Error => e
+          warn "Failed to submit listen: #{e}"
+        end
       end
 
       def make_submission(track)

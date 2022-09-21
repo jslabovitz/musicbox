@@ -2,6 +2,8 @@ class MusicBox
 
   class ListenBrainz
 
+    class Error < StandardError; end
+
     def initialize
       @user = $musicbox.config.fetch(:musicbrainz, :user)
       @token = $musicbox.config.fetch(:musicbrainz, :token)
@@ -64,7 +66,7 @@ class MusicBox
           raise
         end.body
       rescue Faraday::BadRequestError => e
-        raise "bad request: #{e}"
+        raise Error, "bad request: #{e}"
       end
 # ;;pp(json: json)
       if json.empty?
