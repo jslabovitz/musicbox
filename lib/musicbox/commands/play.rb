@@ -178,7 +178,11 @@ class MusicBox
         script = <<~END
           display notification "#{message}" with title "MusicBox" subtitle "#{subtitle}"
         END
-        run_command('osascript', input: script)
+        begin
+          run_command('osascript', input: script)
+        rescue => e
+          warn "Couldn't show notification: #{e}"
+        end
       end
 
       def show_track_info(track)
