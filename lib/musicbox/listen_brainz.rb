@@ -65,8 +65,8 @@ class MusicBox
         else
           raise
         end.body
-      rescue Faraday::BadRequestError => e
-        raise Error, "bad request: #{e}"
+      rescue Faraday::Error => e
+        raise Error, "Error on request: #{e}"
       end
 # ;;pp(json: json)
       if json.empty?
