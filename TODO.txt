@@ -1,5 +1,10 @@
 # TODO
 
+- improve listens handling
+  - add listens to queue (saved to disk)
+  - implement thread that watches queue and submits to ListenBrainz
+  - dynamically receive recomendations?
+
 - allow rating for recommendations
   - https://listenbrainz.readthedocs.io/en/latest/users/api/recommendation.html
   - rating values that can be submitted corresponding to a recommendation:
