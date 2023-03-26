@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'discogs-wrapper', '~> 2.5'
   s.add_dependency 'http', '~> 5.1'
-  s.add_dependency 'io-dispatcher', '~> 0.3'
+  s.add_dependency 'io-dispatcher', '~> 0.5'
   s.add_dependency 'json', '~> 2.6'
   s.add_dependency 'matrix'   # for prawn
   s.add_dependency 'mime-types', '~> 3.4'
