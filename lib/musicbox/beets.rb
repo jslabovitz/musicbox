@@ -29,7 +29,7 @@ class MusicBox
     def self.random(fields:, album: false, number: nil, time: nil)
       raise Error, "Must specify either number: or time:" if [number, time].compact.length != 1
       params = {
-        equal_chance: nil,
+        # equal_chance: nil,
         format: format_for_fields(fields),
       }
       params[:album] = nil if album
