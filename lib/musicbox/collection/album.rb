@@ -179,6 +179,10 @@ class MusicBox
         end
       end
 
+      def random_track
+        @tracks.sample
+      end
+
     end
 
   end

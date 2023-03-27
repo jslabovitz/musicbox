@@ -28,6 +28,32 @@ class MusicBox
       end
     end
 
+    def random_album
+      @albums.items.sample
+    end
+
+    def playlist_for_random_tracks(id:, number: nil, time: nil)
+      tracks = Set.new
+      if number
+        while tracks.count < number
+          tracks << random_album.random_track
+        end
+      elsif time
+        ;;raise Error, "Can't handle :time yet"
+      else
+        raise Error, "Must specify either :number or :time"
+      end
+      Playlist.new(tracks: tracks.to_a, id: id)
+    end
+
+    def playlist_for_random_album(id:)
+      Playlist.new(tracks: random_album.tracks, id: id)
+    end
+
+    def playlist_for_album(id:, album:)
+      Playlist.new(tracks: album.tracks, id: id)
+    end
+
   end
 
 end

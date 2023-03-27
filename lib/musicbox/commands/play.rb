@@ -284,16 +284,18 @@ class MusicBox
       #
 
       def play_random_album
-        play(Playlist.playlist_for_random_album(id: 'album'))
+        play($musicbox.collection.playlist_for_random_album(id: 'album'))
       end
 
       def play_random_tracks
-        play(Playlist.playlist_for_random_tracks(id: 'random-tracks', time: 60))
+        # play($musicbox.collection.playlist_for_random_tracks(id: 'random-tracks', time: 60))
+        play($musicbox.collection.playlist_for_random_tracks(id: 'random-tracks', number: 10))
       end
 
       def play_album_for_current_track
         raise Error, "No current playlist" unless @playlist
-        play(@playlist.playlist_for_album_of_current_track(id: 'album'))
+        album = @playlist.current_track&.album or raise Error, "No current album"
+        play($musicbox.collection.playlist_for_album(id: 'album', album: album))
       end
 
       def show_keymap
