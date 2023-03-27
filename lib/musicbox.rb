@@ -81,6 +81,7 @@ class MusicBox
 
   attr_accessor :discogs
   attr_accessor :collection
+  attr_accessor :playlists
   attr_accessor :import_dir
   attr_accessor :import_done_dir
   attr_accessor :collection_dir
@@ -130,6 +131,7 @@ class MusicBox
     @refs_dir = @root_dir / 'refs'
     @playlists_dir = @root_dir / 'playlists'
     @collection = Collection.new(root_dir: @collection_dir, refs_dir: @refs_dir)
+    @playlists = Playlists.new(root: @playlists_dir)
     @equalizers_dir = Path.new(config.fetch(:equalizers_dir))
     @prompt = TTY::Prompt.new
   end

@@ -29,8 +29,6 @@ class MusicBox
       attr_accessor :ignore_state
 
       def run(args)
-        @playlists = Playlists.new(root: $musicbox.playlists_dir)
-
         if @eq
           @equalizers = Equalizer.load_equalizers(dir: $musicbox.equalizers_dir, name: @eq)
           @equalizer_enabled = !@equalizers.empty?
@@ -158,7 +156,7 @@ class MusicBox
 
       def play(playlist)
         @playlist = playlist
-        @playlists << @playlist
+        $musicbox.playlists << @playlist
         @playlist.save
         @player.start(@playlist.paths)
       end
