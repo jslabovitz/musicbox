@@ -47,7 +47,7 @@ class MusicBox
         '%-4s | %-30s | %-90s | %1s' % [
           @id,
           @name,
-          @aliases.join(', '),
+          @aliases.join('; '),
           @personal ? 'Y' : 'N',
         ]
       end
