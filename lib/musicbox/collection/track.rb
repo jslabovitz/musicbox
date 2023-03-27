@@ -14,6 +14,10 @@ class MusicBox
       include SetParams
       include Simple::Printer::Printable
 
+      def inspect
+        "<#{self.class}>"
+      end
+
       def to_h
         {
           title: @title,

@@ -14,6 +14,10 @@ class MusicBox
 
       include Simple::Printer::Printable
 
+      def inspect
+        "<#{self.class}>"
+      end
+
       def tracks=(tracks)
         @tracks = tracks.map { |t| Track.new(t.merge(album: self)) }
       end
