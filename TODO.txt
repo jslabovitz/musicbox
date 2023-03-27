@@ -7,6 +7,8 @@
       https://www.last.fm/api/scrobbling
       https://www.last.fm/api/show/track.scrobble
 
+- make MusicBox.config instance method instead of class method
+
 - improve 'check'
   - detect albums that aren't in catalog
   - detect missing cover
