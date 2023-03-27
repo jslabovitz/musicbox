@@ -8,9 +8,7 @@ class MusicBox
 
       def run(args)
         $musicbox.find_artists(args).each do |artist|
-          if @personal
-            next unless artist.personal?
-          end
+          next if @personal && !artist.personal?
           puts artist.summary
         end
       end
