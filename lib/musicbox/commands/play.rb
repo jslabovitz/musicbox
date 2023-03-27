@@ -173,8 +173,8 @@ class MusicBox
       end
 
       def show_track_notification(track)
-        subtitle = track.artist
-        message = "%s (%s)" % [track.title, track.album]
+        subtitle = track.artist_name
+        message = "%s (%s)" % [track.title, track.album.title]
         script = <<~END
           display notification "#{message}" with title "MusicBox" subtitle "#{subtitle}"
         END
@@ -187,19 +187,19 @@ class MusicBox
 
       def show_track_info(track)
         system('clear')
-        if track.cover
+        if track.album.has_cover?
           MusicBox.show_image(
-            file: track.cover,
+            file: track.album.cover_file,
             width: 'auto',
             height: 20,
             preserve_aspect_ratio: false)
           puts
         end
         Simple::Printer.print(
-          ['Track', [track.track_num, track.track_count].join('/')],
+          ['Track', [track.track_num, track.album.tracks.count].join('/')],
           ['Title', track.title],
-          ['Album', track.album],
-          ['Artist', track.artist],
+          ['Album', track.album.title],
+          ['Artist', track.artist_name],
         )
         puts
         show_playlist
@@ -310,8 +310,8 @@ class MusicBox
             puts '%1s %-40.40s | %-40.40s | %-40.40s' % [
               (track == @playlist.current_track) ? '>' : ' ',
               track.title,
-              track.album,
-              track.artist,
+              track.album.title,
+              track.artist_name,
             ]
           end
         end

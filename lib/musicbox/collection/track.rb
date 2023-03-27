@@ -5,7 +5,7 @@ class MusicBox
     class Track
 
       attr_accessor :title
-      attr_accessor :artist_name
+      attr_writer   :artist_name
       attr_accessor :track_num
       attr_accessor :disc_num
       attr_accessor :file
@@ -36,6 +36,10 @@ class MusicBox
             @title,
           ],
         ]
+      end
+
+      def artist_name
+        @artist_name || @album.artist_name
       end
 
       def path

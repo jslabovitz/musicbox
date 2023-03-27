@@ -38,7 +38,7 @@ class MusicBox
     end
 
     def make_artist(release:)
-      discogs_name = release.artist.name
+      discogs_name = release.artist
       name = MusicBox.config.fetch(:canonical_names)[discogs_name] || discogs_name
       name.sub!(/\s\(\d+\)/, '')  # handle 'Nico (3)'
       if MusicBox.config.fetch(:personal_names).include?(name)
@@ -57,7 +57,7 @@ class MusicBox
         ;;warn "adding new artist: #{artist}"
         @collection.artists.save_item(artist)
       end
-      unless discogs_name == name || artist.aliases.include?(discogs_artist)
+      unless discogs_name == name || artist.aliases.include?(discogs_name)
         ;;warn "adding alias #{discogs_name.inspect} to artist #{artist.inspect}"
         artist.aliases << discogs_name
         @collection.artists.save_item(artist)
