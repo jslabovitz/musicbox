@@ -1,5 +1,15 @@
 # TODO
 
+- replace ListenBrainz with simple scrobbler log file
+  - move ListenBrainz, etc. to separate gem/tool
+  - tools/info:
+      https://github.com/nkbt/scrobbler
+      https://www.last.fm/api/scrobbling
+      https://www.last.fm/api/show/track.scrobble
+
+- build detection of widows/orphans
+  - re-rip missing/lost CDs
+
 - improve listens handling
   - add listens to queue (saved to disk)
   - implement thread that watches queue and submits to ListenBrainz
@@ -18,29 +28,6 @@
   - reset to 100 (or base) after each song?
   - change increment to ±10
   - +shift (or opt) does by ±1
-
-- re-import
-  - Adrienne Lenker: Abysskiss?
-  - others -- diff old albums dir?
-
-- add bandcamp for searching?
-
-- experiment with replacing most functionality with 'beet', except:
-  - artist ID (needed?)
-  - making album covers/labels
-  - mirroring/searching Discogs collection (for first part of import)
-  - import
-      beet replaygain -a [<id>]
-      beet write <id>
-  - move to separate gems:
-    - cover/label-makers
-      - remove 'prawn' dependency from player, etc.
-    - player
-    - discogs sync
-
-- experiment with AURA
-    https://beets.readthedocs.io/en/stable/plugins/aura.html
-    https://auraspec.readthedocs.io/en/latest/
 
 - make server mode for player
   - listens on HTTP port?
@@ -75,15 +62,15 @@
 
 - see if taglib-ruby will substitute for ffprobe/mp4tags/mp4art/etc.
 
-- re-implement file-based Group
-  - convert all Discogs structures
-
 - when selecting cover, show cover images & info in iTerm
   - instead of shelling out to Preview
   - show resolution, file size, file name
 
 - describe player modes in README
-  - 3-function player: play random album, play random tracks (typical shuffle mode), or play the album for the current track
+  - 3-function player
+    - play random album
+    - play random tracks (typical shuffle mode)
+    - play album for current track
 
 - integrate/expand ripping HOWTO
 
@@ -109,12 +96,6 @@
   - for: unreleased, mixtape, etc.
 
 - allow label font to be configured
-
-- when importing/updating, save track info to JSON file
-  - bit depth
-  - sample rate
-  - channels
-  - format/codec
 
 - have player read default settings from config
   - audio-device, exclusive, EQ, etc.
