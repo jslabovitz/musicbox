@@ -1,12 +1,5 @@
 # TODO
 
-- replace ListenBrainz with simple scrobbler log file
-  - move ListenBrainz, etc. to separate gem/tool
-  - tools/info:
-      https://github.com/nkbt/scrobbler
-      https://www.last.fm/api/scrobbling
-      https://www.last.fm/api/show/track.scrobble
-
 - make MusicBox.config instance method instead of class method
 
 - improve 'check'
@@ -18,6 +11,12 @@
 - reimplement playlist restoration & checkpointing
 
 - implement add/remove from [default] playlist
+
+- submit listen log to ListenBrainz via separate gem/tool
+  - tools/info:
+      https://github.com/nkbt/scrobbler
+      https://www.last.fm/api/scrobbling
+      https://www.last.fm/api/show/track.scrobble
 
 - volume
   - reset to 100 (or base) after each song?
