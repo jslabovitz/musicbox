@@ -15,7 +15,7 @@ class MusicBox
 
     def import_dir(dir)
       raise Error, "Directory #{dir.to_s.inspect} does not exist" unless dir.exist?
-      query = dir.basename.to_s
+      query = '%' + dir.basename.to_s
       puts "Finding: #{query.inspect}"
       releases = $musicbox.find_releases(query)
       release = @prompt.select('Item?', releases, filter: true, per_page: 25, quiet: true)
