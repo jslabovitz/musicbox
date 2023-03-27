@@ -46,7 +46,6 @@ require 'musicbox/commands/label'
 require 'musicbox/commands/open'
 require 'musicbox/commands/orphaned'
 require 'musicbox/commands/play'
-require 'musicbox/commands/recommendations'
 require 'musicbox/commands/save_albums'
 require 'musicbox/commands/show_albums'
 require 'musicbox/commands/show_artists'
@@ -71,7 +70,8 @@ require 'musicbox/cover_maker'
 require 'musicbox/equalizer'
 require 'musicbox/importer'
 require 'musicbox/label_maker'
-require 'musicbox/listen_brainz'
+require 'musicbox/listens'
+require 'musicbox/listen'
 require 'musicbox/player'
 require 'musicbox/playlist'
 require 'musicbox/playlists'
@@ -82,6 +82,7 @@ class MusicBox
   attr_accessor :discogs
   attr_accessor :collection
   attr_accessor :playlists
+  attr_accessor :listens
   attr_accessor :import_dir
   attr_accessor :import_done_dir
   attr_accessor :collection_dir
@@ -130,8 +131,10 @@ class MusicBox
     @discogs_dir = @root_dir / 'discogs'
     @refs_dir = @root_dir / 'refs'
     @playlists_dir = @root_dir / 'playlists'
+    @listens_dir = @root_dir / 'listens'
     @collection = Collection.new(root_dir: @collection_dir, refs_dir: @refs_dir)
     @playlists = Playlists.new(root: @playlists_dir)
+    @listens = Listens.new(root: @listens_dir)
     @equalizers_dir = Path.new(config.fetch(:equalizers_dir))
     @prompt = TTY::Prompt.new
   end

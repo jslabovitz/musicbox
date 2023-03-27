@@ -10,6 +10,8 @@ class MusicBox
       attr_accessor :disc_num
       attr_accessor :file
       attr_accessor :album
+      attr_accessor :listen_saved
+      attr_accessor :listened_at
 
       include SetParams
       include Simple::Printer::Printable

@@ -36,8 +36,6 @@ class MusicBox
           @equalizers = []
         end
 
-        @listen_brainz = ListenBrainz.new
-
         # if @ignore_state
         #   @playlist.reset
         # else
@@ -73,16 +71,12 @@ class MusicBox
           if @playlist
             @playlist.time_pos = time_pos
             # @playlist.save if @playlist.age > 10
-            if time_pos && time_pos >= 4*60 && (track = @playlist.current_track) && !track.saved_listen
-              save_listen(track)
-            end
+            save_listen if time_pos && time_pos >= 4*60
           end
         end
         @player.on_percent_pos_change do |percent|
           if @playlist
-            if percent && percent >= 50 && (track = @playlist.current_track) && !track.saved_listen
-              save_listen(track)
-            end
+            save_listen if percent && percent >= 50
           end
         end
         next_equalizer
@@ -163,6 +157,7 @@ class MusicBox
 
       def show_track_change(track)
         if track
+          track.listened_at = Time.now
           show_track_notification(track)
           show_track_info(track)
         else
@@ -213,68 +208,23 @@ class MusicBox
         end
       end
 
-      def save_listen(track)
-        ;;puts "submitting listen: %s" % [track.artist, track.album, track.title].join(' - ')
-        begin
-          @listen_brainz.submit_listen(make_submission(track))
-          track.saved_listen = true
-        rescue ListenBrainz::Error => e
-          warn "Failed to submit listen: #{e}"
+      def save_listen
+        if (track = @playlist.current_track) && !track.listen_saved
+          listen = Listen.new(
+            id: track.listened_at.to_i,
+            listened_at: track.listened_at,
+            artist_name: track.artist_name,
+            album_title: track.album.title,
+            album_id: track.album.id,
+            track_title: track.title,
+            track_num: track.track_num,
+            track_disc: track.disc_num,
+          )
+          $musicbox.listens << listen
+          listen.save
+          track.listen_saved = true
+          warn "[saved listen]"
         end
-      end
-
-      def make_submission(track)
-        {
-          listen_type: 'single',
-          payload: [
-            {
-              listened_at: Time.now.to_i,
-              track_metadata: make_track_metadata(track),
-            }
-          ],
-        }
-      end
-
-      def make_track_metadata(track)
-        # unused: mb_albumid
-        {
-          artist_name: track.artist,
-          release_name: track.album,
-          track_name: track.title,
-
-          additional_info: {
-            # A list of MusicBrainz Artist IDs, one or more Artist IDs may be included here.
-            # If you have a complete MusicBrainz artist credit that contains multiple Artist IDs, include them all in this list.
-            artist_mbids: [track.mb_albumartistid, track.mb_artistid].compact,
-
-            # A MusicBrainz Release Group ID of the release group this recording was played from.
-            release_group_mbid: track.mb_releasegroupid,
-
-            # A MusicBrainz Release ID of the release this recording was played from.
-            release_mbid: track.mb_releasetrackid,
-
-            # A MusicBrainz Recording ID of the recording that was played.
-            # recording_mbid: ???,
-
-            # A MusicBrainz Track ID associated with the recording that was played.
-            track_mbid: track.mb_trackid,
-
-            # A list of MusicBrainz Work IDs that may be associated with this recording.
-            work_mbids: [track.mb_workid].compact,
-          }.delete_if { |k,v| v.kind_of?(Array) && v.empty? }.compact,
-        }
-      end
-
-      def show_listens
-        ;;pp(listens: @listen_brainz.listens)
-      end
-
-      def show_similar_users
-        ;;pp(listens: @listen_brainz.similar_users)
-      end
-
-      def show_recommendations
-        ;;pp(recommendations: @listen_brainz.recommendations)
       end
 
       #

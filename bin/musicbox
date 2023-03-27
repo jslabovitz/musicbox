@@ -16,7 +16,6 @@ SimpleCommand::Commander.new(
   'open' => MusicBox::Commands::Open,
   'orphaned' => MusicBox::Commands::Orphaned,
   'play' => MusicBox::Commands::Play,
-  'recommendations' => MusicBox::Commands::Recommendations,
   'save-albums' => MusicBox::Commands::SaveAlbums,
   'show-albums' => MusicBox::Commands::ShowAlbums,
   'show-artists' => MusicBox::Commands::ShowArtists,
