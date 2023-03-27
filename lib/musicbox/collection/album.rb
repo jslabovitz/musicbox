@@ -178,8 +178,14 @@ class MusicBox
 
       def check
         # warn "#{@id}: cover file doesn't exist: #{cover_file}" unless cover_file.exist?
+        # puts summary
+        unless @artist_name
+          warn "#{@id}: artist_name not set"
+        end
         @tracks.each do |track|
-          warn "#{@id}: track file doesn't exist: #{track.path}" unless track.path&.exist?
+          unless track.path&.exist?
+            warn "#{@id}: track file doesn't exist: #{track.path}"
+          end
         end
       end
 
