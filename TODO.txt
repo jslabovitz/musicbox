@@ -7,18 +7,11 @@
       https://www.last.fm/api/scrobbling
       https://www.last.fm/api/show/track.scrobble
 
-- build detection of widows/orphans
+- improve 'check'
+  - detect albums that aren't in catalog
+  - detect missing cover
+  - warn badly-ripped CD
   - re-rip missing/lost CDs
-
-- improve listens handling
-  - add listens to queue (saved to disk)
-  - implement thread that watches queue and submits to ListenBrainz
-  - dynamically receive recomendations?
-
-- allow rating for recommendations
-  - https://listenbrainz.readthedocs.io/en/latest/users/api/recommendation.html
-  - rating values that can be submitted corresponding to a recommendation:
-      ['like', 'love', 'dislike', 'hate', 'bad_recommendation']
 
 - reimplement playlist restoration & checkpointing
 
