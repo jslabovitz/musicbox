@@ -10,12 +10,6 @@
   - copy duration from Discogs release
   - delete :artist_name if == album.artist_name
 
-- add new music (~/Downloads/music to add)
-
-- re-rip missing/lost/bad CDs
-  - Bill Nelson (all)
-  - This Mortal Coil
-
 - reimplement playlist restoration & checkpointing
 
 - make MusicBox.config instance method instead of class method
@@ -118,7 +112,7 @@
     - ie, release_id has changed
     - need to move related album
 
-- improve log handling
+- improve rip log handling
   - create Log class with attributes:
     - timestamp
     - media type
