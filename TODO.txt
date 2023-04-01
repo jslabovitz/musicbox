@@ -1,14 +1,24 @@
 # TODO
 
-- make MusicBox.config instance method instead of class method
-
 - improve 'check'
   - detect albums that aren't in catalog
   - detect missing cover
   - warn badly-ripped CD
-  - re-rip missing/lost CDs
+  - check actual track duration against expected
+
+- fix up track info
+  - copy duration from Discogs release
+  - delete :artist_name if == album.artist_name
+
+- add new music (~/Downloads/music to add)
+
+- re-rip missing/lost/bad CDs
+  - Bill Nelson (all)
+  - This Mortal Coil
 
 - reimplement playlist restoration & checkpointing
+
+- make MusicBox.config instance method instead of class method
 
 - implement add/remove from [default] playlist
 
