@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'matrix'   # for prawn
   s.add_dependency 'mime-types', '~> 3.4'
   s.add_dependency 'mpv_client', '~> 0.2'
-  s.add_dependency 'path', '~> 2.0'
+  s.add_dependency 'path', '~> 2.1'
   s.add_dependency 'prawn', '~> 2.4'
   s.add_dependency 'run-command', '~> 0.4'
   s.add_dependency 'set_params', '~> 0.2'
