@@ -1,4 +1,3 @@
-require 'csv'
 require 'base64'
 require 'discogs-wrapper'
 require 'faraday'
@@ -37,7 +36,6 @@ require 'musicbox/collection/track'
 
 require 'musicbox/commands/check'
 require 'musicbox/commands/cover'
-require 'musicbox/commands/csv'
 require 'musicbox/commands/dir'
 require 'musicbox/commands/export'
 require 'musicbox/commands/fix'

@@ -7,7 +7,6 @@ $musicbox = MusicBox.new
 SimpleCommand::Commander.new(
   'check' => MusicBox::Commands::Check,
   'cover' => MusicBox::Commands::Cover,
-  'csv' => MusicBox::Commands::Csv,
   'dir' => MusicBox::Commands::Dir,
   'export' => MusicBox::Commands::Export,
   'fix' => MusicBox::Commands::Fix,

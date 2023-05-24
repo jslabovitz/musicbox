@@ -93,14 +93,6 @@ class MusicBox
         end
       end
 
-      def self.csv_header
-        %w[ID year artist title].to_csv
-      end
-
-      def to_csv
-        [@id, @year, @artist_name, @title].to_csv
-      end
-
       def validate_logs
         log_files = dir.glob('*.log')
         raise Error, "No rip logs" if log_files.empty?
