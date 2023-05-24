@@ -234,14 +234,14 @@ class MusicBox
       def play_random_album
         play(Playlist.playlist_for_random_album(
           collection: $musicbox.collection,
-          id: 'album'))
+          id: 'temp'))
       end
 
       def play_random_tracks
         # play($musicbox.collection.playlist_for_random_tracks(id: 'random-tracks', time: 60))
         play(Playlist.playlist_for_random_tracks(
           collection: $musicbox.collection,
-          id: 'random-tracks',
+          id: 'temp',
           number: 10))
       end
 
@@ -250,7 +250,7 @@ class MusicBox
         album = @playlist.current_track&.album or raise Error, "No current album"
         play(Playlist.playlist_for_album(
           collection: $musicbox.collection,
-          id: 'album',
+          id: 'temp',
           album: album))
       end
 
