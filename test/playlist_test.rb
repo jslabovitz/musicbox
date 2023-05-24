@@ -9,7 +9,10 @@ class MusicBox
 
     def setup
       @musicbox = MusicBox.new
-      @playlist = @musicbox.collection.playlist_for_random_tracks(id: 'test', number: 5)
+      @playlist = Playlist.playlist_for_random_tracks(
+        collection: @musicbox.collection,
+        id: 'test',
+        number: 5)
     end
 
     def test_tracks
