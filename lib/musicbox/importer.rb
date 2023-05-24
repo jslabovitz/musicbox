@@ -48,7 +48,7 @@ class MusicBox
       else
         personal = false
       end
-      id = Collection::Artist.make_id(name)
+      id = make_artist_id(name)
       unless (artist = @collection.artists[id])
         artist = Collection::Artist.new(
           id: id,
@@ -63,6 +63,19 @@ class MusicBox
         @collection.artists.save_item(artist)
       end
       artist
+    end
+
+    def make_artist_id(name)
+      id = ''
+      tokens = name.tokenize
+      while (token = tokens.shift) && id.length < 4
+        if id.empty?
+          id << token[0..2].capitalize
+        else
+          id << token[0].upcase
+        end
+      end
+      id
     end
 
     def make_album(release:, artist:)
