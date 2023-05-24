@@ -3,7 +3,7 @@ class MusicBox
   class Playlist < Simple::Group::Item
 
     attr_accessor :tracks
-    attr_accessor :pos
+    attr_accessor :track_pos
     attr_accessor :time_pos
 
     include Simple::Printer::Printable
@@ -31,7 +31,7 @@ class MusicBox
     end
 
     def initialize(**params)
-      @pos = @time_pos = nil
+      @track_pos = @time_pos = nil
       @tracks = []
       super
     end
@@ -43,7 +43,7 @@ class MusicBox
     def to_h
       super.merge(
         tracks: @tracks.map(&:to_h),
-        pos: @pos,
+        track_pos: @track_pos,
         time_pos: @time_pos,
       )
     end
@@ -53,7 +53,7 @@ class MusicBox
     end
 
     def current_track
-      @pos && @tracks[@pos]
+      @track_pos && @tracks[@track_pos]
     end
 
   end
