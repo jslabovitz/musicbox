@@ -22,10 +22,6 @@ class MusicBox
         @basic_information = BasicInformation.new(info)
       end
 
-      def recently_added?
-        (Date.today - @date_added) < 30
-      end
-
     end
 
   end
