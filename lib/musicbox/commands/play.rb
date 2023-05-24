@@ -238,7 +238,6 @@ class MusicBox
       end
 
       def play_random_tracks
-        # play($musicbox.collection.playlist_for_random_tracks(id: 'random-tracks', time: 60))
         play(Playlist.playlist_for_random_tracks(
           collection: $musicbox.collection,
           id: 'temp',

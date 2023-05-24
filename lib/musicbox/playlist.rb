@@ -8,16 +8,10 @@ class MusicBox
 
     include Simple::Printer::Printable
 
-    def self.playlist_for_random_tracks(collection:, id:, number: nil, time: nil)
+    def self.playlist_for_random_tracks(collection:, id:, number:)
       tracks = Set.new
-      if number
-        while tracks.count < number
-          tracks << collection.random_album.random_track
-        end
-      elsif time
-        ;;raise Error, "Can't handle :time yet"
-      else
-        raise Error, "Must specify either :number or :time"
+      while tracks.count < number
+        tracks << collection.random_album.random_track
       end
       new(tracks: tracks.to_a, id: id)
     end
