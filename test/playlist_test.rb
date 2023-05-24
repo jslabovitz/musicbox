@@ -17,7 +17,7 @@ class MusicBox
     end
 
     def test_current_track
-      @playlist.pos = 0
+      @playlist.track_pos = 0
       assert { @playlist.current_track == @playlist.tracks[0] }
     end
 

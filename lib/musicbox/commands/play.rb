@@ -62,7 +62,7 @@ class MusicBox
         end
         @player.on_playlist_pos_change do |value|
           if @playlist
-            @playlist.pos = value
+            @playlist.track_pos = value
             @playlist.save
             show_track_change(@playlist.current_track)
           end
