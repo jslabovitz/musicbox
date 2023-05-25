@@ -153,21 +153,6 @@ class MusicBox
         end
       end
 
-      def export(dest_dir:, compress: false, force: false, parallel: true)
-        dest_dir.mkpath unless dest_dir.exist?
-        threads = []
-        @tracks.each do |track|
-          if parallel
-            threads << Thread.new do
-              track.export(dest_dir: dest_dir, force: force, compress: compress)
-            end
-          else
-            track.export(dest_dir: dest_dir, force: force, compress: compress)
-          end
-        end
-        threads.map(&:join)
-      end
-
       def check
         # warn "#{@id}: cover file doesn't exist: #{cover_file}" unless cover_file.exist?
         # puts summary

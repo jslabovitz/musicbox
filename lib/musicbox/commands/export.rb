@@ -11,20 +11,20 @@ class MusicBox
 
       def self.defaults
         {
+          compress: true,
+          force: false,
           parallel: true,
         }
       end
 
       def run(args)
         raise Error, "Must specify destination directory" unless @dest_dir
-        @dest_dir = Path.new(@dest_dir).expand_path
-        $musicbox.find_albums(args).each do |album|
-          album.export(
-            dest_dir: @dest_dir / album.description,
-            compress: @compress,
-            force: @force,
-            parallel: @parallel)
-        end
+        exporter = Exporter.new(
+          dest_dir: @dest_dir,
+          compress: @compress,
+          force: @force,
+          parallel: @parallel)
+        exporter.export
       end
 
     end

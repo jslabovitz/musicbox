@@ -66,6 +66,7 @@ require 'musicbox/discogs/track_list'
 
 require 'musicbox/cover_maker'
 require 'musicbox/equalizer'
+require 'musicbox/exporter'
 require 'musicbox/importer'
 require 'musicbox/label_maker'
 require 'musicbox/listens'
@@ -77,17 +78,19 @@ require 'musicbox/tags'
 
 class MusicBox
 
-  attr_accessor :discogs
-  attr_accessor :collection
-  attr_accessor :playlists
-  attr_accessor :listens
+  attr_accessor :root_dir
   attr_accessor :import_dir
   attr_accessor :import_done_dir
   attr_accessor :collection_dir
   attr_accessor :discogs_dir
   attr_accessor :refs_dir
-  attr_accessor :equalizers_dir
   attr_accessor :playlists_dir
+  attr_accessor :listens_dir
+  attr_accessor :equalizers_dir
+  attr_accessor :discogs
+  attr_accessor :collection
+  attr_accessor :playlists
+  attr_accessor :listens
 
   def self.show_image(file:, width: nil, height: nil, preserve_aspect_ratio: nil)
     file = Path.new(file)
