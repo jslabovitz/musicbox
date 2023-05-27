@@ -5,7 +5,6 @@ class MusicBox
     attr_accessor :root_dir
     attr_accessor :albums_dir
     attr_accessor :artists_dir
-    attr_accessor :refs_dir
     attr_accessor :albums
     attr_accessor :artists
 
@@ -17,7 +16,7 @@ class MusicBox
       raise Error, "root_dir #{@root_dir.to_s.inspect} doesn't exist" unless @root_dir.exist?
       @albums_dir = @root_dir / 'albums'
       @artists_dir = @root_dir / 'artists'
-      @albums = Albums.new(root: @albums_dir, refs_dir: @refs_dir)
+      @albums = Albums.new(root: @albums_dir)
       @artists = Artists.new(root: @artists_dir)
       link_artists
     end

@@ -35,7 +35,6 @@ class MusicBox
         $musicbox.import_dir,
         $musicbox.import_done_dir,
         $musicbox.discogs_dir,
-        $musicbox.refs_dir,
         $musicbox.playlists_dir,
         $musicbox.listens_dir,
         $musicbox.equalizers_dir,
