@@ -34,7 +34,7 @@ class MusicBox
         @playlists = Playlists.new(root: @playlists_dir)
         @listens = Listens.new(root: @listens_dir)
 
-        if @eq
+        if @eq && @musicbox.equalizers_dir&.exist?
           @equalizers = Equalizer.load_equalizers(dir: @musicbox.equalizers_dir, name: @eq)
           @equalizer_enabled = !@equalizers.empty?
         else
