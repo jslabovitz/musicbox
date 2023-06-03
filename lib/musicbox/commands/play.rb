@@ -61,7 +61,7 @@ class MusicBox
         @stty_old_params = `stty -g`.chomp
         at_exit {
           system('stty', @stty_old_params) if @stty_old_params
-          @player.shutdown
+          @player&.shutdown
         }
         system('stty', 'cbreak', '-echo')
         @dispatcher.add_io_handler(input: STDIN) { |io| handle_key(io.sysread(1)) }
