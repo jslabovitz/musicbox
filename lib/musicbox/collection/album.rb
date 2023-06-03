@@ -73,83 +73,10 @@ class MusicBox
         cover_file != nil
       end
 
-      def make_label(pdf)
-        pdf.bounding_box([0, 1.in], width: 2.5.in, height: 1.in) do
-          # ;;pdf.transparent(0.5) { pdf.stroke_bounds }
-          pdf.text_box <<~END, inline_format: true
-            <b>#{@artist_name}</b>
-            <i>#{@title}</i>
-          END
-        end
-        pdf.bounding_box([2.7.in, 1.in], width: 0.8.in, height: 1.in) do
-          # ;;pdf.transparent(0.5) { pdf.stroke_bounds }
-          pdf.text_box <<~END, align: :right, inline_format: true
-            <b>#{@artist_id}
-            #{@year}</b>
-
-
-            #{@id}
-          END
-        end
-      end
-
-      def validate_logs
-        log_files = dir.glob('*.log')
-        raise Error, "No rip logs" if log_files.empty?
-        state = :initial
-        log_files.each do |log_file|
-          log_file.readlines.map(&:chomp).each do |line|
-            case state
-            when :initial
-              if line =~ /^AccurateRip Summary/
-                state = :accuraterip_summary
-              end
-            when :accuraterip_summary
-              if line =~ /^\s+Track \d+ : (\S+)/
-                raise Error, "Not accurately ripped" unless $1 == 'OK'
-              else
-                break
-              end
-            end
-          end
-        end
-      end
-
-      def extract_cover
-        begin
-          run_command('mp4art',
-            '--extract',
-            '--art-index', 0,
-            '--overwrite',
-            '--quiet',
-            @tracks.first.path)
-        rescue RunCommandFailed => _
-          # ignore
-        end
-        # cover is in FILE.art[0].TYPE
-        art_paths = dir.glob('*.art*.*').reject { |f| f.extname.downcase == '.gif' }
-        raise Error, "#{id}: multiple covers found" if art_paths.length > 1
-        art_path = art_paths.first
-        unless art_path
-          puts "#{id}: no cover to extract"
-          return nil
-        end
-        file = (art_path.dirname / 'extracted-cover').add_extension(art_path.extname)
-        file.unlink if file.exist?
-        art_path.rename(file)
-        file
-      end
-
-      def make_cover
-        CoverMaker.make_covers(cover_file,
-          output_file: '/tmp/covers.pdf',
-          open: true)
-      end
-
       def update_tags
         @tracks.each do |track|
           track.update_tags
-          track.update_cover(cover_file) if has_cover?
+          MP4Tags.update_cover(cover_file) if has_cover?
         end
       end
 

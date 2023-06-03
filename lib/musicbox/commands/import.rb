@@ -5,10 +5,10 @@ class MusicBox
     class Import < SimpleCommand::Command
 
       def run(args)
-        importer = $musicbox.make_importer
+        importer = Importer.new(musicbox: musicbox)
         if args.empty?
-          return unless $musicbox.import_dir.exist?
-          dirs = $musicbox.import_dir.children.select(&:dir?).sort_by { |d| d.to_s.downcase }
+          return unless @musicbox.import_dir.exist?
+          dirs = @musicbox.import_dir.children.select(&:dir?).sort_by { |d| d.to_s.downcase }
         else
           dirs = args.map { |p| Path.new(p) }
         end

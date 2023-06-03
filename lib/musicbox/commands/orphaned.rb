@@ -5,7 +5,7 @@ class MusicBox
     class Orphaned < SimpleCommand::Command
 
       def run(args)
-        $musicbox.orphaned
+        @musicbox.orphaned
       end
 
     end

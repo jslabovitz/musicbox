@@ -1,5 +1,84 @@
 # TODO
 
+*** bring everything back into one gem
+
+  - possibly move out Discogs logic?
+
+
+--- musicbox setup
+
+  create abbreviated catalog when syncing
+
+  build musicbox-player that reads from abbreviated catalog
+
+  re-sync Music/Media folder -> USB
+
+  install musicbox-player on Pi
+
+  run player on boot
+
+  do image backup
+    to spare microSD card
+
+
+--- interface
+
+  buttons needed:
+    play random track
+    play random album
+    play album for current track
+    play/pause
+
+  try BT button controller
+
+  try USB keypad
+
+  try small LCD display
+    https://www.adafruit.com/product/3531
+    https://learn.adafruit.com/adafruit-128x64-oled-bonnet-for-raspberry-pi/usage
+    https://github.com/zeiv/SSD1306-ruby
+
+
+--- integrate into van
+
+  hookup to USB DAC
+
+  provide power:
+    initial: power bank
+    later:   power controller/RTC
+
+  hook charger up to ignition?
+
+  use Witty power controller/RTC
+    https://www.adafruit.com/product/5704
+    https://github.com/uugear/Witty-Pi-4
+
+  or power down after idle (certain time after pause)
+
+  pause/play on ignition
+    relay -> GPIO
+
+  mount in dash
+
+
+--- update catalog
+
+  find truncated tracks
+    check metadata duration against audio duration
+
+  add new music (Music/music to add)
+
+  rip new CDs
+
+  re-rip missing/lost/bad CDs
+    Bill Nelson (all)
+    This Mortal Coil
+
+  re-sync
+
+
+---
+
 - improve 'check'
   - detect albums that aren't in catalog
   - detect missing cover

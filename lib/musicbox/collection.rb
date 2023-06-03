@@ -11,7 +11,7 @@ class MusicBox
     include SetParams
 
     def initialize(params={})
-      set(params)
+      super
       raise Error, "root_dir not specified" unless @root_dir
       raise Error, "root_dir #{@root_dir.to_s.inspect} doesn't exist" unless @root_dir.exist?
       @albums_dir = @root_dir / 'albums'

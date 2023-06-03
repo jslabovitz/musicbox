@@ -7,7 +7,7 @@ class MusicBox
       attr_accessor :personal
 
       def run(args)
-        $musicbox.find_artists(args).each do |artist|
+        @musicbox.find_artists(args).each do |artist|
           next if @personal == true && !artist.personal?
           next if @personal == false && artist.personal?
           puts artist.summary

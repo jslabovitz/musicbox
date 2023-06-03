@@ -32,16 +32,16 @@ class MusicBox
 
     def make_queue
       ignore_paths = [
-        $musicbox.import_dir,
-        $musicbox.import_done_dir,
-        $musicbox.discogs_dir,
-        $musicbox.playlists_dir,
-        $musicbox.listens_dir,
-        $musicbox.equalizers_dir,
+        @musicbox.import_dir,
+        @musicbox.archive_dir,
+        @musicbox.discogs_dir,
+        @musicbox.playlists_dir,
+        @musicbox.listens_dir,
+        @musicbox.equalizers_dir,
       ]
       queue = Queue.new
-      $musicbox.root_dir.find do |src|
-        dst = @dest_dir / src.relative_to($musicbox.root_dir)
+      @musicbox.root_dir.find do |src|
+        dst = @dest_dir / src.relative_to(@musicbox.root_dir)
         Find.prune if ignore_paths.include?(src) || src.hidden?
         if src.file? && (@force || !dst.exist? || dst.mtime != src.mtime)
           queue.push([
@@ -73,7 +73,7 @@ class MusicBox
       def compress_file(src, dst)
         puts '%-15s %s' % ['COMPRESSING', src]
         dst.dirname.mkpath
-        tags = Tags.load(src)
+        tags = MP4Tags.load(src)
         tmp = dst.add_extension('.tmp')
         intermediate = dst.replace_extension('.caf')
         begin

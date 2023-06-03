@@ -7,7 +7,7 @@ class MusicBox
       attr_accessor :details
 
       def run(args)
-        $musicbox.find_releases(args).each do |release|
+        @musicbox.find_releases(args).each do |release|
           if @details
             release.print
             puts

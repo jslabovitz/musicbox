@@ -2,10 +2,10 @@ class MusicBox
 
   module Commands
 
-    class Update < SimpleCommand::Command
+    class UpdateDiscogs < SimpleCommand::Command
 
       def run(args)
-        $musicbox.update_discogs
+        @musicbox.update_discogs
       end
 
     end

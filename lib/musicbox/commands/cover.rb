@@ -13,7 +13,7 @@ class MusicBox
       end
 
       def run(args)
-        albums = $musicbox.find_albums(args).select(&:has_cover?)
+        albums = @musicbox.find_albums(args).select(&:has_cover?)
         raise Error, "No matching albums" if albums.empty?
         CoverMaker.make_covers(albums.map(&:cover_file),
           output_file: output_file,

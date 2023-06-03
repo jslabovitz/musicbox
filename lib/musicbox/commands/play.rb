@@ -29,8 +29,13 @@ class MusicBox
       attr_accessor :ignore_state
 
       def run(args)
+        @playlists_dir = @musicbox.root_dir / 'playlists'
+        @listens_dir = @musicbox.root_dir / 'listens'
+        @playlists = Playlists.new(root: @playlists_dir)
+        @listens = Listens.new(root: @listens_dir)
+
         if @eq
-          @equalizers = Equalizer.load_equalizers(dir: $musicbox.equalizers_dir, name: @eq)
+          @equalizers = Equalizer.load_equalizers(dir: @musicbox.equalizers_dir, name: @eq)
           @equalizer_enabled = !@equalizers.empty?
         else
           @equalizers = []
@@ -48,38 +53,7 @@ class MusicBox
 
         @dispatcher = IO::Dispatcher.new
         setup_interface
-        @player = Player.new(
-          audio_device: @audio_device,
-          audio_exclusive: @audio_exclusive,
-          mpv_log_level: @mpv_log_level,
-          ignore_state: @ignore_state,
-          dispatcher: @dispatcher)
-        @player.on_state_change do |state|
-          puts "STATE: #{state}"
-        end
-        @player.on_volume_change do |value|
-          puts "VOLUME: #{value}"
-        end
-        @player.on_playlist_pos_change do |value|
-          if @playlist
-            @playlist.track_pos = value
-            @playlist.save
-            show_track_change(@playlist.current_track)
-          end
-        end
-        @player.on_time_pos_change do |time_pos|
-          if @playlist
-            @playlist.time_pos = time_pos
-            # @playlist.save if @playlist.age > 10
-            save_listen if time_pos && time_pos >= 4*60
-          end
-        end
-        @player.on_percent_pos_change do |percent|
-          if @playlist
-            save_listen if percent && percent >= 50
-          end
-        end
-        next_equalizer
+        setup_player
         @dispatcher.run
       end
 
@@ -148,9 +122,44 @@ class MusicBox
         command.to_s.gsub('_', ' ')
       end
 
+      def setup_player
+        @player = Player.new(
+          audio_device: @audio_device,
+          audio_exclusive: @audio_exclusive,
+          mpv_log_level: @mpv_log_level,
+          ignore_state: @ignore_state,
+          dispatcher: @dispatcher)
+        @player.on_state_change do |state|
+          puts "STATE: #{state}"
+        end
+        @player.on_volume_change do |value|
+          puts "VOLUME: #{value}"
+        end
+        @player.on_playlist_pos_change do |value|
+          if @playlist
+            @playlist.track_pos = value
+            @playlist.save
+            show_track_change(@playlist.current_track)
+          end
+        end
+        @player.on_time_pos_change do |time_pos|
+          if @playlist
+            @playlist.time_pos = time_pos
+            # @playlist.save if @playlist.age > 10
+            save_listen if time_pos && time_pos >= 4*60
+          end
+        end
+        @player.on_percent_pos_change do |percent|
+          if @playlist
+            save_listen if percent && percent >= 50
+          end
+        end
+        next_equalizer
+      end
+
       def play(playlist)
         @playlist = playlist
-        $musicbox.playlists << @playlist
+        @playlists << @playlist
         @playlist.save
         @player.start(@playlist.paths)
       end
@@ -181,11 +190,7 @@ class MusicBox
       def show_track_info(track)
         system('clear')
         if track.album.has_cover?
-          MusicBox.show_image(
-            file: track.album.cover_file,
-            width: 'auto',
-            height: 20,
-            preserve_aspect_ratio: false)
+          puts ITerm.show_image_file(track.album.cover_file, width: 'auto', height: 20)
           puts
         end
         Simple::Printer.print(
@@ -220,7 +225,7 @@ class MusicBox
             track_num: track.track_num,
             track_disc: track.disc_num,
           )
-          $musicbox.listens << listen
+          @listens << listen
           listen.save
           track.listen_saved = true
           warn "[saved listen]"
@@ -233,13 +238,13 @@ class MusicBox
 
       def play_random_album
         play(Playlist.playlist_for_random_album(
-          collection: $musicbox.collection,
+          collection: @musicbox.collection,
           id: 'temp'))
       end
 
       def play_random_tracks
         play(Playlist.playlist_for_random_tracks(
-          collection: $musicbox.collection,
+          collection: @musicbox.collection,
           id: 'temp',
           number: 10))
       end
@@ -248,7 +253,7 @@ class MusicBox
         raise Error, "No current playlist" unless @playlist
         album = @playlist.current_track&.album or raise Error, "No current album"
         play(Playlist.playlist_for_album(
-          collection: $musicbox.collection,
+          collection: @musicbox.collection,
           id: 'temp',
           album: album))
       end

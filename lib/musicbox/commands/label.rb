@@ -13,7 +13,7 @@ class MusicBox
       end
 
       def run(args)
-        LabelMaker.make_labels($musicbox.find_albums(args),
+        LabelMaker.make_labels(@musicbox.find_albums(args),
           output_file: @output_file,
           open: true)
       end

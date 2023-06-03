@@ -48,25 +48,8 @@ class MusicBox
         @album.dir / @file
       end
 
-      def update_cover(cover_path)
-        # --replace apparently doesn't work, so must do --remove, then --add
-        begin
-          run_command('mp4art',
-            '--quiet',
-            '--remove',
-            path)
-        rescue RunCommandFailed => _
-          # ignore
-        end
-        run_command('mp4art',
-          '--quiet',
-          '--add',
-          cover_path,
-          path)
-      end
-
       def update_tags
-        tags = Tags.load(path)
+        tags = MP4Tags.load(path)
         tags.update(
           {
             title: @title,

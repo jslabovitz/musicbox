@@ -1,10 +1,8 @@
 #encoding: utf-8
 
-require_relative 'lib/musicbox/version'
-
 Gem::Specification.new do |s|
   s.name          = 'musicbox'
-  s.version       = MusicBox::VERSION
+  s.version       = '0.1'
   s.author        = 'John Labovitz'
   s.email         = 'johnl@johnlabovitz.com'
 
@@ -18,18 +16,18 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
   s.require_path  = 'lib'
 
-  s.add_dependency 'discogs-wrapper', '~> 2.5'
-  s.add_dependency 'http', '~> 5.1'
+  s.add_dependency 'discogs-collection', '~> 0.1'
   s.add_dependency 'io-dispatcher', '~> 0.5'
-  s.add_dependency 'json', '~> 2.6'
-  s.add_dependency 'matrix'   # for prawn
+  s.add_dependency 'iterm-show-image-file', '~> 0.1'
   s.add_dependency 'mime-types', '~> 3.4'
+  s.add_dependency 'matrix'   # for prawn
+  s.add_dependency 'mp4tags', '~> 0.1'
   s.add_dependency 'mpv_client', '~> 0.2'
   s.add_dependency 'path', '~> 2.1'
   s.add_dependency 'prawn', '~> 2.4'
   s.add_dependency 'run-command', '~> 0.4'
   s.add_dependency 'set_params', '~> 0.2'
-  s.add_dependency 'simple-command', '~> 0.4'
+  s.add_dependency 'simple-command', '~> 0.5'
   s.add_dependency 'simple-group', '~> 0.2'
   s.add_dependency 'simple-printer', '~> 0.1'
   s.add_dependency 'sixarm_ruby_unaccent', '~> 1.2'
