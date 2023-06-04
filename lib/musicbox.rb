@@ -1,3 +1,4 @@
+require 'autoeq_loader'
 require 'discogs-collection'
 require 'io-dispatcher'
 require 'iterm-show-image-file'
@@ -29,7 +30,6 @@ require 'musicbox/collection/artists'
 require 'musicbox/collection/track'
 
 require 'musicbox/player'
-require 'musicbox/player/equalizer'
 require 'musicbox/player/listens'
 require 'musicbox/player/listen'
 require 'musicbox/player/playlist'

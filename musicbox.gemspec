@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
   s.require_path  = 'lib'
 
+  s.add_dependency 'autoeq_loader', '~> 0.1'
   s.add_dependency 'discogs-collection', '~> 0.1'
   s.add_dependency 'io-dispatcher', '~> 0.5'
   s.add_dependency 'iterm-show-image-file', '~> 0.1'

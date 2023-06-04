@@ -34,8 +34,9 @@ class MusicBox
         @playlists = Player::Playlists.new(root: @playlists_dir)
         @listens = Player::Listens.new(root: @listens_dir)
 
-        if @eq && @musicbox.equalizers_dir&.exist?
-          @equalizers = Equalizer.load_equalizers(dir: @musicbox.equalizers_dir, name: @eq)
+        if @eq && @musicbox.equalizers_dir
+          equalizers = AutoEQLoader.load_equalizers(@musicbox.equalizers_dir)
+          @equalizers = equalizers.select { |e| e.name =~ /#{Regexp.quote(@eq)}/i }
           @equalizer_enabled = !@equalizers.empty?
         else
           @equalizers = []
@@ -205,7 +206,7 @@ class MusicBox
 
       def set_equalizer
         if @equalizer
-          @player.set_audio_filter(@equalizer.to_af(@equalizer_enabled))
+          @player.set_audio_filter(@equalizer.to_s(@equalizer_enabled))
           puts "equalizer: %s <%s>" % [
             @equalizer&.name || 'none',
             @equalizer_enabled ? 'enabled' : 'disabled',
