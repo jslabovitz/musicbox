@@ -1,9 +1,13 @@
 class MusicBox
 
-  class Playlists < Simple::Group
+  class Player
 
-    def self.item_class
-      Playlist
+    class Playlists < Simple::Group
+
+      def self.item_class
+        Playlist
+      end
+
     end
 
   end

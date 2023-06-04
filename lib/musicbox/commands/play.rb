@@ -31,8 +31,8 @@ class MusicBox
       def run(args)
         @playlists_dir = @musicbox.root_dir / 'playlists'
         @listens_dir = @musicbox.root_dir / 'listens'
-        @playlists = Playlists.new(root: @playlists_dir)
-        @listens = Listens.new(root: @listens_dir)
+        @playlists = Player::Playlists.new(root: @playlists_dir)
+        @listens = Player::Listens.new(root: @listens_dir)
 
         if @eq && @musicbox.equalizers_dir&.exist?
           @equalizers = Equalizer.load_equalizers(dir: @musicbox.equalizers_dir, name: @eq)
@@ -215,7 +215,7 @@ class MusicBox
 
       def save_listen
         if (track = @playlist.current_track) && !track.listen_saved
-          listen = Listen.new(
+          listen = Player::Listen.new(
             id: track.listened_at.to_i,
             listened_at: track.listened_at,
             artist_name: track.artist_name,
@@ -237,13 +237,13 @@ class MusicBox
       #
 
       def play_random_album
-        play(Playlist.playlist_for_random_album(
+        play(Player::Playlist.playlist_for_random_album(
           collection: @musicbox.collection,
           id: 'temp'))
       end
 
       def play_random_tracks
-        play(Playlist.playlist_for_random_tracks(
+        play(Player::Playlist.playlist_for_random_tracks(
           collection: @musicbox.collection,
           id: 'temp',
           number: 10))
@@ -252,7 +252,7 @@ class MusicBox
       def play_album_for_current_track
         raise Error, "No current playlist" unless @playlist
         album = @playlist.current_track&.album or raise Error, "No current album"
-        play(Playlist.playlist_for_album(
+        play(Player::Playlist.playlist_for_album(
           collection: @musicbox.collection,
           id: 'temp',
           album: album))
