@@ -44,12 +44,20 @@ class MusicBox
         )
       end
 
-      def paths
-        @tracks.map(&:path)
-      end
-
       def current_track
         @track_pos && @tracks[@track_pos]
+      end
+
+      def next_track
+        @track_pos && @tracks[@track_pos + 1]
+      end
+
+      def previous_track
+        @track_pos && @track_pos > 0 && @tracks[@track_pos - 1]
+      end
+
+      def write_m3u8(path)
+        File.write(path, @tracks.map(&:path).join("\n"))
       end
 
     end

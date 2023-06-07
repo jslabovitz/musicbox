@@ -30,6 +30,7 @@ require 'musicbox/collection/artists'
 require 'musicbox/collection/track'
 
 require 'musicbox/player'
+require 'musicbox/player/players/console'
 require 'musicbox/player/listens'
 require 'musicbox/player/listen'
 require 'musicbox/player/playlist'
@@ -62,6 +63,8 @@ class MusicBox
   attr_accessor :import_dir
   attr_accessor :archive_dir
   attr_accessor :discogs_dir
+  attr_accessor :playlists_dir
+  attr_accessor :listens_dir
   attr_accessor :collection_dir
   attr_accessor :collection
 
@@ -70,6 +73,8 @@ class MusicBox
     @import_dir = @root_dir / 'import'
     @archive_dir = @root_dir / 'import-done'
     @discogs_dir = @root_dir / 'discogs'
+    @playlists_dir = @root_dir / 'playlists'
+    @listens_dir = @root_dir / 'listens'
     @collection_dir = @root_dir / 'collection'
     @collection = Collection.new(root_dir: @collection_dir)
   end
