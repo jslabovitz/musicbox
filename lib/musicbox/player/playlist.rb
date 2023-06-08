@@ -5,7 +5,7 @@ class MusicBox
     class Playlist < Simple::Group::Item
 
       attr_accessor :tracks
-      attr_accessor :track_pos
+      attr_accessor :pos
       attr_accessor :time_pos
 
       include Simple::Printer::Printable
@@ -27,7 +27,7 @@ class MusicBox
       end
 
       def initialize(**params)
-        @track_pos = @time_pos = nil
+        @pos = @time_pos = nil
         @tracks = []
         super
       end
@@ -39,21 +39,21 @@ class MusicBox
       def to_h
         super.merge(
           tracks: @tracks.map(&:to_h),
-          track_pos: @track_pos,
+          pos: @pos,
           time_pos: @time_pos,
         )
       end
 
       def current_track
-        @track_pos && @tracks[@track_pos]
+        @pos && @tracks[@pos]
       end
 
       def next_track
-        @track_pos && @tracks[@track_pos + 1]
+        @pos && @tracks[@pos + 1]
       end
 
       def previous_track
-        @track_pos && @track_pos > 0 && @tracks[@track_pos - 1]
+        @pos && @pos > 0 && @tracks[@pos - 1]
       end
 
       def write_m3u8(path)

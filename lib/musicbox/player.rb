@@ -85,7 +85,7 @@ class MusicBox
         # ;;warn "PROPERTY: #{name} => #{value.inspect}"
         @playlist_pos = (value >= 0) ? value : nil
         if @playlist
-          @playlist.track_pos = @playlist_pos
+          @playlist.pos = @playlist_pos
           @playlist.save
           if (track = @playlist.current_track)
             track.listened_at = Time.now
@@ -179,7 +179,7 @@ class MusicBox
       @playlist.save
       m3u8_file = @playlist.dir / 'list.m3u8'
       @playlist.write_m3u8(m3u8_file)
-      @future_playlist_pos = (@playlist.track_pos && @playlist.track_pos >= 0) ? @playlist.track_pos : nil
+      @future_playlist_pos = (@playlist.pos && @playlist.pos >= 0) ? @playlist.pos : nil
       @future_time_pos = (@playlist.time_pos && @playlist.time_pos > 0) ? @playlist.time_pos : nil
       @mpv.command('loadlist', m3u8_file.to_s)
     end
