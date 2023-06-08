@@ -24,6 +24,7 @@ class MusicBox
 
       def initialize(**params)
         super
+        @osascript_bin = Path.which('osascript')
       end
 
       def setup_interface
@@ -116,13 +117,11 @@ class MusicBox
       ## end of command callbacks
 
       def display_notification(title:, subtitle:, message:)
-        script = <<~END
-          display notification "#{message}" with title "#{title}" subtitle "#{subtitle}"
-        END
-        begin
-          run_command('osascript', input: script)
-        rescue => e
-          warn "Couldn't show notification: #{e}"
+        if @osascript_bin
+          script = <<~END
+            display notification "#{message}" with title "#{title}" subtitle "#{subtitle}"
+          END
+          run_command(@osascript_bin, input: script)
         end
       end
 
