@@ -2,8 +2,6 @@
 
 --- musicbox setup
 
-  install musicbox-player on Pi
-
   run player on boot
 
   do image backup
@@ -29,12 +27,6 @@
 
 
 --- integrate into van
-
-  hookup to USB DAC
-
-  provide power:
-    initial: power bank
-    later:   power controller/RTC
 
   hook charger up to ignition?
 
