@@ -1,17 +1,6 @@
 # TODO
 
-*** bring everything back into one gem
-
-  - possibly move out Discogs logic?
-
-
 --- musicbox setup
-
-  create abbreviated catalog when syncing
-
-  build musicbox-player that reads from abbreviated catalog
-
-  re-sync Music/Media folder -> USB
 
   install musicbox-player on Pi
 
@@ -90,8 +79,6 @@
   - delete :artist_name if == album.artist_name
 
 - reimplement playlist restoration & checkpointing
-
-- make MusicBox.config instance method instead of class method
 
 - implement add/remove from [default] playlist
 
