@@ -204,7 +204,8 @@ class MusicBox
     end
 
     def play_album_for_current_track
-      album = @playlist&.current_track&.album or raise Error, "No current album"
+      track = @playlist&.current_track or raise RangeError, 'No current track'
+      album = track.album or raise Error, 'No current album'
       play(Playlist.playlist_for_album(
         collection: @musicbox.collection,
         id: 'temp',
