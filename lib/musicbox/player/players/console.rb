@@ -126,32 +126,42 @@ class MusicBox
         end
       end
 
+      def show_info
+        system('clear')
+        if @playlist
+          if (track = @playlist&.current_track)
+            display_notification(
+              title: 'MusicBox',
+              subtitle: track.artist_name,
+              message: '%s (%s)' % [track.title, track.album.title])
+            if track.album.has_cover?
+              puts ITerm.show_image_file(track.album.cover_file, width: 'auto', height: 20)
+              puts
+            end
+            Simple::Printer.print(
+              ['Track', [track.track_num, track.album.tracks.count].join('/')],
+              ['Title', track.title],
+              ['Album', track.album.title],
+              ['Artist', track.artist_name],
+            )
+            puts
+          end
+          show_playlist
+        else
+          puts 'no playlist'
+        end
+      end
+
       #
       # status-changed methods
       #
 
+      def playlist_changed
+        show_info
+      end
+
       def playlist_pos_changed
-        if (track = @playlist&.current_track)
-          display_notification(
-            title: 'MusicBox',
-            subtitle: track.artist_name,
-            message: '%s (%s)' % [track.title, track.album.title])
-          system('clear')
-          if track.album.has_cover?
-            puts ITerm.show_image_file(track.album.cover_file, width: 'auto', height: 20)
-            puts
-          end
-          Simple::Printer.print(
-            ['Track', [track.track_num, track.album.tracks.count].join('/')],
-            ['Title', track.title],
-            ['Album', track.album.title],
-            ['Artist', track.artist_name],
-          )
-          puts
-          show_playlist
-        else
-          puts 'no current track playing'
-        end
+        show_info
       end
 
       def state_changed

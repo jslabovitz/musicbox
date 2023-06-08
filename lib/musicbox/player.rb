@@ -182,6 +182,7 @@ class MusicBox
       @future_playlist_pos = (@playlist.pos && @playlist.pos >= 0) ? @playlist.pos : nil
       @future_time_pos = (@playlist.time_pos && @playlist.time_pos > 0) ? @playlist.time_pos : nil
       @mpv.command('loadlist', m3u8_file.to_s)
+      playlist_changed
     end
 
     def stop
@@ -299,6 +300,9 @@ class MusicBox
     #
     # status-changed (to override in subclass)
     #
+
+    def playlist_changed
+    end
 
     def playlist_pos_changed
     end
