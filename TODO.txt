@@ -1,45 +1,43 @@
 # TODO
 
---- musicbox setup
+--- rPi musicbox setup
+
+  rebuild to use root for everything?
 
   run player on boot
 
   do image backup
     to spare microSD card
 
+  interface:
+    buttons needed:
+      play random track
+      play random album
+      play album for current track
+      play/pause
 
---- interface
+    try BT button controller
 
-  buttons needed:
-    play random track
-    play random album
-    play album for current track
-    play/pause
+    try USB keypad
 
-  try BT button controller
+    try small LCD display
+      https://www.adafruit.com/product/3531
+      https://learn.adafruit.com/adafruit-128x64-oled-bonnet-for-raspberry-pi/usage
+      https://github.com/zeiv/SSD1306-ruby
 
-  try USB keypad
+  power:
+    hook charger up to ignition?
 
-  try small LCD display
-    https://www.adafruit.com/product/3531
-    https://learn.adafruit.com/adafruit-128x64-oled-bonnet-for-raspberry-pi/usage
-    https://github.com/zeiv/SSD1306-ruby
+    use Witty power controller/RTC
+      https://www.adafruit.com/product/5704
+      https://github.com/uugear/Witty-Pi-4
 
+    or power down after idle (certain time after pause)
 
---- integrate into van
+    pause/play on ignition
+      relay -> GPIO
 
-  hook charger up to ignition?
-
-  use Witty power controller/RTC
-    https://www.adafruit.com/product/5704
-    https://github.com/uugear/Witty-Pi-4
-
-  or power down after idle (certain time after pause)
-
-  pause/play on ignition
-    relay -> GPIO
-
-  mount in dash
+    mount in dash
 
 
 --- update catalog
