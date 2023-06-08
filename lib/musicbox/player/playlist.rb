@@ -27,8 +27,8 @@ class MusicBox
       end
 
       def initialize(**params)
-        @pos = @time_pos = nil
         @tracks = []
+        @pos = @time_pos = 0
         super
       end
 
