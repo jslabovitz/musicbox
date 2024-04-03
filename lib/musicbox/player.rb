@@ -43,6 +43,8 @@ class MusicBox
 
     def setup_mpv
       @mpv = MPVClient.new(
+        'no-terminal' => '',
+        'idle' => 'yes',
         'msg-level' => "all=#{@mpv_log_level}",
         'audio-device' => @audio_device,
         'audio-exclusive' => @audio_exclusive ? 'yes' : 'no',
