@@ -76,7 +76,7 @@ class MusicBox
       def update_tags
         @tracks.each do |track|
           track.update_tags
-          MP4Tags.update_cover(cover_file) if has_cover?
+          MP4Tags.update_image(mp4_file: track.path, image_file: cover_file) if has_cover?
         end
       end
 

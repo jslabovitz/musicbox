@@ -5,7 +5,8 @@ class MusicBox
     class UpdateDiscogs < SimpleCommand::Command
 
       def run(args)
-        @musicbox.update_discogs
+        importer = Importer.new(musicbox: @musicbox)
+        importer.update_discogs
       end
 
     end

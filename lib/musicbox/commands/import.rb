@@ -5,7 +5,7 @@ class MusicBox
     class Import < SimpleCommand::Command
 
       def run(args)
-        importer = Importer.new(musicbox: musicbox)
+        importer = Importer.new(musicbox: @musicbox)
         if args.empty?
           return unless @musicbox.import_dir.exist?
           dirs = @musicbox.import_dir.children.select(&:dir?).sort_by { |d| d.to_s.downcase }
@@ -14,7 +14,7 @@ class MusicBox
         end
         dirs.each do |dir|
           begin
-            importer.import_dir(dir)
+            importer.import(dir)
           rescue Error => e
             warn "Error: #{e}"
           end

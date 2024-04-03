@@ -67,12 +67,12 @@ class MusicBox
       raise Error, "Directory #{dir.to_s.inspect} does not exist" unless dir.exist?
       query = '%' + dir.basename.to_s
       puts "Finding: #{query.inspect}"
-      releases = @musicbox.find_releases(query)
+      releases = find_releases(query)
       release = @prompt.select('Item?', releases, filter: true, per_page: 25, quiet: true)
       release.print
       artist = make_artist(release: release)
       album, disc = make_album(release: release, artist: artist)
-      copy_plan = make_tracks(album: album, disc: disc, release: release, dir: dir)
+      copy_plan = make_tracks(album: album, disc: disc, release: release, source_dir: dir)
       return unless @prompt.yes?('Add?')
       @musicbox.collection.albums.save_item(album)
       copy_plan.each do |source_file, dest_file|
@@ -83,15 +83,15 @@ class MusicBox
       MP4Tags.extract_image(mp4_file: album.tracks.first.path)
       select_cover(album: album, release: release)
       album.update_tags
-      @prompt.yes?('Make label?') && Printer::LabelMaker.make_album_label(album)
-      @prompt.yes?('Make cover?') && Printer::CoverMaker.make_album_cover(album)
+      @prompt.yes?('Make label?') && Printer::LabelMaker.make_label(album)
+      @prompt.yes?('Make cover?') && Printer::CoverMaker.make_cover(album)
     end
 
     def make_artist(release:)
       discogs_name = release.artist
       name = @musicbox.canonical_names[discogs_name] || discogs_name
       name.sub!(/\s\(\d+\)/, '')  # handle 'Nico (3)'
-      if @muscibox.personal_names.include?(name)
+      if @musicbox.personal_names.include?(name)
         elems = name.split(/\s+/)
         name = [elems[-1], elems[0..-2].join(' ')].join(', ')
         personal = true
@@ -172,7 +172,7 @@ class MusicBox
       release_track = tags[:title] ? release.find_track_for_title(tags[:title]) : nil
       unless release_track
         puts "Can't find release track with title #{tags[:title].inspect}"
-        choices = release.tracklist.all_tracks.to_h { |t| [t.title, t] }
+        choices = release.tracklist.map { |t| [t.title, t] }.to_h
         release_track = @prompt.select('Track?', choices, per_page: 50)
       end
       name = '%s%02d - %s' % [
