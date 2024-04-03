@@ -51,7 +51,8 @@ class MusicBox
         'replaygain' => @replay_gain,
         'audio-display' => 'no',
         'vo' => 'null',
-        'volume' => @volume)
+        'volume' => @volume,
+      )
       @dispatcher = IO::Dispatcher.new
       @dispatcher.add_io_handler(input: @mpv.socket) { |io| @mpv.process_response }
       @dispatcher.add_io_handler(exception: @mpv.socket) { |io| raise Error, "Exception on #{io}" }
