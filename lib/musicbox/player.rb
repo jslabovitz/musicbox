@@ -6,6 +6,7 @@ class MusicBox
 
     attr_accessor :musicbox
     attr_accessor :equalizers_dir
+    attr_accessor :eq
     attr_accessor :audio_device
     attr_accessor :audio_exclusive
     attr_accessor :mpv_log_level
