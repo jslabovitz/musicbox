@@ -5,7 +5,7 @@ require 'musicbox'
 
 class MusicBox
 
-  class Test < MiniTest::Test
+  class Test < Minitest::Test
 
     def setup
       @musicbox = MusicBox.new
