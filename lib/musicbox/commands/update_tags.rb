@@ -2,9 +2,10 @@ class MusicBox
 
   module Commands
 
-    class UpdateTags < SimpleCommand::Command
+    class UpdateTags < Command
 
       def run(args)
+        super
         @musicbox.find_albums(args).each do |album|
           puts album
           album.update_tags

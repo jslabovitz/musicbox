@@ -2,7 +2,7 @@ class MusicBox
 
   module Commands
 
-    class Export < SimpleCommand::Command
+    class Export < Command
 
       attr_accessor :dest_dir
       attr_accessor :compress
@@ -18,6 +18,7 @@ class MusicBox
       end
 
       def run(args)
+        super
         raise Error, "Must specify destination directory" unless @dest_dir
         exporter = Exporter.new(
           dest_dir: @dest_dir,

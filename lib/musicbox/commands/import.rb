@@ -2,9 +2,10 @@ class MusicBox
 
   module Commands
 
-    class Import < SimpleCommand::Command
+    class Import < Command
 
       def run(args)
+        super
         importer = Importer.new(musicbox: @musicbox)
         if args.empty?
           return unless @musicbox.import_dir.exist?

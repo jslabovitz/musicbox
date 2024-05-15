@@ -2,7 +2,7 @@ class MusicBox
 
   module Commands
 
-    class Play < SimpleCommand::Command
+    class Play < Command
 
       attr_accessor :audio_device
       attr_accessor :audio_exclusive
@@ -11,6 +11,7 @@ class MusicBox
       attr_accessor :ignore_state
 
       def run(args)
+        super
         Player::ConsolePlayer.new(
           musicbox: @musicbox,
           audio_device: @audio_device,

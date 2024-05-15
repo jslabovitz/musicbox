@@ -2,7 +2,7 @@ class MusicBox
 
   module Commands
 
-    class Label < SimpleCommand::Command
+    class Label < Command
 
       attr_accessor :output_file
 
@@ -13,6 +13,7 @@ class MusicBox
       end
 
       def run(args)
+        super
         LabelMaker.make_labels(@musicbox.find_albums(args),
           output_file: @output_file,
           open: true)

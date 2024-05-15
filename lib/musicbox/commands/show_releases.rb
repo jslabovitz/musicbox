@@ -2,11 +2,12 @@ class MusicBox
 
   module Commands
 
-    class ShowReleases < SimpleCommand::Command
+    class ShowReleases < Command
 
       attr_accessor :details
 
       def run(args)
+        super
         importer = Importer.new(musicbox: @musicbox)
         importer.find_releases(args).each do |release|
           if @details

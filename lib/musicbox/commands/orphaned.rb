@@ -2,9 +2,10 @@ class MusicBox
 
   module Commands
 
-    class Orphaned < SimpleCommand::Command
+    class Orphaned < Command
 
       def run(args)
+        super
         @musicbox.orphaned
       end
 

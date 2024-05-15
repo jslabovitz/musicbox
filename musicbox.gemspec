@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'prawn', '~> 2.5'
   s.add_dependency 'run-command', '~> 0.6'
   s.add_dependency 'set_params', '~> 0.2'
-  s.add_dependency 'simple-command', '~> 0.7'
+  s.add_dependency 'simple-command-parser', '~> 1.0'
   s.add_dependency 'simple-group', '~> 0.2'
   s.add_dependency 'simple-printer', '~> 0.3'
   s.add_dependency 'sixarm_ruby_unaccent', '~> 1.2'

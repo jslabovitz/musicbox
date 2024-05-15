@@ -2,9 +2,10 @@ class MusicBox
 
   module Commands
 
-    class Check < SimpleCommand::Command
+    class Check < Command
 
       def run(args)
+        super
         @musicbox.find_albums(args).each do |album|
           album.check
         end

@@ -2,9 +2,10 @@ class MusicBox
 
   module Commands
 
-    class Fix < SimpleCommand::Command
+    class Fix < Command
 
       def run(args)
+        super
       end
 
     end

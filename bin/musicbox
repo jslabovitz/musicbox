@@ -2,5 +2,4 @@
 
 require 'musicbox'
 
-SimpleCommand::Commander.new.run(ARGV,
-  musicbox: MusicBox.new)
+Simple::CommandParser.run(ARGV)

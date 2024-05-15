@@ -2,12 +2,13 @@ class MusicBox
 
   module Commands
 
-    class ShowAlbums < SimpleCommand::Command
+    class ShowAlbums < Command
 
       attr_accessor :cover
       attr_accessor :details
 
       def run(args)
+        super
         @musicbox.find_albums(args).sort.each do |album|
           if @cover
             if album.has_cover?
