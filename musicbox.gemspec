@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'discogs-collection', '~> 0.1'
   s.add_dependency 'io-dispatcher', '~> 0.6'
   s.add_dependency 'iterm-show-image-file', '~> 0.1'
+  s.add_dependency 'logger', '~> 1.6'
   s.add_dependency 'mime-types', '~> 3.5'
   s.add_dependency 'mp4tags', '~> 0.1'
   s.add_dependency 'mpv_client', '~> 0.3'
