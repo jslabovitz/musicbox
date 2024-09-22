@@ -57,6 +57,7 @@ require 'musicbox/commands/save_albums'
 require 'musicbox/commands/show_albums'
 require 'musicbox/commands/show_artists'
 require 'musicbox/commands/show_releases'
+require 'musicbox/commands/stats'
 require 'musicbox/commands/update_discogs'
 require 'musicbox/commands/update_tags'
 
