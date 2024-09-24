@@ -12,7 +12,15 @@ class MusicBox
 
       def run(args)
         super
+        if args.empty?
+          album = nil
+        else
+          albums = @musicbox.find_albums(args)
+          warn "only playing first found album!" if albums.count > 1
+          album = albums.sort.first
+        end
         Player::ConsolePlayer.new(
+          album: album,
           musicbox: @musicbox,
           audio_device: @audio_device,
           audio_exclusive: @audio_exclusive,

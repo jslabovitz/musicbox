@@ -13,6 +13,7 @@ class MusicBox
     attr_accessor :seek_seconds
     attr_accessor :volume
     attr_accessor :replay_gain
+    attr_accessor :album
 
     include SetParams
 
@@ -38,8 +39,12 @@ class MusicBox
       setup_interface
       next_equalizer
       set_state(:ready)
-      # restore_state
-      ;;play_random_tracks
+      if @album
+        play_selected_album
+      else
+        # restore_state
+        play_random_tracks
+      end
     end
 
     def setup_mpv
@@ -193,6 +198,13 @@ class MusicBox
       @playlist = nil
       @mpv.command('stop')
       set_state(:stopped)
+    end
+
+    def play_selected_album
+      play(Playlist.playlist_for_album(
+        collection: @musicbox.collection,
+        id: 'temp',
+        album: @album))
     end
 
     def play_random_album
