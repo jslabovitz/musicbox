@@ -67,8 +67,9 @@ class MusicBox
       raise Error, "Directory #{dir.to_s.inspect} does not exist" unless dir.exist?
       query = '%' + dir.basename.to_s
       puts "Finding: #{query.inspect}"
-      releases = find_releases(query)
+      releases = ['SKIP'] + find_releases(query)
       release = @prompt.select('Item?', releases, filter: true, per_page: 25, quiet: true)
+      return if release.nil? || release == 'SKIP'
       release.print
       artist = make_artist(release: release)
       album, disc = make_album(release: release, artist: artist)
